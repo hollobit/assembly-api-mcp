@@ -279,7 +279,7 @@ claude mcp add assembly-api -- node /absolute/path/to/assembly-api-mcp/dist/inde
 
 - "현재 국회의원 목록을 보여줘"
 - "교육 관련 의안을 검색해줘"
-- "고민정 의원의 의정활동을 분석해줘"
+- "이해민 의원의 의정활동을 분석해줘"
 - "최근 본회의에서 처리된 법안은?"
 - "제22대 국회 위원회 목록을 알려줘"
 - "현재 계류 중인 청원 목록을 보여줘"
@@ -296,7 +296,7 @@ npx tsx src/cli.ts members --party 국민의힘 --size 5
 npx tsx src/cli.ts bills --name 부동산
 
 # 의원 의정활동
-npx tsx src/cli.ts activity --name 고민정
+npx tsx src/cli.ts activity --name 이해민
 
 # 계류의안
 npx tsx src/cli.ts pending --size 10
