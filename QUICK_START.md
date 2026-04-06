@@ -4,7 +4,30 @@
 
 ---
 
-## 1단계: API 키 발급 (2분)
+## 사전 조건
+
+- **Node.js 18 이상** — [nodejs.org](https://nodejs.org)에서 설치
+  - macOS: `brew install node` 또는 공식 설치 파일
+  - Windows: 공식 설치 파일 또는 `winget install OpenJS.NodeJS.LTS`
+  - Linux: `sudo apt install nodejs npm` 또는 [NodeSource](https://github.com/nodesource/distributions)
+
+> 설치 확인: `node --version` (v18 이상이면 OK)
+
+---
+
+## 자동 설치 (가장 빠른 방법)
+
+```bash
+npx assembly-api-mcp setup
+```
+
+대화형 마법사가 API 키 입력 → 프로필 선택 → AI 클라이언트 설정을 한 번에 처리합니다. 아래의 수동 설치 단계를 건너뛸 수 있습니다.
+
+---
+
+## 수동 설치
+
+### 1단계: API 키 발급 (2분)
 
 1. [열린국회정보](https://open.assembly.go.kr) 접속
 2. **회원가입** (무료, 즉시 완료)

@@ -16,13 +16,21 @@ Claude, ChatGPT 등 AI 도구에서 국회의원, 의안, 일정, 회의록, 위
 
 ## 빠른 시작
 
+### 사전 조건
+
+- **Node.js 18 이상** — [nodejs.org](https://nodejs.org)에서 설치
+  - macOS: `brew install node` 또는 공식 설치 파일
+  - Windows: 공식 설치 파일 또는 `winget install OpenJS.NodeJS.LTS`
+  - Linux: `sudo apt install nodejs npm` 또는 [NodeSource](https://github.com/nodesource/distributions)
+- **국회 API 키** — [open.assembly.go.kr](https://open.assembly.go.kr)에서 무료 발급 (`sample` 키로 테스트 가능)
+
 ### 방법 1: 자동 설치 (권장)
 
 ```bash
 npx assembly-api-mcp setup
 ```
 
-대화형 마법사가 API 키 입력 → 프로필 선택 → AI 클라이언트 설정을 자동으로 처리합니다.
+대화형 마법사가 API 키 입력 → 프로필 선택 → AI 클라이언트 설정을 자동으로 처리합니다. macOS, Windows, Linux 모두 동일한 명령으로 설치됩니다.
 
 ### 방법 2: 수동 설치
 
