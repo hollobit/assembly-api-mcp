@@ -2,7 +2,9 @@
 
 대한민국 국회 Open API를 [Model Context Protocol (MCP)](https://modelcontextprotocol.io) 서버로 제공합니다.
 
-Claude, ChatGPT 등 AI 도구에서 국회의원, 의안, 일정, 회의록, 위원회, 표결, 청원 등 국회 데이터에 실시간으로 접근할 수 있습니다.
+Claude, Gemini, ChatGPT 등 AI 도구에서 국회의원, 의안, 일정, 회의록, 위원회, 표결, 청원 등 국회 데이터에 실시간으로 접근할 수 있습니다.
+
+***국가 AI 전환(AX)은 AI 챗봇쓴다고 되지 않죠. 국민들의 일상이 AI로 편리해져야 그것이 진정한 네이티브 AI 시대겠죠***
 
 ## 주요 기능
 
