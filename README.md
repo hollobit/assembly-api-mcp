@@ -8,7 +8,7 @@ Claude, ChatGPT 등 AI 도구에서 국회의원, 의안, 일정, 회의록, 위
 
 - **9개 Lite / 18개 Full 프로필 도구** — 기본 Lite 프로필로 핵심 기능 제공 ([활용 사례 100선](USECASE.md))
 - **276개 국회 API 100% 접근** — `discover_apis` + `query_assembly` 범용 도구
-- **31개 검증된 API 코드** — 실제 데이터 반환 확인
+- **36개 검증된 API 코드** — 실제 데이터 반환 확인
 - **CLI 지원** — 터미널에서 직접 국회 데이터 조회
 - **이중 Transport** — stdio (Claude Desktop) + HTTP (원격 서버)
 - **인메모리 캐싱** — TTL 기반, 정적/동적 데이터 구분
@@ -340,7 +340,7 @@ npx tsx src/cli.ts help
 |------|------|
 | [QUICK_START.md](QUICK_START.md) | 5분 안에 시작하는 빠른 설정 가이드 |
 | [docs/api-catalog.md](docs/api-catalog.md) | 국회 Open API 276개 전체 목록 (카테고리별 분류) |
-| [docs/mcp-api.md](docs/mcp-api.md) | MCP 도구 ↔ 국회 API 코드 매핑 (31개 검증 완료) |
+| [docs/mcp-api.md](docs/mcp-api.md) | MCP 도구 ↔ 국회 API 코드 매핑 (36개 검증 완료) |
 | [docs/discovered-codes.md](docs/discovered-codes.md) | API 코드 발굴 과정 및 검증된 엔드포인트 파라미터 |
 | [docs/mcp-design-analysis.md](docs/mcp-design-analysis.md) | MCP 도구 설계 분석 — Lite/Full 프로필 결정 근거 |
 
