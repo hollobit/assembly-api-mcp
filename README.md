@@ -20,39 +20,9 @@ Claude, Gemini, ChatGPT 등 AI 도구에서 국회의원, 의안, 일정, 회의
 
 ### 사전 조건
 
-- **Node.js 18 이상** — [nodejs.org](https://nodejs.org)에서 설치
-  - macOS: `brew install node` 또는 공식 설치 파일
-  - Windows: 공식 설치 파일 또는 `winget install OpenJS.NodeJS.LTS`
-  - Linux: `sudo apt install nodejs npm` 또는 [NodeSource](https://github.com/nodesource/distributions)
 - **국회 API 키** — [open.assembly.go.kr](https://open.assembly.go.kr)에서 무료 발급 (`sample` 키로 테스트 가능)
 
-### 방법 1: 자동 설치 (권장)
-
-```bash
-npx assembly-api-mcp setup
-```
-
-대화형 마법사가 API 키 입력 → 프로필 선택 → AI 클라이언트 설정을 자동으로 처리합니다. macOS, Windows, Linux 모두 동일한 명령으로 설치됩니다.
-
-### 방법 2: 수동 설치
-
-> 상세한 가이드는 [QUICK_START.md](QUICK_START.md)를 참조하세요.
-
-```bash
-# 1. 설치
-git clone https://github.com/hollobit/assembly-api-mcp.git
-cd assembly-api-mcp
-npm install && npm run build
-
-# 2. API 키 설정
-cp .env.example .env
-# .env 파일에 ASSEMBLY_API_KEY 입력 (발급: https://open.assembly.go.kr)
-
-# 3. 테스트
-npx tsx src/cli.ts test
-```
-
-### 방법 3: 원격 서버 (설치 불필요)
+### 방법 1: 원격 서버 (설치 불필요, 권장)
 
 설치 없이 URL만으로 바로 사용할 수 있습니다:
 
@@ -92,6 +62,34 @@ https://assembly-api-mcp.fly.dev/mcp?key=YOUR_API_KEY&profile=full
 ```
 
 프로필을 변경하려면 클라이언트 설정의 URL에서 `profile=` 값을 수정한 뒤 앱을 재시작하세요. 프로필별 도구 목록은 [MCP 도구 목록](#mcp-도구-목록) 섹션을 참조하세요.
+
+### 방법 2: 자동 설치 (로컬)
+
+Node.js 18 이상이 필요합니다 ([nodejs.org](https://nodejs.org)).
+
+```bash
+npx assembly-api-mcp setup
+```
+
+대화형 마법사가 API 키 입력 → 프로필 선택 → AI 클라이언트 설정을 자동으로 처리합니다. macOS, Windows, Linux 모두 동일한 명령으로 설치됩니다.
+
+### 방법 3: 수동 설치
+
+> 상세한 가이드는 [QUICK_START.md](QUICK_START.md)를 참조하세요.
+
+```bash
+# 1. 설치 (Node.js 18 이상 필요)
+git clone https://github.com/hollobit/assembly-api-mcp.git
+cd assembly-api-mcp
+npm install && npm run build
+
+# 2. API 키 설정
+cp .env.example .env
+# .env 파일에 ASSEMBLY_API_KEY 입력 (발급: https://open.assembly.go.kr)
+
+# 3. 테스트
+npx tsx src/cli.ts test
+```
 
 ## AI 클라이언트 연동
 
