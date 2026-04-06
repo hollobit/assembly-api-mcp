@@ -11,6 +11,7 @@ import { type AppConfig } from "../../config.js";
 import { createApiClient } from "../../api/client.js";
 import { API_CODES, CURRENT_AGE } from "../../api/codes.js";
 import { type ApiResult } from "../../api/client.js";
+import { formatToolError } from "../helpers.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -189,7 +190,7 @@ export function registerLiteChainTools(
   // ── analyze_legislator ─────────────────────────────────────────────────
   server.tool(
     "analyze_legislator",
-    "국회의원의 의정활동을 종합 분석합니다. 인적사항, 발의법안, 표결참여를 한 번에 조회합니다.",
+    "국회의원 의정활동 종합 분석. 인적사항, 발의법안, 표결참여를 한 번에 조회합니다. 특정 의원 활동을 파악할 때 사용하세요.",
     {
       name: z.string().describe("의원 이름"),
       age: z
@@ -258,15 +259,7 @@ export function registerLiteChainTools(
           }) }],
         };
       } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : String(err);
-        const code = message.includes('API_KEY') ? 'AUTH_ERROR'
-          : message.includes('rate') ? 'RATE_LIMIT'
-          : message.includes('timeout') ? 'TIMEOUT'
-          : 'UNKNOWN';
-        return {
-          content: [{ type: "text" as const, text: JSON.stringify({ error: message, code }) }],
-          isError: true,
-        };
+        return formatToolError(err);
       }
     },
   );
@@ -274,7 +267,7 @@ export function registerLiteChainTools(
   // ── track_legislation ──────────────────────────────────────────────────
   server.tool(
     "track_legislation",
-    "특정 주제의 법안을 추적합니다. 키워드로 관련 법안을 검색하고 심사 현황을 확인합니다.",
+    "주제별 법안을 추적합니다. 키워드(쉼표 구분)로 관련 법안을 검색하고 심사 현황까지 확인. '교육 관련 법안', 'AI 입법 동향' 같은 주제 탐색에 최적.",
     {
       keywords: z
         .string()
@@ -390,15 +383,7 @@ export function registerLiteChainTools(
           }) }],
         };
       } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : String(err);
-        const code = message.includes('API_KEY') ? 'AUTH_ERROR'
-          : message.includes('rate') ? 'RATE_LIMIT'
-          : message.includes('timeout') ? 'TIMEOUT'
-          : 'UNKNOWN';
-        return {
-          content: [{ type: "text" as const, text: JSON.stringify({ error: message, code }) }],
-          isError: true,
-        };
+        return formatToolError(err);
       }
     },
   );

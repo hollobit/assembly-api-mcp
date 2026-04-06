@@ -8,6 +8,7 @@ import { z } from "zod";
 import { type McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { type AppConfig } from "../config.js";
 import { createApiClient } from "../api/client.js";
+import { API_CODES } from "../api/codes.js";
 
 export function registerLibraryTools(
   server: McpServer,
@@ -34,7 +35,7 @@ export function registerLibraryTools(
         if (params.page_size) queryParams.pSize = Math.min(params.page_size, config.apiResponse.maxPageSize);
 
         const result = await api.fetchOpenAssembly(
-          "nywrpgoaatcpoqbiy",
+          API_CODES.LIBRARY_SEARCH,
           queryParams,
         );
 

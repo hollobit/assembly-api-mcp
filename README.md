@@ -6,7 +6,7 @@ Claude, ChatGPT 등 AI 도구에서 국회의원, 의안, 일정, 회의록, 위
 
 ## 주요 기능
 
-- **7개 Lite / 23개 Full 프로필 도구** — 기본 Lite 프로필로 핵심 기능 제공
+- **9개 Lite / 18개 Full 프로필 도구** — 기본 Lite 프로필로 핵심 기능 제공 ([활용 사례 100선](USECASE.md))
 - **276개 국회 API 100% 접근** — `discover_apis` + `query_assembly` 범용 도구
 - **31개 검증된 API 코드** — 실제 데이터 반환 확인
 - **CLI 지원** — 터미널에서 직접 국회 데이터 조회
@@ -200,76 +200,43 @@ ngrok http 3000
 
 ## MCP 도구 목록
 
-### Lite 프로필 (7개, 기본)
+### Lite 프로필 (9개, 기본)
 
 AI가 효율적으로 사용할 수 있도록 핵심 기능을 통합한 프로필입니다.
 
 | 도구 | 설명 |
 |------|------|
-| `search_members` | 의원 검색+상세 (이름/정당/선거구, 사진 URL 포함, 1건이면 자동 상세) |
+| `search_members` | 의원 검색 (이름/정당/선거구/위원회, 1건이면 자동 상세) |
 | `search_bills` | 의안 검색+상세+상태필터 (계류/처리/최근, bill_id로 상세) |
-| `search_records` | 일정+회의록+표결 (type: schedule/meetings/votes) |
-| `analyze_legislator` | 의원 종합분석 (인적+사진+발의+표결 한 번에) |
+| `get_schedule` | 국회 일정 조회 (날짜/위원회/키워드) |
+| `search_meetings` | 회의록 검색 (본회의/위원회/소위/국감/인사청문회/공청회) |
+| `get_votes` | 표결 조회 (전체 본회의 표결 또는 의안별 상세) |
+| `analyze_legislator` | 의원 종합분석 (인적+발의+표결 한 번에) |
 | `track_legislation` | 주제별 법안 추적 (다중 키워드, 심사이력) |
 | `discover_apis` | 276개 API 키워드 검색 |
 | `query_assembly` | 범용 API 직접 호출 |
 
-### Full 프로필 (23개)
+> 활용 예시는 [활용 사례 100선](USECASE.md)을 참조하세요.
 
-`MCP_PROFILE=full`로 전환하면 기존 23개 개별 도구를 사용할 수 있습니다.
+### Full 프로필 (18개)
 
-#### 국회의원 (3개)
+`MCP_PROFILE=full`로 전환하면 Lite 9개 + Full 전용 9개를 사용할 수 있습니다.
 
-| 도구 | 설명 |
-|------|------|
-| `get_members` | 국회의원 검색 (이름/정당/선거구, 사진 URL 포함) |
-| `get_member_detail` | 의원 상세 정보 |
-| `search_member_activity` | 의원 의정활동 (발의법안 + 표결) |
+#### Lite 도구 (9개) — 위와 동일
 
-#### 의안 (9개)
+#### Full 전용 (9개)
 
 | 도구 | 설명 |
 |------|------|
-| `search_bills` | 의안 검색 (의안명/제안자/위원회) |
-| `get_bill_detail` | 의안 상세 조회 |
-| `search_all_bills` | 의안 통합검색 (전 대수 포함) |
-| `get_pending_bills` | 계류의안 목록 |
-| `get_processed_bills` | 처리의안 목록 |
-| `get_recent_bills` | 최근 본회의 처리 의안 |
+| `get_bill_detail` | 의안 상세 조회 (제안이유, 주요내용) |
 | `get_bill_review` | 의안 심사정보 |
 | `get_bill_history` | 의안 접수/처리 이력 |
-| `get_plenary_votes` | 본회의 표결정보 |
-
-#### 일정 / 회의록 (2개)
-
-| 도구 | 설명 |
-|------|------|
-| `get_schedule` | 국회 일정 (통합, 90,201건) |
-| `search_meeting_records` | 회의록 검색 (본회의/위원회/국감/인사청문회) |
-
-#### 위원회 / 표결 / 청원 / 입법예고 (4개)
-
-| 도구 | 설명 |
-|------|------|
-| `get_committees` | 위원회 목록 (356건) |
-| `get_vote_results` | 의안별 표결 결과 |
-| `search_petitions` | 청원 검색 (276건) |
-| `get_legislation_notices` | 입법예고 조회 (265건) |
-
-#### 부속기관 (3개)
-
-| 도구 | 설명 |
-|------|------|
+| `get_committees` | 위원회 목록 |
+| `search_petitions` | 국민동의청원 검색 |
+| `get_legislation_notices` | 입법예고 조회 |
 | `search_library` | 국회도서관 자료 검색 |
 | `get_budget_analysis` | 예산정책처 분석 자료 |
 | `search_research_reports` | 입법조사처 보고서 |
-
-#### 범용 (2개) — 276개 API 100% 커버
-
-| 도구 | 설명 |
-|------|------|
-| `discover_apis` | 276개 국회 API 키워드 검색 |
-| `query_assembly` | 임의 API 코드로 직접 호출 |
 
 ## CLI 사용법
 
@@ -466,7 +433,7 @@ assembly-api/
 │   │   ├── monitor.ts        # API 응답 시간 모니터링
 │   │   └── rate-limiter.ts   # Rate Limit 추적
 │   ├── tools/                # MCP 도구 (16개 파일, 23개 도구)
-│   │   ├── lite/             # Lite 프로필 통합 도구 (7개)
+│   │   ├── lite/             # Lite 프로필 도구 (9개)
 │   ├── resources/            # MCP 정적 리소스
 │   └── prompts/              # MCP 프롬프트 템플릿
 ├── tests/                    # 단위 테스트 (248개)

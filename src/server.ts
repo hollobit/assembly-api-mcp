@@ -16,24 +16,14 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { type AppConfig } from "./config.js";
 import { registerLiteTools } from "./tools/lite/index.js";
-import { registerLiteRecordTools } from "./tools/lite/records.js";
-import { registerLiteChainTools } from "./tools/lite/chains.js";
-import { registerLiteMemberTools } from "./tools/lite/members.js";
-import { registerMemberTools } from "./tools/members.js";
-import { registerBillTools } from "./tools/bills.js";
-import { registerScheduleTools } from "./tools/schedule.js";
-import { registerMeetingTools } from "./tools/meetings.js";
+import { registerBillDetailTool } from "./tools/bills.js";
 import { registerCommitteeTools } from "./tools/committees.js";
-import { registerVoteTools } from "./tools/votes.js";
 import { registerPetitionTools } from "./tools/petitions.js";
 import { registerLegislationTools } from "./tools/legislation.js";
 import { registerLibraryTools } from "./tools/library.js";
 import { registerBudgetTools } from "./tools/budget.js";
 import { registerResearchTools } from "./tools/research.js";
-import { registerSpeechTools } from "./tools/speeches.js";
 import { registerBillExtraTools } from "./tools/bill-extras.js";
-import { registerDiscoverTools } from "./tools/discover.js";
-import { registerQueryTools } from "./tools/query.js";
 import { registerResources } from "./resources/static-data.js";
 import { registerPrompts } from "./prompts/templates.js";
 
@@ -49,30 +39,20 @@ function buildMcpServer(config: AppConfig): McpServer {
 
   // 도구 등록 — 프로필에 따라 분기
   if (config.profile === "full") {
-    // Full 프로필: 기존 23개 도구 전부
-    registerMemberTools(server, config);
-    registerBillTools(server, config);
-    registerScheduleTools(server, config);
-    registerMeetingTools(server, config);
-    registerCommitteeTools(server, config);
-    registerVoteTools(server, config);
-    registerPetitionTools(server, config);
-    registerLegislationTools(server, config);
-    registerLibraryTools(server, config);
-    registerBudgetTools(server, config);
-    registerResearchTools(server, config);
-    registerSpeechTools(server, config);
-    registerBillExtraTools(server, config);
-    registerDiscoverTools(server, config);
-    registerQueryTools(server, config);
-    // Full 프로필에 lite-only 도구 추가 (search_records, analyze_legislator, track_legislation)
-    // search_bills/search_members는 full에 이미 같은 이름으로 존재하므로 제외
-    // discover_apis/query_assembly도 이미 등록됨
-    registerLiteRecordTools(server, config);
-    registerLiteChainTools(server, config);
-    registerLiteMemberTools(server, config);
+    // Lite 도구 9개 전체 먼저 등록
+    registerLiteTools(server, config);
+
+    // Full 전용: Lite에 없는 고유 도구만 추가 등록
+    registerBillDetailTool(server, config);   // get_bill_detail
+    registerBillExtraTools(server, config);   // get_bill_review, get_bill_history
+    registerCommitteeTools(server, config);   // get_committees
+    registerPetitionTools(server, config);    // search_petitions
+    registerLegislationTools(server, config); // get_legislation_notices
+    registerLibraryTools(server, config);     // search_library
+    registerBudgetTools(server, config);      // get_budget_analysis
+    registerResearchTools(server, config);    // search_research_reports
   } else {
-    // Lite 프로필 (기본): 7개 도구
+    // Lite 프로필 (기본): 9개 도구
     registerLiteTools(server, config);
   }
 

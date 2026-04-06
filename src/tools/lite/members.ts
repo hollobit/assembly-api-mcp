@@ -10,6 +10,7 @@ import { type McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { type AppConfig } from "../../config.js";
 import { createApiClient } from "../../api/client.js";
 import { API_CODES } from "../../api/codes.js";
+import { formatToolError } from "../helpers.js";
 
 // ---------------------------------------------------------------------------
 // Field mappings
@@ -71,7 +72,7 @@ function buildQueryParams(params: {
   readonly name?: string;
   readonly party?: string;
   readonly district?: string;
-  readonly age?: number;
+  readonly committee?: string;
   readonly page?: number;
   readonly page_size?: number;
 }, maxPageSize: number): Record<string, string | number> {
@@ -80,9 +81,15 @@ function buildQueryParams(params: {
   if (params.name) queryParams.HG_NM = params.name;
   if (params.party) queryParams.POLY_NM = params.party;
   if (params.district) queryParams.ORIG_NM = params.district;
-  // MEMBER_INFO API는 UNIT_CD 불필요 (현재 의원만 반환, 형식 오류로 빈 결과 방지)
+  // MEMBER_INFO API는 현재 의원만 반환
   if (params.page) queryParams.pIndex = params.page;
-  if (params.page_size) queryParams.pSize = Math.min(params.page_size, maxPageSize);
+
+  // committee 필터 사용 시 전체 목록을 가져와서 클라이언트 측 필터링
+  if (params.committee) {
+    queryParams.pSize = 300;
+  } else if (params.page_size) {
+    queryParams.pSize = Math.min(params.page_size, maxPageSize);
+  }
 
   return queryParams;
 }
@@ -99,14 +106,12 @@ export function registerLiteMemberTools(
 
   server.tool(
     "search_members",
-    "국회의원 통합 검색 도구입니다. 이름, 정당, 선거구, 대수로 검색할 수 있으며, " +
-      "이름 검색 결과가 1명이면 자동으로 상세 정보(약력, 연락처, SNS 등)를 반환합니다. " +
-      "get_members와 get_member_detail을 통합한 도구입니다.",
+    "현재 국회의원을 검색합니다. 이름, 정당, 선거구, 소속위원회로 필터링 가능. 결과가 1명이면 약력·연락처 등 상세 정보를 자동 반환합니다.",
     {
       name: z.string().optional().describe("의원 이름 (부분 일치 검색)"),
       party: z.string().optional().describe("정당명"),
       district: z.string().optional().describe("선거구명"),
-      age: z.number().optional().describe("대수 (예: 22 = 제22대 국회)"),
+      committee: z.string().optional().describe("소속위원회명 (부분 일치). 클라이언트 측 필터링으로 처리"),
       page: z.number().optional().describe("페이지 번호 (기본: 1)"),
       page_size: z.number().optional().describe("페이지 크기 (기본: 20, 최대: 100)"),
     },
@@ -119,18 +124,28 @@ export function registerLiteMemberTools(
           queryParams,
         );
 
-        if (result.rows.length === 0) {
+        let rows = result.rows;
+
+        // 소속위원회 클라이언트 측 필터링 (API가 서버 측 필터 미지원)
+        if (params.committee) {
+          const kw = params.committee.toLowerCase();
+          rows = rows.filter((row) =>
+            String(row.CMITS ?? "").toLowerCase().includes(kw),
+          );
+        }
+
+        if (rows.length === 0) {
           return {
             content: [{
               type: "text" as const,
-              text: JSON.stringify({ total: 0, items: [], query: { name: params.name, party: params.party, district: params.district, age: params.age } }),
+              text: JSON.stringify({ total: 0, items: [], query: { name: params.name, party: params.party, district: params.district, committee: params.committee } }),
             }],
           };
         }
 
         // 결과가 1건이면 상세 정보 반환 (items 배열로 통일)
-        if (result.rows.length === 1) {
-          const detail = formatRow(result.rows[0], DETAIL_FIELDS);
+        if (rows.length === 1) {
+          const detail = formatRow(rows[0], DETAIL_FIELDS);
           return {
             content: [{
               type: "text" as const,
@@ -140,23 +155,15 @@ export function registerLiteMemberTools(
         }
 
         // 여러 건이면 요약 목록 반환
-        const summaries = result.rows.map((row) => formatRow(row, SUMMARY_FIELDS));
+        const summaries = rows.map((row) => formatRow(row, SUMMARY_FIELDS));
         return {
           content: [{
             type: "text" as const,
-            text: JSON.stringify({ total: result.totalCount, returned: result.rows.length, items: summaries }),
+            text: JSON.stringify({ total: rows.length, returned: rows.length, items: summaries }),
           }],
         };
       } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : String(err);
-        const code = message.includes('API_KEY') ? 'AUTH_ERROR'
-          : message.includes('rate') ? 'RATE_LIMIT'
-          : message.includes('timeout') ? 'TIMEOUT'
-          : 'UNKNOWN';
-        return {
-          content: [{ type: "text" as const, text: JSON.stringify({ error: message, code }) }],
-          isError: true,
-        };
+        return formatToolError(err);
       }
     },
   );

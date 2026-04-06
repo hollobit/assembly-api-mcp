@@ -17,13 +17,11 @@ import { type McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { type AppConfig } from "../../config.js";
 import { createApiClient } from "../../api/client.js";
 import { API_CODES, CURRENT_AGE } from "../../api/codes.js";
+import { formatToolError } from "../helpers.js";
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
-
-/** 최근 본회의 부의안건 API 코드 */
-const RECENT_PLENARY_BILLS = "nxjuyqnxadtotdrbw";
 
 type BillStatus = "all" | "pending" | "processed" | "recent";
 
@@ -32,7 +30,7 @@ const STATUS_API_MAP: Readonly<Record<BillStatus, string>> = {
   all: API_CODES.MEMBER_BILLS,
   pending: API_CODES.BILL_PENDING,
   processed: API_CODES.BILL_PROCESSED,
-  recent: RECENT_PLENARY_BILLS,
+  recent: API_CODES.RECENT_PLENARY_BILLS,
 };
 
 /** AGE 파라미터가 불필요한 status 목록 */
@@ -156,9 +154,7 @@ export function registerLiteBillTools(
 
   server.tool(
     "search_bills",
-    "국회 의안(법률안)을 통합 검색합니다. " +
-      "의안명/제안자/소관위원회/상태(계류/처리/최근)로 필터링하거나, " +
-      "의안ID를 지정하여 상세 정보를 조회할 수 있습니다.",
+    "의안(법률안) 검색 및 상세 조회. 의안명/제안자/위원회/상태(계류·처리·최근)로 검색하거나, bill_id로 상세 조회. 주제별 법안 추적에는 track_legislation을 사용하세요.",
     {
       bill_name: z
         .string()
@@ -260,11 +256,7 @@ export function registerLiteBillTools(
           ],
         };
       } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : String(err);
-        return {
-          content: [{ type: "text" as const, text: JSON.stringify({ error: message, code: message.includes('API_KEY') ? 'AUTH_ERROR' : message.includes('rate') ? 'RATE_LIMIT' : message.includes('timeout') ? 'TIMEOUT' : 'UNKNOWN' }) }],
-          isError: true,
-        };
+        return formatToolError(err);
       }
     },
   );

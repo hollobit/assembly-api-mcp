@@ -3,7 +3,9 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { type AppConfig } from "../../src/config.js";
 import { registerLiteMemberTools } from "../../src/tools/lite/members.js";
 import { registerLiteBillTools } from "../../src/tools/lite/bills.js";
-import { registerLiteRecordTools } from "../../src/tools/lite/records.js";
+import { registerLiteScheduleTools } from "../../src/tools/lite/schedule.js";
+import { registerLiteMeetingTools } from "../../src/tools/lite/meetings.js";
+import { registerLiteVoteTools } from "../../src/tools/lite/votes.js";
 import { registerLiteChainTools } from "../../src/tools/lite/chains.js";
 
 // ---------------------------------------------------------------------------
@@ -243,27 +245,30 @@ describe("Lite search_members", () => {
     expect(query.party).toBeUndefined();
   });
 
-  it("age 파라미터 → UNIT_CD 불필요 (현재 의원만 반환)", async () => {
-    mockFetchSuccess(buildAssemblyResponse("nwvrqwxyaytdsfvhu", [], 0));
+  it("committee 파라미터 → 클라이언트 측 필터링 (CMITS 필드)", async () => {
+    mockFetchSuccess(
+      buildAssemblyResponse("nwvrqwxyaytdsfvhu", [
+        { HG_NM: "김의원", POLY_NM: "민주당", CMITS: "국방위원회,법사위원회" },
+        { HG_NM: "이의원", POLY_NM: "국민의힘", CMITS: "교육위원회" },
+      ], 2),
+    );
 
     const tools = getRegisteredTools(server);
-    await tools.search_members.handler({ age: 22 }, {} as never);
+    const result = await tools.search_members.handler(
+      { committee: "국방" },
+      {} as never,
+    );
 
+    const parsed = getParsed(result);
+    expect(parsed.total).toBe(1);
+    const items = parsed.items as Record<string, unknown>[];
+    expect(items).toHaveLength(1);
+    expect(items[0]["이름"]).toBe("김의원");
+
+    // pSize=300으로 전체 목록 가져오기
     const calledUrl = (globalThis.fetch as ReturnType<typeof vi.fn>).mock
       .calls[0]?.[0] as string;
-    // UNIT_CD is no longer sent
-    expect(calledUrl).not.toContain("UNIT_CD");
-  });
-
-  it("age 파라미터는 URL에 UNIT_CD를 포함하지 않는다", async () => {
-    mockFetchSuccess(buildAssemblyResponse("nwvrqwxyaytdsfvhu", [], 0));
-
-    const tools = getRegisteredTools(server);
-    await tools.search_members.handler({ age: 9 }, {} as never);
-
-    const calledUrl = (globalThis.fetch as ReturnType<typeof vi.fn>).mock
-      .calls[0]?.[0] as string;
-    expect(calledUrl).not.toContain("UNIT_CD");
+    expect(calledUrl).toContain("pSize=300");
   });
 
   it("district 파라미터 → ORIG_NM 전달", async () => {
@@ -280,12 +285,12 @@ describe("Lite search_members", () => {
     expect(calledUrl).toContain("ORIG_NM");
   });
 
-  it("검색 조건에 대수 필터 표시", async () => {
+  it("검색 조건에 필터 표시", async () => {
     mockFetchSuccess(buildAssemblyResponse("nwvrqwxyaytdsfvhu", [], 0));
 
     const tools = getRegisteredTools(server);
     const result = await tools.search_members.handler(
-      { age: 22, district: "부산" },
+      { district: "부산" },
       {} as never,
     );
 
@@ -293,7 +298,6 @@ describe("Lite search_members", () => {
     expect(parsed.total).toBe(0);
     expect(parsed.items).toEqual([]);
     const query = parsed.query as Record<string, unknown>;
-    expect(query.age).toBe(22);
     expect(query.district).toBe("부산");
   });
 
@@ -661,24 +665,24 @@ describe("Lite search_bills", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Tests — search_records (lite/records.ts)
+// Tests — get_schedule (lite/schedule.ts)
 // ---------------------------------------------------------------------------
 
-describe("Lite search_records", () => {
+describe("Lite get_schedule", () => {
   let server: McpServer;
   const config = createTestConfig();
 
   beforeEach(() => {
     vi.restoreAllMocks();
     server = createServer();
-    registerLiteRecordTools(server, config);
+    registerLiteScheduleTools(server, config);
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  it("type='schedule' → ALLSCHEDULE API, date_from 하이픈 제거", async () => {
+  it("date_from → ALLSCHEDULE API, 하이픈 제거", async () => {
     mockFetchSuccess(
       buildAssemblyResponse("ALLSCHEDULE", [
         {
@@ -693,8 +697,8 @@ describe("Lite search_records", () => {
     );
 
     const tools = getRegisteredTools(server);
-    const result = await tools.search_records.handler(
-      { type: "schedule", date_from: "2024-06-01" },
+    const result = await tools.get_schedule.handler(
+      { date_from: "2024-06-01" },
       {} as never,
     );
 
@@ -708,15 +712,15 @@ describe("Lite search_records", () => {
     const calledUrl = (globalThis.fetch as ReturnType<typeof vi.fn>).mock
       .calls[0]?.[0] as string;
     expect(calledUrl).toContain("ALLSCHEDULE");
-    expect(calledUrl).toContain("SCH_DT=20240601");
+    expect(calledUrl).toContain("SCH_DT=2024-06-01");
   });
 
-  it("type='schedule' + committee → CMIT_NM 파라미터 전달", async () => {
+  it("committee → CMIT_NM 파라미터 전달", async () => {
     mockFetchSuccess(buildAssemblyResponse("ALLSCHEDULE", [], 0));
 
     const tools = getRegisteredTools(server);
-    await tools.search_records.handler(
-      { type: "schedule", committee: "교육위" },
+    await tools.get_schedule.handler(
+      { committee: "교육위" },
       {} as never,
     );
 
@@ -725,7 +729,55 @@ describe("Lite search_records", () => {
     expect(calledUrl).toContain("CMIT_NM");
   });
 
-  it("type='meetings' 기본 → MEETING_COMMITTEE API 사용", async () => {
+  it("page, page_size 전달", async () => {
+    mockFetchSuccess(buildAssemblyResponse("ALLSCHEDULE", [], 0));
+
+    const tools = getRegisteredTools(server);
+    await tools.get_schedule.handler(
+      { page: 2, page_size: 30 },
+      {} as never,
+    );
+
+    const calledUrl = (globalThis.fetch as ReturnType<typeof vi.fn>).mock
+      .calls[0]?.[0] as string;
+    expect(calledUrl).toContain("pIndex=2");
+    expect(calledUrl).toContain("pSize=30");
+  });
+
+  it("네트워크 오류 → isError: true", async () => {
+    mockFetchNetworkError();
+
+    const tools = getRegisteredTools(server);
+    const result = await tools.get_schedule.handler(
+      {},
+      {} as never,
+    );
+
+    expect(isError(result)).toBe(true);
+    const parsed = getParsed(result);
+    expect(parsed.error).toBeDefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Tests — search_meetings (lite/meetings.ts)
+// ---------------------------------------------------------------------------
+
+describe("Lite search_meetings", () => {
+  let server: McpServer;
+  const config = createTestConfig();
+
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    server = createServer();
+    registerLiteMeetingTools(server, config);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("기본 → MEETING_COMMITTEE API 사용", async () => {
     mockFetchSuccess(
       buildAssemblyResponse("ncwgseseafwbuheph", [
         {
@@ -740,8 +792,8 @@ describe("Lite search_records", () => {
     );
 
     const tools = getRegisteredTools(server);
-    const result = await tools.search_records.handler(
-      { type: "meetings" },
+    const result = await tools.search_meetings.handler(
+      {},
       {} as never,
     );
 
@@ -757,7 +809,7 @@ describe("Lite search_records", () => {
     expect(calledUrl).toContain("DAE_NUM=22");
   });
 
-  it("type='meetings' + meeting_type='국정감사' → MEETING_AUDIT + ERACO", async () => {
+  it("meeting_type='국정감사' → MEETING_AUDIT + ERACO", async () => {
     mockFetchSuccess(
       buildAssemblyResponse("VCONFAPIGCONFLIST", [
         {
@@ -770,8 +822,8 @@ describe("Lite search_records", () => {
     );
 
     const tools = getRegisteredTools(server);
-    const result = await tools.search_records.handler(
-      { type: "meetings", meeting_type: "국정감사" },
+    const result = await tools.search_meetings.handler(
+      { meeting_type: "국정감사" },
       {} as never,
     );
 
@@ -786,7 +838,7 @@ describe("Lite search_records", () => {
     expect(calledUrl).toContain("ERACO");
   });
 
-  it("type='meetings' + meeting_type='본회의' → MEETING_PLENARY + DAE_NUM", async () => {
+  it("meeting_type='본회의' → MEETING_PLENARY + DAE_NUM", async () => {
     mockFetchSuccess(
       buildAssemblyResponse("nzbyfwhwaoanttzje", [
         {
@@ -798,8 +850,8 @@ describe("Lite search_records", () => {
     );
 
     const tools = getRegisteredTools(server);
-    const result = await tools.search_records.handler(
-      { type: "meetings", meeting_type: "본회의" },
+    const result = await tools.search_meetings.handler(
+      { meeting_type: "본회의" },
       {} as never,
     );
 
@@ -815,12 +867,12 @@ describe("Lite search_records", () => {
     expect(calledUrl).toContain("CONF_DATE");
   });
 
-  it("type='meetings' + meeting_type='본회의' + date_from → date_from 연도 사용", async () => {
+  it("meeting_type='본회의' + date_from → 연도 사용", async () => {
     mockFetchSuccess(buildAssemblyResponse("nzbyfwhwaoanttzje", [], 0));
 
     const tools = getRegisteredTools(server);
-    await tools.search_records.handler(
-      { type: "meetings", meeting_type: "본회의", date_from: "2023-03-15" },
+    await tools.search_meetings.handler(
+      { meeting_type: "본회의", date_from: "2023-03-15" },
       {} as never,
     );
 
@@ -829,14 +881,14 @@ describe("Lite search_records", () => {
     expect(calledUrl).toContain("CONF_DATE=2023");
   });
 
-  it("type='meetings' + meeting_type='인사청문회' → MEETING_CONFIRMATION + ERACO", async () => {
+  it("meeting_type='인사청문회' → MEETING_CONFIRMATION + ERACO", async () => {
     mockFetchSuccess(
       buildAssemblyResponse("VCONFCFRMCONFLIST", [], 0),
     );
 
     const tools = getRegisteredTools(server);
-    await tools.search_records.handler(
-      { type: "meetings", meeting_type: "인사청문회" },
+    await tools.search_meetings.handler(
+      { meeting_type: "인사청문회" },
       {} as never,
     );
 
@@ -846,14 +898,14 @@ describe("Lite search_records", () => {
     expect(calledUrl).toContain("ERACO");
   });
 
-  it("type='meetings' + meeting_type='공청회' → MEETING_PUBLIC_HEARING + ERACO", async () => {
+  it("meeting_type='공청회' → MEETING_PUBLIC_HEARING + ERACO", async () => {
     mockFetchSuccess(
       buildAssemblyResponse("VCONFPHCONFLIST", [], 0),
     );
 
     const tools = getRegisteredTools(server);
-    await tools.search_records.handler(
-      { type: "meetings", meeting_type: "공청회" },
+    await tools.search_meetings.handler(
+      { meeting_type: "공청회" },
       {} as never,
     );
 
@@ -863,14 +915,14 @@ describe("Lite search_records", () => {
     expect(calledUrl).toContain("ERACO");
   });
 
-  it("type='meetings' + keyword → SUB_NAME 전달", async () => {
+  it("keyword → SUB_NAME 전달", async () => {
     mockFetchSuccess(
       buildAssemblyResponse("ncwgseseafwbuheph", [], 0),
     );
 
     const tools = getRegisteredTools(server);
-    await tools.search_records.handler(
-      { type: "meetings", keyword: "교육" },
+    await tools.search_meetings.handler(
+      { keyword: "교육" },
       {} as never,
     );
 
@@ -879,14 +931,14 @@ describe("Lite search_records", () => {
     expect(calledUrl).toContain("SUB_NAME");
   });
 
-  it("type='meetings' 위원회 기본 + committee → COMM_NAME 전달", async () => {
+  it("committee → COMM_NAME 전달", async () => {
     mockFetchSuccess(
       buildAssemblyResponse("ncwgseseafwbuheph", [], 0),
     );
 
     const tools = getRegisteredTools(server);
-    await tools.search_records.handler(
-      { type: "meetings", committee: "법사위" },
+    await tools.search_meetings.handler(
+      { committee: "법사위" },
       {} as never,
     );
 
@@ -895,7 +947,72 @@ describe("Lite search_records", () => {
     expect(calledUrl).toContain("COMM_NAME");
   });
 
-  it("type='votes' + bill_id → VOTE_BY_BILL API 사용", async () => {
+  it("formatRow에서 TITLE / CONF_LINK_URL 폴백", async () => {
+    mockFetchSuccess(
+      buildAssemblyResponse("ncwgseseafwbuheph", [
+        {
+          TITLE: "회의명테스트",
+          CONF_DATE: "2024-01-01",
+          DAE_NUM: "22",
+          SUB_NAME: "안건",
+          CONF_LINK_URL: "https://conf.example.com",
+        },
+      ], 1),
+    );
+
+    const tools = getRegisteredTools(server);
+    const result = await tools.search_meetings.handler(
+      {},
+      {} as never,
+    );
+
+    const text = getText(result);
+    expect(text).toContain("회의명테스트");
+    expect(text).toContain("https://conf.example.com");
+  });
+
+  it("formatRow에서 LINK_URL 폴백", async () => {
+    mockFetchSuccess(
+      buildAssemblyResponse("VCONFAPIGCONFLIST", [
+        {
+          CLASS_NAME: "국정감사회의",
+          ERACO: "제22대",
+          LINK_URL: "https://link.example.com",
+        },
+      ], 1),
+    );
+
+    const tools = getRegisteredTools(server);
+    const result = await tools.search_meetings.handler(
+      { meeting_type: "국정감사" },
+      {} as never,
+    );
+
+    const text = getText(result);
+    expect(text).toContain("국정감사회의");
+    expect(text).toContain("https://link.example.com");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Tests — get_votes (lite/votes.ts)
+// ---------------------------------------------------------------------------
+
+describe("Lite get_votes", () => {
+  let server: McpServer;
+  const config = createTestConfig();
+
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    server = createServer();
+    registerLiteVoteTools(server, config);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("bill_id 있음 → VOTE_BY_BILL API 사용", async () => {
     mockFetchSuccess(
       buildAssemblyResponse("ncocpgfiaoituanbr", [
         {
@@ -908,8 +1025,8 @@ describe("Lite search_records", () => {
     );
 
     const tools = getRegisteredTools(server);
-    const result = await tools.search_records.handler(
-      { type: "votes", bill_id: "PRC_V1" },
+    const result = await tools.get_votes.handler(
+      { bill_id: "PRC_V1" },
       {} as never,
     );
 
@@ -928,40 +1045,50 @@ describe("Lite search_records", () => {
     expect(calledUrl).toContain("AGE=22");
   });
 
-  it("type='votes' bill_id 없음 → 오류: bill_id 필수", async () => {
+  it("bill_id 없음 → VOTE_PLENARY API 사용 (전체 표결 목록)", async () => {
+    mockFetchSuccess(
+      buildAssemblyResponse("nwbpacrgavhjryiph", [
+        {
+          BILL_ID: "PRC_V2",
+          BILL_NAME: "전체표결법안",
+          VOTE_DATE: "2024-06-01",
+          YES_TCNT: "200",
+          NO_TCNT: "50",
+          BLANK_TCNT: "10",
+          RESULT: "가결",
+        },
+      ], 1),
+    );
+
     const tools = getRegisteredTools(server);
-    const result = await tools.search_records.handler(
-      { type: "votes" },
+    const result = await tools.get_votes.handler(
+      {},
       {} as never,
     );
 
-    expect(isError(result)).toBe(true);
-    expect(getText(result)).toContain("bill_id가 필수");
-  });
-
-  it("page, page_size 전달 (schedule)", async () => {
-    mockFetchSuccess(buildAssemblyResponse("ALLSCHEDULE", [], 0));
-
-    const tools = getRegisteredTools(server);
-    await tools.search_records.handler(
-      { type: "schedule", page: 2, page_size: 30 },
-      {} as never,
-    );
+    const parsed = getParsed(result);
+    expect(parsed.total).toBe(1);
+    const items = parsed.items as Record<string, unknown>[];
+    expect(items).toHaveLength(1);
+    expect(items[0]).toHaveProperty("의안ID");
+    expect(items[0]).toHaveProperty("표결일");
+    expect(items[0]).toHaveProperty("찬성");
+    expect(items[0]).toHaveProperty("결과");
 
     const calledUrl = (globalThis.fetch as ReturnType<typeof vi.fn>).mock
       .calls[0]?.[0] as string;
-    expect(calledUrl).toContain("pIndex=2");
-    expect(calledUrl).toContain("pSize=30");
+    expect(calledUrl).toContain("nwbpacrgavhjryiph");
+    expect(calledUrl).toContain("AGE=22");
   });
 
-  it("page_size > maxPageSize 클램핑 (votes)", async () => {
+  it("page_size > maxPageSize 클램핑", async () => {
     mockFetchSuccess(
       buildAssemblyResponse("ncocpgfiaoituanbr", [], 0),
     );
 
     const tools = getRegisteredTools(server);
-    await tools.search_records.handler(
-      { type: "votes", bill_id: "PRC_V1", page_size: 500 },
+    await tools.get_votes.handler(
+      { bill_id: "PRC_V1", page_size: 500 },
       {} as never,
     );
 
@@ -974,60 +1101,14 @@ describe("Lite search_records", () => {
     mockFetchNetworkError();
 
     const tools = getRegisteredTools(server);
-    const result = await tools.search_records.handler(
-      { type: "schedule" },
+    const result = await tools.get_votes.handler(
+      {},
       {} as never,
     );
 
     expect(isError(result)).toBe(true);
     const parsed = getParsed(result);
     expect(parsed.error).toBeDefined();
-  });
-
-  it("meetings formatRow에서 TITLE / CONF_LINK_URL 폴백", async () => {
-    mockFetchSuccess(
-      buildAssemblyResponse("ncwgseseafwbuheph", [
-        {
-          TITLE: "회의명테스트",
-          CONF_DATE: "2024-01-01",
-          DAE_NUM: "22",
-          SUB_NAME: "안건",
-          CONF_LINK_URL: "https://conf.example.com",
-        },
-      ], 1),
-    );
-
-    const tools = getRegisteredTools(server);
-    const result = await tools.search_records.handler(
-      { type: "meetings" },
-      {} as never,
-    );
-
-    const text = getText(result);
-    expect(text).toContain("회의명테스트");
-    expect(text).toContain("https://conf.example.com");
-  });
-
-  it("meetings formatRow에서 LINK_URL 폴백", async () => {
-    mockFetchSuccess(
-      buildAssemblyResponse("VCONFAPIGCONFLIST", [
-        {
-          CLASS_NAME: "국정감사회의",
-          ERACO: "제22대",
-          LINK_URL: "https://link.example.com",
-        },
-      ], 1),
-    );
-
-    const tools = getRegisteredTools(server);
-    const result = await tools.search_records.handler(
-      { type: "meetings", meeting_type: "국정감사" },
-      {} as never,
-    );
-
-    const text = getText(result);
-    expect(text).toContain("국정감사회의");
-    expect(text).toContain("https://link.example.com");
   });
 });
 

@@ -100,6 +100,14 @@ export const API_CODES = {
   // ── 입법조사처 ─────────────────────────────────
   /** 입법조사처 보고서 */
   RESEARCH_REPORTS: "naaborihbkorknasp",
+
+  // ── 기타 ────────────────────────────────────
+  /** 최근 본회의 부의안건 */
+  RECENT_PLENARY_BILLS: "nxjuyqnxadtotdrbw",
+  /** 국회도서관 자료검색 */
+  LIBRARY_SEARCH: "nywrpgoaatcpoqbiy",
+  /** 예산정책처 분석자료 */
+  BUDGET_ANALYSIS: "OZN379001174FW17905",
 } as const;
 
 export type ApiCode = (typeof API_CODES)[keyof typeof API_CODES];

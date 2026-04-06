@@ -2,9 +2,13 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { type AppConfig } from "../../src/config.js";
 import { registerMemberTools } from "../../src/tools/members.js";
-import { registerBillTools } from "../../src/tools/bills.js";
+import { registerBillDetailTool } from "../../src/tools/bills.js";
 import { registerScheduleTools } from "../../src/tools/schedule.js";
 import { registerMeetingTools } from "../../src/tools/meetings.js";
+import { registerLiteBillTools } from "../../src/tools/lite/bills.js";
+import { registerLiteScheduleTools } from "../../src/tools/lite/schedule.js";
+import { registerLiteMeetingTools } from "../../src/tools/lite/meetings.js";
+import { registerLiteMemberTools } from "../../src/tools/lite/members.js";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -110,11 +114,16 @@ describe("MCP Tool Registration", () => {
       expect(tools).toHaveProperty("get_member_detail");
     });
 
-    it("registerBillTools는 search_bills와 get_bill_detail을 등록한다", () => {
-      registerBillTools(server, config);
+    it("registerBillDetailTool은 get_bill_detail을 등록한다", () => {
+      registerBillDetailTool(server, config);
+      const tools = getRegisteredTools(server);
+      expect(tools).toHaveProperty("get_bill_detail");
+    });
+
+    it("registerLiteBillTools는 search_bills를 등록한다", () => {
+      registerLiteBillTools(server, config);
       const tools = getRegisteredTools(server);
       expect(tools).toHaveProperty("search_bills");
-      expect(tools).toHaveProperty("get_bill_detail");
     });
 
     it("registerScheduleTools는 get_schedule을 등록한다", () => {
@@ -129,20 +138,20 @@ describe("MCP Tool Registration", () => {
       expect(tools).toHaveProperty("search_meeting_records");
     });
 
-    it("모든 도구를 한 서버에 등록할 수 있다", () => {
-      registerMemberTools(server, config);
-      registerBillTools(server, config);
-      registerScheduleTools(server, config);
-      registerMeetingTools(server, config);
+    it("Lite 도구와 Full 전용 도구를 한 서버에 등록할 수 있다", () => {
+      registerLiteMemberTools(server, config);
+      registerLiteBillTools(server, config);
+      registerLiteScheduleTools(server, config);
+      registerLiteMeetingTools(server, config);
+      registerBillDetailTool(server, config);
       const tools = getRegisteredTools(server);
 
       const expectedNames = [
-        "get_members",
-        "get_member_detail",
+        "search_members",
         "search_bills",
         "get_bill_detail",
         "get_schedule",
-        "search_meeting_records",
+        "search_meetings",
       ];
       for (const name of expectedNames) {
         expect(tools).toHaveProperty(name);
@@ -150,8 +159,8 @@ describe("MCP Tool Registration", () => {
     });
 
     it("같은 도구를 두 번 등록하면 에러를 던진다", () => {
-      registerMemberTools(server, config);
-      expect(() => registerMemberTools(server, config)).toThrow(
+      registerBillDetailTool(server, config);
+      expect(() => registerBillDetailTool(server, config)).toThrow(
         "already registered",
       );
     });
@@ -161,8 +170,8 @@ describe("MCP Tool Registration", () => {
   // get_members
   // -----------------------------------------------------------------------
 
-  describe("get_members", () => {
-    it("성공적인 의원 목록을 반환한다", async () => {
+  describe("search_members (Lite)", () => {
+    it("성공적인 의원 목록을 반환한다 (1건이면 상세)", async () => {
       const rows = [
         {
           HG_NM: "홍길동",
@@ -183,17 +192,18 @@ describe("MCP Tool Registration", () => {
       ];
       mockFetchSuccess(buildAssemblyResponse("nwvrqwxyaytdsfvhu", rows, 1));
 
-      registerMemberTools(server, config);
+      registerLiteMemberTools(server, config);
       const tools = getRegisteredTools(server);
-      const result = await tools.get_members.handler({ name: "홍길동" }, {} as never);
+      const result = await tools.search_members.handler({ name: "홍길동" }, {} as never);
       const content = (result as { content: Array<{ text: string }> }).content;
 
       expect(content).toHaveLength(1);
       const parsed = JSON.parse(content[0].text);
       expect(parsed.total).toBe(1);
       expect(parsed.items).toHaveLength(1);
-      expect(parsed.items[0].이름).toBe("홍길동");
-      expect(parsed.items[0].정당).toBe("테스트당");
+      // 1건이므로 상세(DETAIL_FIELDS) 반환 — 한글 키
+      expect(parsed.items[0]["이름"]).toBe("홍길동");
+      expect(parsed.items[0]["정당"]).toBe("테스트당");
     });
 
     it("API 에러를 올바르게 처리한다", async () => {
@@ -201,9 +211,9 @@ describe("MCP Tool Registration", () => {
         buildAssemblyErrorResponse("nwvrqwxyaytdsfvhu", "INFO-200", "인증키 오류"),
       );
 
-      registerMemberTools(server, config);
+      registerLiteMemberTools(server, config);
       const tools = getRegisteredTools(server);
-      const result = await tools.get_members.handler({}, {} as never);
+      const result = await tools.search_members.handler({}, {} as never);
       const response = result as { content: Array<{ text: string }>; isError?: boolean };
 
       expect(response.isError).toBe(true);
@@ -213,47 +223,21 @@ describe("MCP Tool Registration", () => {
     it("네트워크 오류를 처리한다", async () => {
       mockFetchNetworkError();
 
-      registerMemberTools(server, config);
+      registerLiteMemberTools(server, config);
       const tools = getRegisteredTools(server);
-      const result = await tools.get_members.handler({}, {} as never);
+      const result = await tools.search_members.handler({}, {} as never);
       const response = result as { content: Array<{ text: string }>; isError?: boolean };
 
       expect(response.isError).toBe(true);
       expect(response.content[0].text).toContain("오류");
     });
-  });
-
-  // -----------------------------------------------------------------------
-  // get_member_detail
-  // -----------------------------------------------------------------------
-
-  describe("get_member_detail", () => {
-    it("의원 상세 정보를 반환한다", async () => {
-      const rows = [
-        { HG_NM: "김철수", POLY_NM: "테스트당", ORIG_NM: "부산 해운대구을" },
-      ];
-      mockFetchSuccess(buildAssemblyResponse("nwvrqwxyaytdsfvhu", rows, 1));
-
-      registerMemberTools(server, config);
-      const tools = getRegisteredTools(server);
-      const result = await tools.get_member_detail.handler(
-        { name: "김철수" },
-        {} as never,
-      );
-      const content = (result as { content: Array<{ text: string }> }).content;
-
-      const parsed = JSON.parse(content[0].text);
-      expect(parsed.total).toBe(1);
-      expect(parsed.item).toBeDefined();
-      expect(parsed.item.HG_NM).toBe("김철수");
-    });
 
     it("의원을 찾을 수 없으면 안내 메시지를 반환한다", async () => {
       mockFetchSuccess(buildAssemblyResponse("nwvrqwxyaytdsfvhu", [], 0));
 
-      registerMemberTools(server, config);
+      registerLiteMemberTools(server, config);
       const tools = getRegisteredTools(server);
-      const result = await tools.get_member_detail.handler(
+      const result = await tools.search_members.handler(
         { name: "없는사람" },
         {} as never,
       );
@@ -264,28 +248,13 @@ describe("MCP Tool Registration", () => {
       expect(parsed.items).toEqual([]);
       expect(parsed.query.name).toBe("없는사람");
     });
-
-    it("네트워크 오류를 처리한다", async () => {
-      mockFetchNetworkError();
-
-      registerMemberTools(server, config);
-      const tools = getRegisteredTools(server);
-      const result = await tools.get_member_detail.handler(
-        { name: "홍길동" },
-        {} as never,
-      );
-      const response = result as { content: Array<{ text: string }>; isError?: boolean };
-
-      expect(response.isError).toBe(true);
-      expect(response.content[0].text).toContain("오류");
-    });
   });
 
   // -----------------------------------------------------------------------
   // search_bills
   // -----------------------------------------------------------------------
 
-  describe("search_bills", () => {
+  describe("search_bills (Lite)", () => {
     it("성공적인 의안 검색 결과를 반환한다", async () => {
       const rows = [
         {
@@ -303,7 +272,7 @@ describe("MCP Tool Registration", () => {
       ];
       mockFetchSuccess(buildAssemblyResponse("nzmimeepazxkubdpn", rows, 1));
 
-      registerBillTools(server, config);
+      registerLiteBillTools(server, config);
       const tools = getRegisteredTools(server);
       const result = await tools.search_bills.handler(
         { bill_name: "테스트", age: 22 },
@@ -314,8 +283,8 @@ describe("MCP Tool Registration", () => {
       const parsed = JSON.parse(content[0].text);
       expect(parsed.total).toBe(1);
       expect(parsed.items).toHaveLength(1);
-      expect(parsed.items[0].의안명).toBe("테스트법률안");
-      expect(parsed.items[0].처리상태).toBe("계류");
+      expect(parsed.items[0]["의안명"]).toBe("테스트법률안");
+      expect(parsed.items[0]["처리상태"]).toBe("계류");
     });
 
     it("API 에러를 올바르게 처리한다", async () => {
@@ -323,7 +292,7 @@ describe("MCP Tool Registration", () => {
         buildAssemblyErrorResponse("nzmimeepazxkubdpn", "INFO-300", "요청 제한 초과"),
       );
 
-      registerBillTools(server, config);
+      registerLiteBillTools(server, config);
       const tools = getRegisteredTools(server);
       const result = await tools.search_bills.handler({}, {} as never);
       const response = result as { content: Array<{ text: string }>; isError?: boolean };
@@ -335,7 +304,7 @@ describe("MCP Tool Registration", () => {
     it("네트워크 오류를 처리한다", async () => {
       mockFetchNetworkError();
 
-      registerBillTools(server, config);
+      registerLiteBillTools(server, config);
       const tools = getRegisteredTools(server);
       const result = await tools.search_bills.handler({}, {} as never);
       const response = result as { content: Array<{ text: string }>; isError?: boolean };
@@ -361,7 +330,7 @@ describe("MCP Tool Registration", () => {
       ];
       mockFetchSuccess(buildAssemblyResponse("BILLINFODETAIL", rows, 1));
 
-      registerBillTools(server, config);
+      registerBillDetailTool(server, config);
       const tools = getRegisteredTools(server);
       const result = await tools.get_bill_detail.handler(
         { bill_id: "PRC_B2E2A0K9" },
@@ -378,7 +347,7 @@ describe("MCP Tool Registration", () => {
     it("의안을 찾을 수 없으면 안내 메시지를 반환한다", async () => {
       mockFetchSuccess(buildAssemblyResponse("BILLINFODETAIL", [], 0));
 
-      registerBillTools(server, config);
+      registerBillDetailTool(server, config);
       const tools = getRegisteredTools(server);
       const result = await tools.get_bill_detail.handler(
         { bill_id: "NONEXISTENT" },
@@ -395,7 +364,7 @@ describe("MCP Tool Registration", () => {
     it("네트워크 오류를 처리한다", async () => {
       mockFetchNetworkError();
 
-      registerBillTools(server, config);
+      registerBillDetailTool(server, config);
       const tools = getRegisteredTools(server);
       const result = await tools.get_bill_detail.handler(
         { bill_id: "PRC_B2E2A0K9" },
@@ -412,7 +381,7 @@ describe("MCP Tool Registration", () => {
   // get_schedule
   // -----------------------------------------------------------------------
 
-  describe("get_schedule", () => {
+  describe("get_schedule (Lite)", () => {
     it("통합 일정을 반환한다", async () => {
       const rows = [
         {
@@ -426,7 +395,7 @@ describe("MCP Tool Registration", () => {
       ];
       mockFetchSuccess(buildAssemblyResponse("ALLSCHEDULE", rows, 1));
 
-      registerScheduleTools(server, config);
+      registerLiteScheduleTools(server, config);
       const tools = getRegisteredTools(server);
       const result = await tools.get_schedule.handler(
         { date_from: "2024-06-01" },
@@ -437,16 +406,16 @@ describe("MCP Tool Registration", () => {
       const parsed = JSON.parse(content[0].text);
       expect(parsed.total).toBe(1);
       expect(parsed.items).toHaveLength(1);
-      expect(parsed.items[0].위원회).toBe("법제사법위원회");
+      expect(parsed.items[0]["위원회"]).toBe("법제사법위원회");
     });
 
     it("통합 일정 API (ALLSCHEDULE)를 사용한다", async () => {
       mockFetchSuccess(buildAssemblyResponse("ALLSCHEDULE", [], 0));
 
-      registerScheduleTools(server, config);
+      registerLiteScheduleTools(server, config);
       const tools = getRegisteredTools(server);
       await tools.get_schedule.handler(
-        { meeting_type: "본회의" },
+        {},
         {} as never,
       );
 
@@ -456,10 +425,10 @@ describe("MCP Tool Registration", () => {
 
     it("API 에러를 처리한다", async () => {
       mockFetchSuccess(
-        buildAssemblyErrorResponse("niktlnofmsbmeorkq", "INFO-200", "인증키 오류"),
+        buildAssemblyErrorResponse("ALLSCHEDULE", "INFO-200", "인증키 오류"),
       );
 
-      registerScheduleTools(server, config);
+      registerLiteScheduleTools(server, config);
       const tools = getRegisteredTools(server);
       const result = await tools.get_schedule.handler({}, {} as never);
       const response = result as { content: Array<{ text: string }>; isError?: boolean };
@@ -471,7 +440,7 @@ describe("MCP Tool Registration", () => {
     it("네트워크 오류를 처리한다", async () => {
       mockFetchNetworkError();
 
-      registerScheduleTools(server, config);
+      registerLiteScheduleTools(server, config);
       const tools = getRegisteredTools(server);
       const result = await tools.get_schedule.handler({}, {} as never);
       const response = result as { content: Array<{ text: string }>; isError?: boolean };
@@ -485,7 +454,7 @@ describe("MCP Tool Registration", () => {
   // search_meeting_records
   // -----------------------------------------------------------------------
 
-  describe("search_meeting_records", () => {
+  describe("search_meetings (Lite)", () => {
     it("위원회 회의록 검색 결과를 반환한다", async () => {
       const rows = [
         {
@@ -500,9 +469,9 @@ describe("MCP Tool Registration", () => {
       ];
       mockFetchSuccess(buildAssemblyResponse("ncwgseseafwbuheph", rows, 1));
 
-      registerMeetingTools(server, config);
+      registerLiteMeetingTools(server, config);
       const tools = getRegisteredTools(server);
-      const result = await tools.search_meeting_records.handler(
+      const result = await tools.search_meetings.handler(
         { keyword: "법률안" },
         {} as never,
       );
@@ -511,15 +480,15 @@ describe("MCP Tool Registration", () => {
       const parsed = JSON.parse(content[0].text);
       expect(parsed.total).toBe(1);
       expect(parsed.items).toHaveLength(1);
-      expect(parsed.items[0].회의명).toBe("법률안 심사");
+      expect(parsed.items[0]["회의명"]).toBe("법률안 심사");
     });
 
     it("본회의 회의록을 요청하면 올바른 API 코드를 사용한다", async () => {
       mockFetchSuccess(buildAssemblyResponse("nzbyfwhwaoanttzje", [], 0));
 
-      registerMeetingTools(server, config);
+      registerLiteMeetingTools(server, config);
       const tools = getRegisteredTools(server);
-      await tools.search_meeting_records.handler(
+      await tools.search_meetings.handler(
         { meeting_type: "본회의" },
         {} as never,
       );
@@ -531,9 +500,9 @@ describe("MCP Tool Registration", () => {
     it("국정감사 회의록을 요청하면 올바른 API 코드를 사용한다", async () => {
       mockFetchSuccess(buildAssemblyResponse("VCONFAPIGCONFLIST", [], 0));
 
-      registerMeetingTools(server, config);
+      registerLiteMeetingTools(server, config);
       const tools = getRegisteredTools(server);
-      await tools.search_meeting_records.handler(
+      await tools.search_meetings.handler(
         { meeting_type: "국정감사" },
         {} as never,
       );
@@ -545,9 +514,9 @@ describe("MCP Tool Registration", () => {
     it("인사청문회 회의록을 요청하면 올바른 API 코드를 사용한다", async () => {
       mockFetchSuccess(buildAssemblyResponse("VCONFCFRMCONFLIST", [], 0));
 
-      registerMeetingTools(server, config);
+      registerLiteMeetingTools(server, config);
       const tools = getRegisteredTools(server);
-      await tools.search_meeting_records.handler(
+      await tools.search_meetings.handler(
         { meeting_type: "인사청문회" },
         {} as never,
       );
@@ -556,26 +525,12 @@ describe("MCP Tool Registration", () => {
       expect(calledUrl).toContain("VCONFCFRMCONFLIST");
     });
 
-    it("API 에러를 처리한다", async () => {
-      mockFetchSuccess(
-        buildAssemblyErrorResponse("nradonlafmaqcvtna", "INFO-200", "인증키 오류"),
-      );
-
-      registerMeetingTools(server, config);
-      const tools = getRegisteredTools(server);
-      const result = await tools.search_meeting_records.handler({}, {} as never);
-      const response = result as { content: Array<{ text: string }>; isError?: boolean };
-
-      expect(response.isError).toBe(true);
-      expect(response.content[0].text).toContain("오류");
-    });
-
     it("네트워크 오류를 처리한다", async () => {
       mockFetchNetworkError();
 
-      registerMeetingTools(server, config);
+      registerLiteMeetingTools(server, config);
       const tools = getRegisteredTools(server);
-      const result = await tools.search_meeting_records.handler({}, {} as never);
+      const result = await tools.search_meetings.handler({}, {} as never);
       const response = result as { content: Array<{ text: string }>; isError?: boolean };
 
       expect(response.isError).toBe(true);
@@ -591,9 +546,9 @@ describe("MCP Tool Registration", () => {
     it("page_size가 maxPageSize를 초과하면 maxPageSize로 제한된다", async () => {
       mockFetchSuccess(buildAssemblyResponse("nwvrqwxyaytdsfvhu", [], 0));
 
-      registerMemberTools(server, config);
+      registerLiteMemberTools(server, config);
       const tools = getRegisteredTools(server);
-      await tools.get_members.handler(
+      await tools.search_members.handler(
         { page_size: 500 },
         {} as never,
       );

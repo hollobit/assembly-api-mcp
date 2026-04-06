@@ -21,7 +21,7 @@ export function registerQueryTools(
 
   server.tool(
     "query_assembly",
-    "국회 API를 직접 호출합니다. API 코드와 파라미터를 지정하여 어떤 국회 데이터든 조회할 수 있습니다. API 코드는 discover_apis나 docs/discovered-codes.md에서 확인할 수 있습니다.",
+    "API 코드로 국회 데이터를 직접 호출합니다. discover_apis로 찾은 코드를 사용하거나, 알려진 코드를 직접 입력. 전용 도구가 없는 276개 API에 접근하는 범용 도구입니다.",
     {
       api_code: z
         .string()

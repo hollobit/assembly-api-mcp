@@ -49,9 +49,19 @@ describe("Lite 도구 모듈 import", () => {
     expect(mod.registerLiteBillTools).toBeDefined();
   });
 
-  it("registerLiteRecordTools를 export한다", async () => {
-    const mod = await import("../../src/tools/lite/records.js");
-    expect(mod.registerLiteRecordTools).toBeDefined();
+  it("registerLiteScheduleTools를 export한다", async () => {
+    const mod = await import("../../src/tools/lite/schedule.js");
+    expect(mod.registerLiteScheduleTools).toBeDefined();
+  });
+
+  it("registerLiteMeetingTools를 export한다", async () => {
+    const mod = await import("../../src/tools/lite/meetings.js");
+    expect(mod.registerLiteMeetingTools).toBeDefined();
+  });
+
+  it("registerLiteVoteTools를 export한다", async () => {
+    const mod = await import("../../src/tools/lite/votes.js");
+    expect(mod.registerLiteVoteTools).toBeDefined();
   });
 
   it("registerLiteChainTools를 export한다", async () => {
@@ -61,7 +71,7 @@ describe("Lite 도구 모듈 import", () => {
 });
 
 describe("Lite 도구 등록 검증", () => {
-  it("registerLiteTools는 server.tool을 7번 호출한다", async () => {
+  it("registerLiteTools는 server.tool을 9번 호출한다", async () => {
     const { registerLiteTools } = await import("../../src/tools/lite/index.js");
 
     const toolCalls: string[] = [];
@@ -81,10 +91,12 @@ describe("Lite 도구 등록 검증", () => {
 
     registerLiteTools(mockServer as any, mockConfig);
 
-    expect(toolCalls).toHaveLength(7);
+    expect(toolCalls).toHaveLength(9);
     expect(toolCalls).toContain("search_members");
     expect(toolCalls).toContain("search_bills");
-    expect(toolCalls).toContain("search_records");
+    expect(toolCalls).toContain("get_schedule");
+    expect(toolCalls).toContain("search_meetings");
+    expect(toolCalls).toContain("get_votes");
     expect(toolCalls).toContain("analyze_legislator");
     expect(toolCalls).toContain("track_legislation");
     expect(toolCalls).toContain("discover_apis");

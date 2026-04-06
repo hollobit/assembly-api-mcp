@@ -67,7 +67,7 @@ export function registerDiscoverTools(
 
   server.tool(
     "discover_apis",
-    "국회 열린데이터 276개 API를 검색합니다. 키워드로 원하는 데이터의 API 코드를 찾을 수 있습니다. 찾은 코드는 query_assembly 도구로 직접 호출할 수 있습니다.",
+    "국회 276개 API를 키워드/카테고리로 탐색합니다. 전용 도구가 없는 데이터(청원, 의안통계, 위원회 위원 명단 등)의 API 코드를 찾아 query_assembly로 호출할 수 있습니다.",
     {
       keyword: z
         .string()
