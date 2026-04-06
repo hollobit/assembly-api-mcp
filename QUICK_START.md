@@ -1,21 +1,51 @@
 # 빠른 시작 가이드
 
-5분 안에 국회 API MCP 서버를 실행하는 방법입니다.
+5분 안에 국회 API MCP 서버를 사용하는 방법입니다.
 
 ---
 
 ## 사전 조건
 
-- **Node.js 18 이상** — [nodejs.org](https://nodejs.org)에서 설치
-  - macOS: `brew install node` 또는 공식 설치 파일
-  - Windows: 공식 설치 파일 또는 `winget install OpenJS.NodeJS.LTS`
-  - Linux: `sudo apt install nodejs npm` 또는 [NodeSource](https://github.com/nodesource/distributions)
-
-> 설치 확인: `node --version` (v18 이상이면 OK)
+- **국회 API 키** — [open.assembly.go.kr](https://open.assembly.go.kr)에서 무료 발급 (`sample` 키로 테스트 가능)
 
 ---
 
-## 자동 설치 (가장 빠른 방법)
+## 원격 서버 (설치 불필요, 가장 빠른 방법)
+
+아무것도 설치하지 않고 URL만 등록하면 바로 사용할 수 있습니다.
+
+AI 클라이언트 설정에 아래 URL을 추가하세요:
+
+```
+https://assembly-api-mcp.fly.dev/mcp?key=YOUR_API_KEY&profile=lite
+```
+
+Claude Desktop 설정 예시 (`~/Library/Application Support/Claude/claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "assembly-api": {
+      "url": "https://assembly-api-mcp.fly.dev/mcp?key=YOUR_API_KEY&profile=lite"
+    }
+  }
+}
+```
+
+| 파라미터 | 필수 | 기본값 | 설명 |
+|---------|------|--------|------|
+| `key` | O | `sample` | 열린국회정보 API 키 |
+| `profile` | X | `lite` | `lite` (9개 도구) 또는 `full` (18개 도구) |
+
+> `sample` 키로 최대 10건까지 테스트할 수 있습니다. 설정 후 Claude Desktop을 완전 종료(Cmd+Q) 후 재시작하세요.
+
+원격 서버만으로 충분하다면 아래 단계는 건너뛰어도 됩니다.
+
+---
+
+## 자동 설치 (로컬 실행)
+
+Node.js 18 이상이 필요합니다 ([nodejs.org](https://nodejs.org)).
 
 ```bash
 npx assembly-api-mcp setup
@@ -26,6 +56,8 @@ npx assembly-api-mcp setup
 ---
 
 ## 수동 설치
+
+Node.js 18 이상이 필요합니다 ([nodejs.org](https://nodejs.org)).
 
 ### 1단계: API 키 발급 (2분)
 
