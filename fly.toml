@@ -1,0 +1,27 @@
+app = "assembly-api-mcp"
+primary_region = "nrt"
+
+[build]
+
+[env]
+  MCP_TRANSPORT = "http"
+  MCP_PORT = "8080"
+  MCP_PROFILE = "lite"
+  ASSEMBLY_API_KEY = "sample"
+  NODE_ENV = "production"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [http_service.concurrency]
+    type = "connections"
+    hard_limit = 100
+    soft_limit = 80
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"

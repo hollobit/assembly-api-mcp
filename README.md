@@ -50,6 +50,33 @@ cp .env.example .env
 npx tsx src/cli.ts test
 ```
 
+### 방법 3: 원격 서버 (설치 불필요)
+
+설치 없이 URL만으로 바로 사용할 수 있습니다:
+
+```
+https://assembly-api-mcp.fly.dev/mcp?key=YOUR_API_KEY&profile=lite
+```
+
+Claude Desktop 설정 예시:
+
+```json
+{
+  "mcpServers": {
+    "assembly-api": {
+      "url": "https://assembly-api-mcp.fly.dev/mcp?key=YOUR_API_KEY&profile=lite"
+    }
+  }
+}
+```
+
+| 파라미터 | 필수 | 기본값 | 설명 |
+|---------|------|--------|------|
+| `key` | O | `sample` | 열린국회정보 API 키 |
+| `profile` | X | `lite` | `lite` (9개 도구) 또는 `full` (18개 도구) |
+
+> `sample` 키로 최대 10건까지 테스트할 수 있습니다.
+
 ## AI 클라이언트 연동
 
 > 상세한 설정 가이드는 [QUICK_START.md](QUICK_START.md)를 참조하세요.

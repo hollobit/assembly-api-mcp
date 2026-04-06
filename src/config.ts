@@ -146,6 +146,65 @@ export function loadConfig(): AppConfig {
   };
 }
 
+/**
+ * 원격 서버 모드용 config 로더
+ *
+ * ASSEMBLY_API_KEY가 없어도 서버를 시작할 수 있습니다.
+ * 사용자별 API 키는 URL 쿼리 파라미터로 세션 생성 시 전달됩니다.
+ */
+export function loadRemoteConfig(): AppConfig {
+  return {
+    apiKeys: {
+      assemblyApiKey: optionalEnv("ASSEMBLY_API_KEY") ?? "sample",
+      dataGoKrServiceKey: optionalEnv("DATA_GO_KR_SERVICE_KEY"),
+      nanetApiKey: optionalEnv("NANET_API_KEY"),
+      naboApiKey: optionalEnv("NABO_API_KEY"),
+    },
+    server: {
+      transport: "http",
+      port: envIntOrDefault("MCP_PORT", 3000),
+      logLevel: envOrDefault("LOG_LEVEL", "info") as
+        | "debug"
+        | "info"
+        | "warn"
+        | "error",
+    },
+    cache: {
+      enabled: envBoolOrDefault("CACHE_ENABLED", true),
+      ttlStatic: envIntOrDefault("CACHE_TTL_STATIC", 86400),
+      ttlDynamic: envIntOrDefault("CACHE_TTL_DYNAMIC", 3600),
+    },
+    apiResponse: {
+      defaultType: envOrDefault("DEFAULT_RESPONSE_TYPE", "json") as
+        | "json"
+        | "xml",
+      defaultPageSize: envIntOrDefault("DEFAULT_PAGE_SIZE", 20),
+      maxPageSize: envIntOrDefault("MAX_PAGE_SIZE", 100),
+    },
+    profile: parseProfile(envOrDefault("MCP_PROFILE", "lite")),
+  };
+}
+
+/**
+ * 기존 config를 URL 쿼리 파라미터로 오버라이드하여 새 config를 생성합니다.
+ * 원본 config를 변경하지 않습니다 (immutable).
+ */
+export function overrideConfigFromParams(
+  base: AppConfig,
+  params: { key?: string; profile?: string },
+): AppConfig {
+  return {
+    ...base,
+    apiKeys: {
+      ...base.apiKeys,
+      assemblyApiKey: params.key ?? base.apiKeys.assemblyApiKey,
+    },
+    profile: params.profile
+      ? parseProfile(params.profile)
+      : base.profile,
+  };
+}
+
 // ---------------------------------------------------------------------------
 // API Base URLs
 // ---------------------------------------------------------------------------

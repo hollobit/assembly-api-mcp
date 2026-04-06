@@ -14,7 +14,7 @@ import { randomUUID } from "node:crypto";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
-import { type AppConfig } from "./config.js";
+import { type AppConfig, overrideConfigFromParams } from "./config.js";
 import { registerLiteTools } from "./tools/lite/index.js";
 import { registerBillDetailTool } from "./tools/bills.js";
 import { registerCommitteeTools } from "./tools/committees.js";
@@ -125,7 +125,7 @@ async function startHttpTransport(config: AppConfig): Promise<McpServer> {
       }
 
       // MCP endpoint — per-session transport routing
-      if (url === MCP_ENDPOINT) {
+      if (url === MCP_ENDPOINT || url.startsWith(MCP_ENDPOINT + "?")) {
         void handleMcpRequest(req, res, config, sessions);
         return;
       }
@@ -171,6 +171,16 @@ async function startHttpTransport(config: AppConfig): Promise<McpServer> {
   return buildMcpServer(config);
 }
 
+function parseQueryParams(url: string): { key?: string; profile?: string } {
+  const idx = url.indexOf("?");
+  if (idx === -1) return {};
+  const searchParams = new URLSearchParams(url.slice(idx + 1));
+  return {
+    key: searchParams.get("key") ?? undefined,
+    profile: searchParams.get("profile") ?? undefined,
+  };
+}
+
 async function handleMcpRequest(
   req: IncomingMessage,
   res: ServerResponse,
@@ -189,10 +199,14 @@ async function handleMcpRequest(
 
   // New session — only allowed via POST (initialization) or when no session ID
   if (!sessionId && req.method === "POST") {
+    // URL 쿼리 파라미터로 세션별 config 생성 (key, profile)
+    const params = parseQueryParams(req.url ?? "");
+    const sessionConfig = overrideConfigFromParams(config, params);
+
     const newTransport = new StreamableHTTPServerTransport({
       sessionIdGenerator: () => randomUUID(),
     });
-    const newServer = buildMcpServer(config);
+    const newServer = buildMcpServer(sessionConfig);
     await newServer.connect(newTransport);
 
     // Handle the request (this will generate the session ID in the response)

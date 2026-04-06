@@ -32,6 +32,6 @@ COPY --from=build /app/dist ./dist
 RUN addgroup -S assembly && adduser -S assembly -G assembly
 USER assembly
 
-EXPOSE 3000
+EXPOSE ${MCP_PORT:-3000}
 
-CMD ["node", "dist/index.js"]
+CMD ["node", "dist/index.js", "remote"]
