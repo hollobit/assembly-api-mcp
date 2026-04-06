@@ -77,6 +77,20 @@ Claude Desktop 설정 예시:
 
 > `sample` 키로 최대 10건까지 테스트할 수 있습니다.
 
+#### 프로필 선택 및 변경
+
+URL의 `profile` 파라미터를 변경하면 사용 가능한 도구 수가 달라집니다:
+
+```
+# Lite 프로필 (9개 도구, 기본) — 일반 사용에 권장
+https://assembly-api-mcp.fly.dev/mcp?key=YOUR_API_KEY&profile=lite
+
+# Full 프로필 (18개 도구) — 심사정보, 청원, 입법예고 등 세부 도구 필요 시
+https://assembly-api-mcp.fly.dev/mcp?key=YOUR_API_KEY&profile=full
+```
+
+프로필을 변경하려면 클라이언트 설정의 URL에서 `profile=` 값을 수정한 뒤 앱을 재시작하세요. 프로필별 도구 목록은 [MCP 도구 목록](#mcp-도구-목록) 섹션을 참조하세요.
+
 ## AI 클라이언트 연동
 
 > 상세한 설정 가이드는 [QUICK_START.md](QUICK_START.md)를 참조하세요.
