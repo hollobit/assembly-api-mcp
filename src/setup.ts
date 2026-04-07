@@ -129,8 +129,8 @@ export async function runSetup(): Promise<void> {
     // Step 2: 프로필 선택
     console.log("");
     console.log("📋 Step 2: 프로필 선택");
-    console.log("   1) lite — 9개 통합 도구 (기본, 권장)");
-    console.log("   2) full — 18개 도구 (파워유저)");
+    console.log("   1) lite — 6개 통합 도구 (기본, 권장)");
+    console.log("   2) full — 10개 도구 (파워유저)");
     console.log("");
 
     const profileChoice = await rl.question("   선택 [1]: ");
