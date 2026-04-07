@@ -72,17 +72,19 @@ export function registerLiteMeetingTools(
 
         let apiCode: string;
         // keyword 검색 시 더 많은 결과를 가져와서 필터링
-        const needsClientFilter = !!params.keyword;
-        if (needsClientFilter && !params.page_size) {
+        if (params.keyword && !params.page_size) {
           queryParams.pSize = 100;
         }
+
+        // CONF_DATE 기본값: 사용자가 연도를 지정하지 않으면
+        // 현재 연도로 시도하되, 결과가 0건이면 이전 연도로 폴백
+        const confDateYear = params.date_from?.slice(0, 4);
 
         switch (params.meeting_type) {
           case "본회의":
             apiCode = API_CODES.MEETING_PLENARY;
             queryParams.DAE_NUM = age;
-            queryParams.CONF_DATE =
-              params.date_from?.slice(0, 4) ?? String(new Date().getFullYear());
+            queryParams.CONF_DATE = confDateYear ?? String(new Date().getFullYear());
             break;
           case "국정감사":
             apiCode = API_CODES.MEETING_AUDIT;
@@ -99,20 +101,32 @@ export function registerLiteMeetingTools(
           case "소위원회":
             apiCode = API_CODES.MEETING_COMMITTEE;
             queryParams.DAE_NUM = age;
-            queryParams.CONF_DATE =
-              params.date_from?.slice(0, 4) ?? String(new Date().getFullYear());
+            queryParams.CONF_DATE = confDateYear ?? String(new Date().getFullYear());
             if (params.committee) queryParams.COMM_NAME = params.committee;
             break;
           default:
             apiCode = API_CODES.MEETING_COMMITTEE;
             queryParams.DAE_NUM = age;
-            queryParams.CONF_DATE =
-              params.date_from?.slice(0, 4) ?? String(new Date().getFullYear());
+            queryParams.CONF_DATE = confDateYear ?? String(new Date().getFullYear());
             if (params.committee) queryParams.COMM_NAME = params.committee;
             break;
         }
 
-        const result = await api.fetchOpenAssembly(apiCode, queryParams);
+        let result = await api.fetchOpenAssembly(apiCode, queryParams);
+
+        // CONF_DATE 기반 API에서 결과 0건이고 사용자가 연도 미지정 시 → 이전 연도 자동 폴백
+        if (
+          result.rows.length === 0 &&
+          !confDateYear &&
+          queryParams.CONF_DATE
+        ) {
+          const prevYear = String(Number(queryParams.CONF_DATE) - 1);
+          result = await api.fetchOpenAssembly(apiCode, {
+            ...queryParams,
+            CONF_DATE: prevYear,
+          });
+        }
+
         let rows = result.rows;
 
         // 키워드 클라이언트 측 필터링 (안건명, 회의명에서 검색)
