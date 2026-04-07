@@ -341,15 +341,22 @@ async function fetchWithErrorHandling(url: string): Promise<unknown> {
     throw new Error(`HTTP 오류: ${response.status} ${response.statusText}`);
   }
 
-  const text = await response.text();
+  const rawText = await response.text();
+  // BOM 제거 + trim
+  const text = rawText.replace(/^\uFEFF/, "").trim();
 
   // XML 응답이 돌아온 경우 (JSON 요청했으나 서버가 XML 반환)
-  if (text.trim().startsWith("<")) {
+  if (text.startsWith("<") || text.includes("<?xml")) {
     const codeMatch = text.match(/<CODE>([^<]+)<\/CODE>/);
     const msgMatch = text.match(/<MESSAGE>([^<]+)<\/MESSAGE>/);
     const code = codeMatch?.[1] ?? "unknown";
     const msg = msgMatch?.[1] ?? "알 수 없는 오류 (XML 응답)";
     throw new Error(`API 오류 [${code}]: ${msg}`);
+  }
+
+  // 빈 응답 처리
+  if (text.length === 0) {
+    throw new Error("API 응답이 비어있습니다.");
   }
 
   try {

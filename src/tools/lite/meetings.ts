@@ -64,13 +64,18 @@ export function registerLiteMeetingTools(
         const age = params.age ?? CURRENT_AGE;
         const queryParams: Record<string, string | number> = {};
 
-        if (params.keyword) queryParams.SUB_NAME = params.keyword;
+        // keyword는 클라이언트 측 필터링으로 처리 (API가 SUB_NAME 파라미터를 안정적으로 지원하지 않음)
         if (params.page) queryParams.pIndex = params.page;
         if (params.page_size) {
           queryParams.pSize = Math.min(params.page_size, config.apiResponse.maxPageSize);
         }
 
         let apiCode: string;
+        // keyword 검색 시 더 많은 결과를 가져와서 필터링
+        const needsClientFilter = !!params.keyword;
+        if (needsClientFilter && !params.page_size) {
+          queryParams.pSize = 100;
+        }
 
         switch (params.meeting_type) {
           case "본회의":
@@ -108,7 +113,20 @@ export function registerLiteMeetingTools(
         }
 
         const result = await api.fetchOpenAssembly(apiCode, queryParams);
-        const formatted = result.rows.map(formatMeetingRow);
+        let rows = result.rows;
+
+        // 키워드 클라이언트 측 필터링 (안건명, 회의명에서 검색)
+        if (params.keyword) {
+          const kw = params.keyword.toLowerCase();
+          rows = rows.filter((row) => {
+            const subName = String(row.SUB_NAME ?? "").toLowerCase();
+            const title = String(row.TITLE ?? "").toLowerCase();
+            const commName = String(row.COMM_NAME ?? "").toLowerCase();
+            return subName.includes(kw) || title.includes(kw) || commName.includes(kw);
+          });
+        }
+
+        const formatted = rows.map(formatMeetingRow);
 
         return {
           content: [
