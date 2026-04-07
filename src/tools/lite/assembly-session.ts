@@ -1,0 +1,241 @@
+/**
+ * 국회 일정/회의록/표결 통합 도구
+ *
+ * get_schedule, search_meetings, get_votes를 하나의 assembly_session 도구로 통합합니다.
+ * type 파라미터로 모드를 선택하거나, 파라미터 조합으로 자동 감지합니다.
+ */
+import { z } from "zod";
+import { type McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { type AppConfig } from "../../config.js";
+import { createApiClient } from "../../api/client.js";
+import { API_CODES, CURRENT_AGE } from "../../api/codes.js";
+import { formatToolError } from "../helpers.js";
+
+type SessionType = "schedule" | "meeting" | "vote";
+type Row = Readonly<Record<string, unknown>>;
+
+interface ApiClient {
+  fetchOpenAssembly: (
+    code: string,
+    params: Record<string, string | number>,
+  ) => Promise<{ rows: readonly Row[] }>;
+}
+
+// -- Formatters ---------------------------------------------------------------
+
+function formatScheduleRow(row: Row): Record<string, unknown> {
+  return {
+    일정종류: row.SCH_KIND, 일자: row.SCH_DT, 시간: row.SCH_TM,
+    위원회: row.CMIT_NM, 내용: row.SCH_CN, 장소: row.EV_PLC,
+  };
+}
+
+function formatMeetingRow(row: Row): Record<string, unknown> {
+  return {
+    회의명: row.TITLE ?? row.COMM_NAME ?? row.CLASS_NAME,
+    회의일: row.CONF_DATE, 대수: row.DAE_NUM ?? row.ERACO,
+    안건: row.SUB_NAME,
+    회의록URL: row.PDF_LINK_URL ?? row.CONF_LINK_URL ?? row.LINK_URL,
+    영상URL: row.VOD_LINK_URL,
+  };
+}
+
+function formatVoteByBillRow(row: Row): Record<string, unknown> {
+  return { 의안ID: row.BILL_ID, 의안명: row.BILL_NAME, 의원명: row.HG_NM, 표결결과: row.VOTE_RESULT };
+}
+
+function formatVotePlenaryRow(row: Row): Record<string, unknown> {
+  return {
+    의안ID: row.BILL_ID, 의안명: row.BILL_NAME ?? row.BILL_NM,
+    표결일: row.VOTE_DATE, 찬성: row.YES_TCNT, 반대: row.NO_TCNT,
+    기권: row.BLANK_TCNT, 결과: row.RESULT ?? row.VOTE_RESULT,
+  };
+}
+
+// -- Auto-detection -----------------------------------------------------------
+
+function detectType(params: {
+  type?: SessionType; bill_id?: string; vote_type?: string; meeting_type?: string;
+}): SessionType {
+  if (params.type) return params.type;
+  if (params.bill_id || params.vote_type) return "vote";
+  if (params.meeting_type) return "meeting";
+  return "schedule";
+}
+
+// -- Schedule handler ---------------------------------------------------------
+
+async function handleSchedule(
+  api: ApiClient,
+  params: { date_from?: string; date_to?: string; keyword?: string; committee?: string; page?: number; page_size?: number },
+  config: AppConfig,
+): Promise<Record<string, unknown>[]> {
+  const q: Record<string, string | number> = {};
+  const hasRange = params.date_from && params.date_to;
+  if (params.date_from && !hasRange) q.SCH_DT = params.date_from;
+  if (params.committee) q.CMIT_NM = params.committee;
+  if (params.page) q.pIndex = params.page;
+  q.pSize = hasRange
+    ? Math.min(params.page_size ?? 100, config.apiResponse.maxPageSize)
+    : Math.min(params.page_size ?? config.apiResponse.defaultPageSize, config.apiResponse.maxPageSize);
+
+  const result = await api.fetchOpenAssembly(API_CODES.SCHEDULE_ALL, q);
+  let rows = result.rows;
+  if (hasRange) {
+    rows = rows.filter((r) => {
+      const dt = String(r.SCH_DT ?? "");
+      return dt >= params.date_from! && dt <= params.date_to!;
+    });
+  }
+  if (params.keyword) {
+    const kw = params.keyword.toLowerCase();
+    rows = rows.filter((r) => String(r.SCH_CN ?? "").toLowerCase().includes(kw));
+  }
+  return rows.map(formatScheduleRow);
+}
+
+// -- Meeting handler ----------------------------------------------------------
+
+async function handleMeeting(
+  api: ApiClient,
+  params: { meeting_type?: string; keyword?: string; committee?: string; date_from?: string; age?: number; page?: number; page_size?: number },
+  config: AppConfig,
+): Promise<Record<string, unknown>[]> {
+  const age = params.age ?? CURRENT_AGE;
+  const confDateYear = params.date_from?.slice(0, 4);
+  const currentYear = String(new Date().getFullYear());
+  const usesConfDate = !["국정감사", "인사청문회", "공청회"].includes(params.meeting_type ?? "");
+  const q: Record<string, string | number> = {};
+  if (params.page) q.pIndex = params.page;
+  q.pSize = params.keyword
+    ? Math.min(100, config.apiResponse.maxPageSize)
+    : Math.min(params.page_size ?? config.apiResponse.defaultPageSize, config.apiResponse.maxPageSize);
+
+  let apiCode: string;
+  switch (params.meeting_type) {
+    case "본회의":
+      apiCode = API_CODES.MEETING_PLENARY;
+      q.DAE_NUM = age;
+      q.CONF_DATE = confDateYear ?? currentYear;
+      break;
+    case "국정감사":
+      apiCode = API_CODES.MEETING_AUDIT;
+      q.ERACO = `제${age}대`;
+      break;
+    case "인사청문회":
+      apiCode = API_CODES.MEETING_CONFIRMATION;
+      q.ERACO = `제${age}대`;
+      break;
+    case "공청회":
+      apiCode = API_CODES.MEETING_PUBLIC_HEARING;
+      q.ERACO = `제${age}대`;
+      break;
+    default: // 위원회 / 소위원회
+      apiCode = API_CODES.MEETING_COMMITTEE;
+      q.DAE_NUM = age;
+      q.CONF_DATE = confDateYear ?? currentYear;
+      if (params.committee) q.COMM_NAME = params.committee;
+      break;
+  }
+
+  let result = await api.fetchOpenAssembly(apiCode, q);
+  // 연도 폴백: 현재 연도 결과 부족 시 이전 연도 병합
+  if (usesConfDate && !confDateYear && q.CONF_DATE) {
+    const prevYear = String(Number(q.CONF_DATE) - 1);
+    if (result.rows.length === 0) {
+      result = await api.fetchOpenAssembly(apiCode, { ...q, CONF_DATE: prevYear });
+    } else if (result.rows.length < 20) {
+      const prev = await api.fetchOpenAssembly(apiCode, { ...q, CONF_DATE: prevYear });
+      result = { rows: [...result.rows, ...prev.rows] };
+    }
+  }
+
+  let rows = result.rows;
+  if (params.keyword) {
+    const kw = params.keyword.toLowerCase();
+    rows = rows.filter((r) => {
+      const fields = [r.SUB_NAME, r.TITLE, r.COMM_NAME].map((v) => String(v ?? "").toLowerCase());
+      return fields.some((f) => f.includes(kw));
+    });
+  }
+  return rows.map(formatMeetingRow);
+}
+
+// -- Vote handler -------------------------------------------------------------
+
+const VOTE_TYPE_MAP: Record<string, string> = {
+  "법률안": API_CODES.PLENARY_LAW,
+  "예산안": API_CODES.PLENARY_BUDGET,
+  "결산": API_CODES.PLENARY_BUDGET,
+  "기타": API_CODES.PLENARY_ETC,
+};
+
+async function handleVote(
+  api: ApiClient,
+  params: { bill_id?: string; vote_type?: string; age?: number; page?: number; page_size?: number },
+  config: AppConfig,
+): Promise<Record<string, unknown>[]> {
+  const q: Record<string, string | number> = { AGE: params.age ?? CURRENT_AGE };
+  if (params.page) q.pIndex = params.page;
+  if (params.page_size) q.pSize = Math.min(params.page_size, config.apiResponse.maxPageSize);
+
+  let apiCode: string;
+  let formatRow: (row: Row) => Record<string, unknown>;
+  if (params.bill_id) {
+    apiCode = API_CODES.VOTE_BY_BILL;
+    q.BILL_ID = params.bill_id;
+    formatRow = formatVoteByBillRow;
+  } else {
+    apiCode = (params.vote_type && VOTE_TYPE_MAP[params.vote_type]) ?? API_CODES.VOTE_PLENARY;
+    formatRow = formatVotePlenaryRow;
+  }
+
+  const result = await api.fetchOpenAssembly(apiCode, q);
+  return result.rows.map(formatRow);
+}
+
+// -- Registration -------------------------------------------------------------
+
+export function registerAssemblySessionTool(server: McpServer, config: AppConfig): void {
+  const api = createApiClient(config);
+
+  server.tool(
+    "assembly_session",
+    "국회 일정·회의록·표결을 조회합니다. type=schedule로 일정, meeting으로 회의록, vote로 표결. 자동 감지 가능.",
+    {
+      type: z.enum(["schedule", "meeting", "vote"]).optional()
+        .describe("조회 유형. 생략 시 파라미터로 자동 감지"),
+      date_from: z.string().optional()
+        .describe("시작 날짜 (YYYY-MM-DD) 또는 연도 (YYYY). schedule: 날짜 필터, meeting: 연도 필터"),
+      date_to: z.string().optional()
+        .describe("종료 날짜 (YYYY-MM-DD). schedule 모드에서 범위 검색 시 사용"),
+      meeting_type: z.enum(["본회의", "위원회", "소위원회", "국정감사", "인사청문회", "공청회"]).optional()
+        .describe("회의 종류 (meeting 모드)"),
+      keyword: z.string().optional()
+        .describe("검색 키워드. schedule: 일정 내용, meeting: 안건명/회의명"),
+      committee: z.string().optional().describe("위원회명 (schedule/meeting 모드)"),
+      bill_id: z.string().optional().describe("의안 ID (vote 모드: 의원별 표결 상세)"),
+      vote_type: z.enum(["법률안", "예산안", "결산", "기타"]).optional()
+        .describe("본회의 처리안건 유형 (vote 모드)"),
+      age: z.number().optional().describe(`대수 (기본: ${CURRENT_AGE} = 제${CURRENT_AGE}대 국회)`),
+      page: z.number().optional().describe("페이지 번호 (기본: 1)"),
+      page_size: z.number().optional().describe("페이지 크기 (기본: 20, 최대: 100)"),
+    },
+    async (params) => {
+      try {
+        const mode = detectType(params);
+        let items: Record<string, unknown>[];
+        switch (mode) {
+          case "schedule": items = await handleSchedule(api, params, config); break;
+          case "meeting":  items = await handleMeeting(api, params, config);  break;
+          case "vote":     items = await handleVote(api, params, config);     break;
+        }
+        return {
+          content: [{ type: "text" as const, text: JSON.stringify({ mode, total: items.length, items }) }],
+        };
+      } catch (err: unknown) {
+        return formatToolError(err);
+      }
+    },
+  );
+}

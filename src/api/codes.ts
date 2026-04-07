@@ -54,6 +54,18 @@ export const API_CODES = {
   BILL_STATS_COMMITTEE: "BILLCNTCMIT",
   /** 처리 의안통계 위원회별 법률안 */
   BILL_STATS_LAW_COMMITTEE: "BILLCNTLAWCMIT",
+  /** 처리 의안통계 발의주체별 법률안 */
+  BILL_STATS_PROPOSER: "BILLCNTPRPSR",
+  /** 처리 의안통계 의안종류별·위원회별 */
+  BILL_STATS_LAW_DIV: "BILLCNTLAWDIV",
+
+  // ── 본회의 처리안건 ────────────────────────────
+  /** 본회의 처리안건_법률안 */
+  PLENARY_LAW: "nkalemivaqmoibxro",
+  /** 본회의 처리안건_예산안 */
+  PLENARY_BUDGET: "nbslryaradshbpbpm",
+  /** 본회의 처리안건_기타 */
+  PLENARY_ETC: "nzgjnvnraowulzqwl",
 
   // ── 일정 ────────────────────────────────────
   /** 국회일정 통합 API (90,201건, AGE 불필요) */
