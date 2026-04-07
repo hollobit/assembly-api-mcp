@@ -141,12 +141,20 @@ async function startHttpTransport(config: AppConfig): Promise<McpServer> {
 
       // OpenAPI REST endpoints (/api/*, /openapi.json)
       if (url.startsWith("/api/") || url.startsWith("/openapi.json")) {
-        void handleRestRequest(req, res, config).then((handled) => {
-          if (!handled) {
-            res.writeHead(404, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ error: "Not found" }));
-          }
-        });
+        void handleRestRequest(req, res, config)
+          .then((handled) => {
+            if (!handled) {
+              res.writeHead(404, { "Content-Type": "application/json" });
+              res.end(JSON.stringify({ error: "Not found" }));
+            }
+          })
+          .catch((err: unknown) => {
+            const msg = err instanceof Error ? err.message : String(err);
+            if (!res.headersSent) {
+              res.writeHead(500, { "Content-Type": "application/json" });
+              res.end(JSON.stringify({ success: false, error: msg }));
+            }
+          });
         return;
       }
 

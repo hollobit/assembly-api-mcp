@@ -188,10 +188,14 @@ export const getSchedule: RouteHandler = async (ctx, params) => {
 export const searchMeetings: RouteHandler = async (ctx, params) => {
   try {
     const age = intParam(params.age, CURRENT_AGE);
+    const keyword = params.keyword;
+
+    // keyword는 클라이언트 측 필터링 (API가 SUB_NAME 파라미터를 안정적으로 지원하지 않음)
     const qp: Record<string, string | number> = {
       ...buildPagination(params, ctx.config.apiResponse.maxPageSize),
     };
-    if (params.keyword) qp.SUB_NAME = params.keyword;
+    // 키워드 검색 시 충분한 건수 확보
+    if (keyword && !params.page_size) qp.pSize = 100;
 
     const MEETING_CODES: Record<string, string> = {
       "본회의": API_CODES.MEETING_PLENARY,
@@ -204,17 +208,53 @@ export const searchMeetings: RouteHandler = async (ctx, params) => {
 
     const meetingType = params.meeting_type ?? "위원회";
     const apiCode = MEETING_CODES[meetingType] ?? API_CODES.MEETING_COMMITTEE;
+    const confDateYear = params.date_from?.slice(0, 4);
+    const usesConfDate = meetingType === "본회의" || meetingType === "위원회" || meetingType === "소위원회";
 
-    if (meetingType === "본회의" || meetingType === "위원회" || meetingType === "소위원회") {
+    if (usesConfDate) {
       qp.DAE_NUM = age;
-      qp.CONF_DATE = params.date_from?.slice(0, 4) ?? String(new Date().getFullYear());
+      qp.CONF_DATE = confDateYear ?? String(new Date().getFullYear());
       if (params.committee && meetingType !== "본회의") qp.COMM_NAME = params.committee;
     } else {
       qp.ERACO = `제${age}대`;
     }
 
-    const result = await ctx.api.fetchOpenAssembly(apiCode, qp);
-    return ok(result.rows, { total: result.rows.length });
+    let result: { totalCount: number; rows: readonly Record<string, unknown>[] };
+    try {
+      result = await ctx.api.fetchOpenAssembly(apiCode, qp);
+    } catch {
+      // sample 키 등으로 API 호출 실패 시 빈 결과 반환
+      result = { totalCount: 0, rows: [] };
+    }
+
+    // 현재 연도 결과 부족 시 이전 연도 합산 (사용자 미지정 시만)
+    if (usesConfDate && !confDateYear && qp.CONF_DATE) {
+      const currentRows = result.rows;
+      const needMore = keyword ? currentRows.length < 20 : currentRows.length === 0;
+      if (needMore) {
+        try {
+          const prevYear = String(Number(qp.CONF_DATE) - 1);
+          const prevResult = await ctx.api.fetchOpenAssembly(apiCode, { ...qp, CONF_DATE: prevYear });
+          result = { ...result, rows: [...currentRows, ...prevResult.rows] };
+        } catch {
+          // 이전 연도 조회도 실패 시 현재 결과만 사용
+        }
+      }
+    }
+
+    // 키워드 클라이언트 측 필터링
+    let rows = result.rows;
+    if (keyword) {
+      const kw = keyword.toLowerCase();
+      rows = rows.filter((row) => {
+        const subName = String(row.SUB_NAME ?? "").toLowerCase();
+        const title = String(row.TITLE ?? "").toLowerCase();
+        const commName = String(row.COMM_NAME ?? "").toLowerCase();
+        return subName.includes(kw) || title.includes(kw) || commName.includes(kw);
+      });
+    }
+
+    return ok(rows, { total: rows.length });
   } catch (e) {
     return error(500, e instanceof Error ? e.message : String(e));
   }
