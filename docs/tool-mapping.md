@@ -195,26 +195,112 @@ Full 프로필은 Lite 6개를 모두 포함하며, 심층 분석용 4개 도구
 
 ## API 코드 매핑 총정리
 
-### codes.ts에 등록된 코드 (44개)
+### codes.ts에 등록된 코드 (44개) → 도구 매핑
 
-| 카테고리 | 코드 수 | Lite에서 사용 | Full에서 추가 사용 |
-|---------|--------|-------------|-----------------|
-| 국회의원 | 2 | 2 | 0 |
-| 의안 | 14 | 10 | 4 |
-| 표결 | 2 | 2 | 0 |
-| 의안 통계 | 5 | 5 | 0 |
-| 본회의 처리안건 | 3 | 3 | 0 |
-| 일정 | 3 | 1 | 0 |
-| 회의록 | 5 | 5 | 0 |
-| 위원회 | 2 | 2 | 2 |
-| 청원 | 3 | 1 | 2 |
-| 입법예고 | 2 | 1 | 0 |
-| 메타/기타 | 3 | 2 | 1 |
-| **합계** | **44** | **34** | **9** |
+| # | codes.ts 키 | API 코드 | API명 | 사용 도구 |
+|---|------------|---------|-------|----------|
+| 1 | MEMBER_INFO | `nwvrqwxyaytdsfvhu` | 국회의원 인적사항 | `assembly_member` |
+| 2 | MEMBER_BILLS | `nzmimeepazxkubdpn` | 의원 발의법률안 | `assembly_member`, `assembly_bill` |
+| 3 | BILL_SEARCH | `TVBPMBILL11` | 의안 통합검색 | CLI |
+| 4 | BILL_RECEIVED | `BILLRCP` | 의안 접수목록 | `bill_detail` (Full) |
+| 5 | BILL_REVIEW | `BILLJUDGE` | 의안 심사정보 | `assembly_bill`, `bill_detail` |
+| 6 | BILL_DETAIL | `BILLINFODETAIL` | 의안 상세정보 | `assembly_bill`, `bill_detail` |
+| 7 | BILL_PENDING | `nwbqublzajtcqpdae` | 계류의안 | `assembly_bill` |
+| 8 | BILL_PROCESSED | `nzpltgfqabtcpsmai` | 처리의안 | `assembly_bill` |
+| 9 | PLENARY_AGENDA | `nayjnliqaexiioauy` | 본회의부의안건 | CLI |
+| 10 | BILL_PROPOSERS | `BILLINFOPPSR` | 의안 제안자정보 | `assembly_bill`, `bill_detail` |
+| 11 | BILL_COMMITTEE_CONF | `BILLJUDGECONF` | 위원회심사 회의정보 | `assembly_bill`, `bill_detail` |
+| 12 | BILL_LAW_COMMITTEE_CONF | `BILLLWJUDGECONF` | 법사위 회의정보 | `bill_detail` (Full) |
+| 13 | VOTE_BY_BILL | `ncocpgfiaoituanbr` | 의안별 표결현황 | `assembly_session` |
+| 14 | VOTE_PLENARY | `nwbpacrgavhjryiph` | 본회의 표결정보 | `assembly_member`, `assembly_session` |
+| 15 | BILL_STATS_MAIN | `BILLCNTMAIN` | 의안통계 총괄 | `assembly_bill` (stats) |
+| 16 | BILL_STATS_COMMITTEE | `BILLCNTCMIT` | 의안통계 위원회별 | `assembly_bill` (stats) |
+| 17 | BILL_STATS_LAW_COMMITTEE | `BILLCNTLAWCMIT` | 의안통계 위원회별 법률안 | `assembly_bill` (stats) |
+| 18 | BILL_STATS_PROPOSER | `BILLCNTPRPSR` | 의안통계 발의주체별 | `assembly_bill` (stats) |
+| 19 | BILL_STATS_LAW_DIV | `BILLCNTLAWDIV` | 의안통계 의안종류별 | `assembly_bill` (stats) |
+| 20 | PLENARY_LAW | `nkalemivaqmoibxro` | 본회의 처리_법률안 | `assembly_session` (vote_type) |
+| 21 | PLENARY_BUDGET | `nbslryaradshbpbpm` | 본회의 처리_예산안 | `assembly_session` (vote_type) |
+| 22 | PLENARY_ETC | `nzgjnvnraowulzqwl` | 본회의 처리_기타 | `assembly_session` (vote_type) |
+| 23 | SCHEDULE_ALL | `ALLSCHEDULE` | 국회일정 통합 | `assembly_session` |
+| 24 | SCHEDULE_PLENARY | `nekcaiymatialqlxr` | 본회의 일정 | (미사용, SCHEDULE_ALL이 커버) |
+| 25 | SCHEDULE_COMMITTEE | `nrsldhjpaemrmolla` | 위원회별 일정 | (미사용, SCHEDULE_ALL이 커버) |
+| 26 | MEETING_PLENARY | `nzbyfwhwaoanttzje` | 본회의 회의록 | `assembly_session` |
+| 27 | MEETING_COMMITTEE | `ncwgseseafwbuheph` | 위원회 회의록 | `assembly_session` |
+| 28 | MEETING_AUDIT | `VCONFAPIGCONFLIST` | 국정감사 회의록 | `assembly_session` |
+| 29 | MEETING_CONFIRMATION | `VCONFCFRMCONFLIST` | 인사청문회 회의록 | `assembly_session` |
+| 30 | MEETING_PUBLIC_HEARING | `VCONFPHCONFLIST` | 공청회 회의록 | `assembly_session` |
+| 31 | COMMITTEE_INFO | `nxrvzonlafugpqjuh` | 위원회 현황 | `assembly_org`, `committee_detail` |
+| 32 | COMMITTEE_MEMBERS | `nktulghcadyhmiqxi` | 위원회 위원 명단 | `assembly_org`, `committee_detail` |
+| 33 | PETITION_PENDING | `nvqbafvaajdiqhehi` | 청원 계류현황 | `assembly_org`, `petition_detail` |
+| 34 | PETITION_LIST | `PTTRCP` | 청원 접수목록 | `petition_detail` (Full) |
+| 35 | PETITION_DETAIL | `PTTINFODETAIL` | 청원 상세정보 | `assembly_org`, `petition_detail` |
+| 36 | LEGISLATION_ACTIVE | `nknalejkafmvgzmpt` | 진행중 입법예고 | `assembly_org` |
+| 37 | LEGISLATION_CLOSED | `nohgwtzsamojdozky` | 종료된 입법예고 | (미사용, query_assembly로 접근) |
+| 38 | META_API_LIST | `OPENSRVAPI` | API 전체 현황 | `discover_apis` |
+| 39 | MEMBER_ALL | `ALLNAMEMBER` | 의원 정보 통합 | (미사용, MEMBER_INFO 사용) |
+| 40 | SESSION_INFO | `BILLSESSPROD` | 회기정보 | (리소스에서 참조) |
+| 41 | RESEARCH_REPORTS | `naaborihbkorknasp` | 입법조사처 보고서 | `research_data` (Full) |
+| 42 | RECENT_PLENARY_BILLS | `nxjuyqnxadtotdrbw` | 최근 본회의 부의안건 | `assembly_bill` |
+| 43 | LIBRARY_SEARCH | `nywrpgoaatcpoqbiy` | 국회도서관 자료검색 | `research_data` (Full) |
+| 44 | BUDGET_ANALYSIS | `OZN379001174FW17905` | 예산정책처 분석자료 | `research_data` (Full) |
 
-### Lite에서 접근 불가한 나머지 ~232개 API
+### 카테고리별 요약
 
-`discover_apis` + `query_assembly` 2개 범용 도구로 276개 API 전체에 **100% 접근 가능**합니다.
+| 카테고리 | 등록 코드 | Lite 사용 | Full 추가 사용 | 미사용 |
+|---------|----------|----------|--------------|--------|
+| 국회의원 | 2 | 2 | 0 | 0 |
+| 의안 | 14 | 10 | 4 | 0 |
+| 표결 | 2 | 2 | 0 | 0 |
+| 의안 통계 | 5 | 5 | 0 | 0 |
+| 본회의 처리안건 | 3 | 3 | 0 | 0 |
+| 일정 | 3 | 1 | 0 | 2 (통합API가 커버) |
+| 회의록 | 5 | 5 | 0 | 0 |
+| 위원회 | 2 | 1 | 1 | 0 |
+| 청원 | 3 | 2 | 1 | 0 |
+| 입법예고 | 2 | 1 | 0 | 1 (query_assembly) |
+| 메타/기타 | 3 | 2 | 1 | 2 (리소스/대체) |
+| **합계** | **44** | **34** | **7** | **5** |
+
+### 전체 국회 API 276개 커버리지
+
+| 카테고리 | 전체 | 등록 | 커버율 | 접근 방법 |
+|---------|------|------|--------|----------|
+| 1. 메타 | 1 | 1 | 100% | `discover_apis` |
+| 2. 통합 API | 8 | 0 | 0% | 개별 API로 대체 |
+| 3. 국회의원 | 21 | 2 | 10% | `assembly_member` + `query_assembly` |
+| 4. 의안 | 24 | 14 | 58% | `assembly_bill` + `bill_detail` |
+| 5. 의안 통계 | 7 | 5 | 71% | `assembly_bill(mode=stats)` |
+| 6. 본회의 처리안건 | 4 | 3 | 75% | `assembly_session(vote_type=...)` |
+| 7. 회의록 | 21 | 5 | 24% | `assembly_session` + `query_assembly` |
+| 8. 일정 | 13 | 3 | 23% | `assembly_session` + `query_assembly` |
+| 9. 위원회 | 5 | 2 | 40% | `assembly_org` + `committee_detail` |
+| 10. 청원 | 7 | 3 | 43% | `assembly_org` + `petition_detail` |
+| 11. 인사청문/국감 | 6 | 0 | 0% | `query_assembly` |
+| 12. 역대 국회 | 11 | 0 | 0% | `query_assembly` |
+| 13. 보도자료/뉴스 | 22 | 0 | 0% | `query_assembly` |
+| 14. 의회외교 | 8 | 0 | 0% | `query_assembly` |
+| 15. 영문 API | 7 | 0 | 0% | `query_assembly` |
+| 16. 예산정책처 | 25 | 1 | 4% | `research_data` + `query_assembly` |
+| 17. 입법조사처 | ~10 | 1 | ~10% | `research_data` + `query_assembly` |
+| 18~23. 기타 | ~76 | 1 | ~1% | `query_assembly` |
+| **합계** | **~276** | **44** | **16%** | **100% 접근 (query_assembly)** |
+
+> **핵심**: 44개 API는 전용 도구로 최적화되어 있고, 나머지 ~232개는 `discover_apis`로 코드를 찾고 `query_assembly`로 직접 호출하여 **276개 API 100%에 접근**할 수 있습니다.
+
+### 코드 미발굴 주요 API (향후 발굴 우선순위)
+
+| 우선순위 | API | data.go.kr | 기대 효과 |
+|---------|-----|-----------|----------|
+| 1 | 법률안 제안이유 및 주요내용 | 15152558 | 의안 원문 전문 접근 |
+| 2 | 의안별 회의록 목록 | 15126150 | 특정 법안 논의 추적 |
+| 3 | 의원이력 | 15125956 | `assembly_member` 분석 강화 |
+| 4 | 본회의 표결정보 (의원별) | 15125948 | 의원별 투표 성향 |
+| 5 | 역대 국회의원 현황 | 15126020 | 역대 데이터 접근 |
+| 6 | 국감 결과보고서 | 15126116 | 시사성 높은 데이터 |
+| 7 | 제안설명서 목록 | 15126158 | 의안 원문 보완 |
+| 8 | 의원 상임위 활동 | 15125949 | 위원회 활동 분석 |
+
+> 발굴 방법: 실제 API 키로 `OPENSRVAPI` 호출 → `INF_ID` 확인 → Excel 스펙 다운로드 → 요청주소에서 코드 추출
 
 ---
 
