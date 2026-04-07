@@ -217,6 +217,26 @@ export function registerLiteBillTools(
           }
 
           const detail = formatDetailRow(result.rows[0]);
+
+          // 공동발의자 자동 포함 (상위 5명, 백그라운드 실패 무시)
+          try {
+            const proposerResult = await api.fetchOpenAssembly(
+              API_CODES.BILL_PROPOSERS,
+              { BILL_ID: params.bill_id, pSize: 20 },
+            );
+            if (proposerResult.rows.length > 0) {
+              const proposers = proposerResult.rows.map((r) => ({
+                이름: r.HG_NM ?? r.RST_PROPOSER,
+                정당: r.POLY_NM,
+                선거구: r.ORIG_NM,
+              }));
+              (detail as Record<string, unknown>)["공동발의자"] = proposers.slice(0, 5);
+              (detail as Record<string, unknown>)["공동발의자_총수"] = proposerResult.totalCount;
+            }
+          } catch {
+            // 제안자 조회 실패는 무시 — 나머지 상세 정보는 정상 반환
+          }
+
           return {
             content: [
               {

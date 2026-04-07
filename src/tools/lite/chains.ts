@@ -371,8 +371,9 @@ export function registerLiteChainTools(
 
         await sendProgress(extra, 2, totalSteps, `법안 ${uniqueBills.length}건 발견, 정리 중...`);
 
-        // Step 3: 심사 이력 조회 (상위 5건, 옵션)
+        // Step 3: 심사 이력 + 위원회심사 회의 조회 (상위 5건, 옵션)
         const histories = new Map<string, readonly Record<string, unknown>[]>();
+        const committeeConfs = new Map<string, readonly Record<string, unknown>[]>();
 
         if (includeHistory && uniqueBills.length > 0) {
           await sendProgress(extra, 3, totalSteps, "심사 이력 조회 중...");
@@ -405,6 +406,34 @@ export function registerLiteChainTools(
           for (const { billNo, rows } of historyResults) {
             histories.set(billNo, rows);
           }
+
+          // 위원회심사 회의정보도 함께 조회 (BILLJUDGECONF)
+          const confResults = await Promise.all(
+            top5.map((bill) =>
+              api
+                .fetchOpenAssembly(API_CODES.BILL_COMMITTEE_CONF, {
+                  BILL_ID: bill.billNo,
+                })
+                .then((result) => ({
+                  billNo: bill.billNo,
+                  meetings: result.rows.map((r) => ({
+                    회의일: r.CONF_DT ?? r.MEETTING_DATE,
+                    위원회: r.CMIT_NM ?? r.COMMITTEE_NAME,
+                    회의결과: r.PROC_RESULT_CD ?? r.CONF_RESULT,
+                  })),
+                }))
+                .catch(() => ({
+                  billNo: bill.billNo,
+                  meetings: [] as Record<string, unknown>[],
+                })),
+            ),
+          );
+
+          for (const { billNo, meetings } of confResults) {
+            if (meetings.length > 0) {
+              committeeConfs.set(billNo, meetings);
+            }
+          }
         }
 
         await sendProgress(extra, totalSteps, totalSteps, "법안 추적 완료");
@@ -414,6 +443,10 @@ export function registerLiteChainTools(
         for (const [billNo, rows] of histories) {
           historiesObj[billNo] = rows;
         }
+        const committeeConfsObj: Record<string, readonly Record<string, unknown>[]> = {};
+        for (const [billNo, meetings] of committeeConfs) {
+          committeeConfsObj[billNo] = meetings;
+        }
 
         return {
           content: [{ type: "text" as const, text: JSON.stringify({
@@ -422,6 +455,7 @@ export function registerLiteChainTools(
             total: uniqueBills.length,
             items: uniqueBills,
             histories: Object.keys(historiesObj).length > 0 ? historiesObj : undefined,
+            committee_meetings: Object.keys(committeeConfsObj).length > 0 ? committeeConfsObj : undefined,
           }) }],
         };
       } catch (err: unknown) {

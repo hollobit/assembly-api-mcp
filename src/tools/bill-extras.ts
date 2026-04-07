@@ -69,12 +69,39 @@ export function registerBillExtraTools(
           소관위원회: row.JRCMIT_NM,
         }));
 
+        // 위원회심사 회의정보 + 법사위 회의정보 추가 조회 (bill_id 있을 때만)
+        let committeeConf: Record<string, unknown>[] = [];
+        let lawCommitteeConf: Record<string, unknown>[] = [];
+
+        if (params.bill_id) {
+          const [confResult, lawConfResult] = await Promise.allSettled([
+            api.fetchOpenAssembly(API_CODES.BILL_COMMITTEE_CONF, { BILL_ID: params.bill_id }),
+            api.fetchOpenAssembly(API_CODES.BILL_LAW_COMMITTEE_CONF, { BILL_ID: params.bill_id }),
+          ]);
+
+          if (confResult.status === "fulfilled") {
+            committeeConf = confResult.value.rows.map((r) => ({
+              회의일: r.CONF_DT ?? r.MEETTING_DATE,
+              위원회: r.CMIT_NM ?? r.COMMITTEE_NAME,
+              결과: r.PROC_RESULT_CD ?? r.CONF_RESULT,
+            }));
+          }
+          if (lawConfResult.status === "fulfilled") {
+            lawCommitteeConf = lawConfResult.value.rows.map((r) => ({
+              회의일: r.CONF_DT ?? r.MEETTING_DATE,
+              결과: r.PROC_RESULT_CD ?? r.CONF_RESULT,
+            }));
+          }
+        }
+
         return {
           content: [{
             type: "text" as const,
             text: JSON.stringify({
               total: formatted.length,
               items: formatted,
+              committee_meetings: committeeConf.length > 0 ? committeeConf : undefined,
+              law_committee_meetings: lawCommitteeConf.length > 0 ? lawCommitteeConf : undefined,
               note: formatted.length === 0 && result.rows.length > 0
                 ? "API 결과에서 해당 의안을 찾지 못했습니다. bill_id 또는 bill_name을 확인해 주세요."
                 : undefined,
@@ -143,6 +170,56 @@ export function registerBillExtraTools(
           content: [{
             type: "text" as const,
             text: JSON.stringify({ total: formatted.length, items: formatted }),
+          }],
+        };
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        return {
+          content: [{ type: "text" as const, text: JSON.stringify({ error: message, code: message.includes('API_KEY') ? 'AUTH_ERROR' : message.includes('rate') ? 'RATE_LIMIT' : message.includes('timeout') ? 'TIMEOUT' : 'UNKNOWN' }) }],
+          isError: true,
+        };
+      }
+    },
+  );
+
+  // ── 3. 의안 제안자 상세 ─────────────────────────────────────
+
+  server.tool(
+    "get_bill_proposers",
+    "의안의 제안자(공동발의 의원) 전체 목록을 조회합니다. 의안ID로 검색합니다.",
+    {
+      bill_id: z.string().describe("의안 ID (필수)"),
+      page: z.number().optional().describe("페이지 번호 (기본: 1)"),
+      page_size: z.number().optional().describe("페이지 크기 (기본: 100, 최대: 100)"),
+    },
+    async (params) => {
+      try {
+        const queryParams: Record<string, string | number> = {
+          BILL_ID: params.bill_id,
+          pSize: Math.min(params.page_size ?? 100, config.apiResponse.maxPageSize),
+        };
+        if (params.page) queryParams.pIndex = params.page;
+
+        const result = await api.fetchOpenAssembly(
+          API_CODES.BILL_PROPOSERS,
+          queryParams,
+        );
+
+        const formatted = result.rows.map((row) => ({
+          이름: row.HG_NM ?? row.RST_PROPOSER,
+          정당: row.POLY_NM,
+          선거구: row.ORIG_NM,
+          의원코드: row.MONA_CD,
+        }));
+
+        return {
+          content: [{
+            type: "text" as const,
+            text: JSON.stringify({
+              total: result.totalCount,
+              items: formatted,
+              bill_id: params.bill_id,
+            }),
           }],
         };
       } catch (err: unknown) {

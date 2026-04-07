@@ -34,6 +34,12 @@ export const API_CODES = {
   BILL_PROCESSED: "nzpltgfqabtcpsmai",
   /** 본회의부의안건 (139건) */
   PLENARY_AGENDA: "nayjnliqaexiioauy",
+  /** 의안 제안자정보 (BILL_ID 필요) */
+  BILL_PROPOSERS: "BILLINFOPPSR",
+  /** 위원회심사 회의정보 (BILL_ID 필요) */
+  BILL_COMMITTEE_CONF: "BILLJUDGECONF",
+  /** 법사위 회의정보 (BILL_ID 필요) */
+  BILL_LAW_COMMITTEE_CONF: "BILLLWJUDGECONF",
 
   // ── 표결 ────────────────────────────────────
   /** 의안별 표결현황 (AGE 필요, 1,352건@22대) */

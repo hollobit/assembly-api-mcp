@@ -48,7 +48,7 @@ function buildMcpServer(config: AppConfig): McpServer {
 
     // Full 전용: Lite에 없는 고유 도구만 추가 등록
     registerBillDetailTool(server, config);   // get_bill_detail
-    registerBillExtraTools(server, config);   // get_bill_review, get_bill_history
+    registerBillExtraTools(server, config);   // get_bill_review, get_bill_history, get_bill_proposers
     registerCommitteeTools(server, config);   // get_committees
     registerPetitionTools(server, config);    // search_petitions
     registerLegislationTools(server, config); // get_legislation_notices
