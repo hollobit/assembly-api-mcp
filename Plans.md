@@ -120,13 +120,24 @@ assembly-api-mcp setup
 | 15.5 | fetch AbortController 타임아웃 (10초) | 느린 API 호출 10초 후 자동 중단, 타임아웃 에러 반환 | - | cc:完了 |
 | 15.6 | REST 응답 Cache-Control 헤더 | 정적 데이터에 `Cache-Control: public, max-age=3600`, 동적 데이터에 `max-age=60` | 15.4 | cc:完了 |
 
+### Phase 16: 문서/코드 정합성 수정
+
+검증 과정에서 발견된 도구 수 불일치 및 버전 불일치를 수정한다.
+원래 Lite 7개/Full 23개였으나 Phase 12 이후 Lite 9개/Full 18개로 변경됨. 문서와 소스코드 주석이 업데이트되지 않은 부분을 일괄 수정.
+
+| Task | 내용 | DoD | Depends | Status |
+|------|------|-----|---------|--------|
+| 16.1 | 도구 수 불일치 수정 — 문서 (QUICK_START.md, README.md, .env.example) | Lite "7개"→"9개", Full "23개"→"18개" 일괄 반영, 관련 수치 정합 | - | cc:完了 |
+| 16.2 | 도구 수 불일치 수정 — 소스코드 주석/메시지 (config.ts, setup.ts, static-data.ts, lite/index.ts) | 소스 내 "7개"→"9개", "23개"→"18개" 수정, 빌드 통과 | 16.1 | cc:完了 |
+| 16.3 | server.ts MCP 버전 동기화 | version: "0.2.0" → "0.3.0" (package.json과 일치) | - | cc:完了 |
+
 ---
 
 ## 현재 프로젝트 수치
 
 | 항목 | 수치 |
 |------|------|
-| MCP 도구 | 7개 (Lite) / 23개 (Full) |
+| MCP 도구 | 9개 (Lite) / 18개 (Full) |
 | 검증된 API 코드 | 31개 |
 | 전체 국회 API | 276개 (100% 접근 가능) |
 | 단위 테스트 | 248개 통과 (88.8% 커버리지) |

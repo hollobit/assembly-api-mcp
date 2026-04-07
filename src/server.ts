@@ -35,7 +35,7 @@ import { registerPrompts } from "./prompts/templates.js";
 function buildMcpServer(config: AppConfig): McpServer {
   const server = new McpServer({
     name: "assembly-api-mcp",
-    version: "0.2.0",
+    version: "0.3.0",
   });
 
   // 도구 등록 — 프로필에 따라 분기

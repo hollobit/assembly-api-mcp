@@ -28,7 +28,7 @@ export function registerLiteTools(
   server: McpServer,
   config: AppConfig,
 ): void {
-  // Lite 전용 도구 (7개)
+  // Lite 전용 도구 (7개 등록 함수 → 9개 도구: schedule, meetings, votes가 개별 등록)
   registerLiteMemberTools(server, config);
   registerLiteBillTools(server, config);
   registerLiteScheduleTools(server, config);

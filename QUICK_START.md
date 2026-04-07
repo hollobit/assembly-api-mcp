@@ -391,7 +391,7 @@ claude mcp add assembly-api -- node /absolute/path/to/assembly-api-mcp/dist/inde
 - "제22대 국회 위원회 목록을 알려줘"
 - "현재 계류 중인 청원 목록을 보여줘"
 
-> Lite 프로필(기본)에서는 7개 통합 도구가 사용됩니다.
+> Lite 프로필(기본)에서는 9개 통합 도구가 사용됩니다.
 
 ### CLI에서
 
@@ -476,7 +476,7 @@ MCP_PORT=3001 npm start
 
 ## 다음 단계
 
-- [README.md](README.md) — 전체 프로젝트 설명, Lite(7개)/Full(23개) 도구 목록
+- [README.md](README.md) — 전체 프로젝트 설명, Lite(9개)/Full(18개) 도구 목록
 - [docs/api-catalog.md](docs/api-catalog.md) — 국회 API 276개 전체 목록
 - [docs/mcp-api.md](docs/mcp-api.md) — MCP 도구 ↔ API 매핑 상세
 - [docs/discovered-codes.md](docs/discovered-codes.md) — 발굴된 API 코드 및 파라미터

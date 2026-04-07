@@ -497,7 +497,7 @@ assembly-api/
 │   │   ├── codes.ts          # 검증된 API 코드 매핑
 │   │   ├── monitor.ts        # API 응답 시간 모니터링
 │   │   └── rate-limiter.ts   # Rate Limit 추적
-│   ├── tools/                # MCP 도구 (16개 파일, 23개 도구)
+│   ├── tools/                # MCP 도구 (Lite 9개 / Full 18개)
 │   │   ├── lite/             # Lite 프로필 도구 (9개)
 │   ├── openapi/              # OpenAPI REST 브릿지
 │   │   ├── router.ts         # REST 라우터 (/api/*)

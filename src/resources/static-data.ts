@@ -120,12 +120,12 @@ export function registerResources(
             description: "국회 API MCP 서버 도구 가이드",
             profile: config.profile,
             lite: {
-              description: "Lite 프로필 (7개 도구) — AI 에이전트 최적화, 토큰 73% 절감",
+              description: "Lite 프로필 (9개 도구) — AI 에이전트 최적화, 토큰 73% 절감",
               tools: [
                 {
                   name: "search_members",
                   description: "의원 검색+상세. 1건이면 자동 상세 반환",
-                  example: { name: "고민정" },
+                  example: { name: "이해민" },
                 },
                 {
                   name: "search_bills",
@@ -133,14 +133,24 @@ export function registerResources(
                   example: { bill_name: "교육", status: "pending" },
                 },
                 {
-                  name: "search_records",
-                  description: "일정/회의록/표결 통합. type으로 구분",
-                  example: { type: "schedule", date_from: "2026-04-01" },
+                  name: "get_schedule",
+                  description: "국회 일정 조회 (날짜/위원회/키워드)",
+                  example: { date_from: "2026-04-01" },
+                },
+                {
+                  name: "search_meetings",
+                  description: "회의록 검색 (본회의/위원회/소위/국감/인사청문회/공청회)",
+                  example: { meeting_type: "위원회", keyword: "교육" },
+                },
+                {
+                  name: "get_votes",
+                  description: "표결 조회 (전체 본회의 표결 또는 의안별 상세)",
+                  example: { age: 22 },
                 },
                 {
                   name: "analyze_legislator",
                   description: "의원 종합분석 (인적+발의+표결 한 번에)",
-                  example: { name: "고민정" },
+                  example: { name: "이해민" },
                 },
                 {
                   name: "track_legislation",
@@ -160,8 +170,8 @@ export function registerResources(
               ],
             },
             full: {
-              description: "Full 프로필 (23개 도구) — 모든 개별 도구 노출",
-              toolCount: 23,
+              description: "Full 프로필 (18개 도구) — Lite 9개 + Full 전용 9개",
+              toolCount: 18,
             },
             tips: [
               "Lite에서 위원회/청원/입법예고 조회 → query_assembly 사용",
