@@ -302,35 +302,29 @@ async function resolveHost(hostname: string): Promise<string | undefined> {
 }
 
 /**
- * Keep-Alive + DNS 캐시 적용 fetch
+ * Keep-Alive + DNS 프리워밍 적용 fetch
  *
- * Node.js 22 fetch는 내장 undici 기반으로 keep-alive가 기본 활성이지만,
- * DNS 캐시를 명시적으로 적용하여 매 요청의 DNS 조회 오버헤드를 제거합니다.
+ * Node.js 22 fetch는 내장 undici 기반으로 keep-alive가 기본 활성입니다.
+ * DNS 프리워밍: 첫 fetch 전에 DNS를 미리 조회하여 캐시에 올려둡니다.
+ * (HTTPS에서 호스트를 IP로 교체하면 SSL 인증서 불일치가 발생하므로
+ *  URL은 변경하지 않고 OS DNS 캐시를 활용합니다.)
  */
 async function fetchWithErrorHandling(url: string): Promise<unknown> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
-  // DNS 캐시 적용: URL의 호스트를 IP로 교체하고 Host 헤더 설정
-  let fetchUrl = url;
-  const headers: Record<string, string> = {};
+  // DNS 프리워밍: OS DNS 캐시를 미리 채움 (URL은 변경하지 않음)
   try {
     const parsed = new URL(url);
-    const ip = await resolveHost(parsed.hostname);
-    if (ip) {
-      parsed.hostname = ip;
-      fetchUrl = parsed.toString();
-      headers["Host"] = new URL(url).host;
-    }
+    void resolveHost(parsed.hostname);
   } catch {
-    // DNS 캐시 실패 시 원본 URL 사용
+    // DNS 프리워밍 실패는 무시
   }
 
   let response: Response;
   try {
-    response = await fetch(fetchUrl, {
+    response = await fetch(url, {
       signal: controller.signal,
-      headers,
       keepalive: true,
     });
   } catch (err: unknown) {
