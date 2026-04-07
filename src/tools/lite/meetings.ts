@@ -64,14 +64,16 @@ export function registerLiteMeetingTools(
         const age = params.age ?? CURRENT_AGE;
         const queryParams: Record<string, string | number> = {};
 
-        // keyword는 클라이언트 측 필터링으로 처리 (API가 SUB_NAME 쿼리 파라미터를 지원하지 않음)
         if (params.page) queryParams.pIndex = params.page;
+        queryParams.pSize = Math.min(
+          params.page_size ?? config.apiResponse.defaultPageSize,
+          config.apiResponse.maxPageSize,
+        );
 
-        // 키워드 검색 시 충분한 건수 확보 (클라이언트 필터링 대상)
-        const effectivePageSize = params.keyword
-          ? Math.max(params.page_size ?? 100, 100)
-          : (params.page_size ?? config.apiResponse.defaultPageSize);
-        queryParams.pSize = Math.min(effectivePageSize, config.apiResponse.maxPageSize);
+        // 키워드 → API SUB_NAME 파라미터로 서버 측 검색
+        if (params.keyword) {
+          queryParams.SUB_NAME = params.keyword;
+        }
 
         let apiCode: string;
 
@@ -115,27 +117,24 @@ export function registerLiteMeetingTools(
 
         let result = await api.fetchOpenAssembly(apiCode, queryParams);
 
-        // CONF_DATE 기반 API: 현재 연도 결과가 부족하면 이전 연도도 합산
-        if (usesConfDate && !confDateYear && queryParams.CONF_DATE) {
-          const currentRows = result.rows;
-          const needMore = params.keyword
-            ? currentRows.length < 20  // 키워드 필터링 전이므로 여유 있게 판단
-            : currentRows.length === 0;
-
-          if (needMore) {
-            const prevYear = String(Number(queryParams.CONF_DATE) - 1);
-            const prevResult = await api.fetchOpenAssembly(apiCode, {
-              ...queryParams,
-              CONF_DATE: prevYear,
-            });
-            result = { ...result, rows: [...currentRows, ...prevResult.rows] };
-          }
+        // CONF_DATE 기반 API: 결과가 0건이고 사용자가 연도 미지정 시 → 이전 연도로 폴백
+        if (
+          result.rows.length === 0 &&
+          usesConfDate &&
+          !confDateYear &&
+          queryParams.CONF_DATE
+        ) {
+          const prevYear = String(Number(queryParams.CONF_DATE) - 1);
+          result = await api.fetchOpenAssembly(apiCode, {
+            ...queryParams,
+            CONF_DATE: prevYear,
+          });
         }
 
         let rows = result.rows;
 
-        // 키워드 클라이언트 측 필터링 (안건명, 회의명에서 검색)
-        if (params.keyword) {
+        // SUB_NAME이 지원되지 않는 API 유형의 경우 클라이언트 측 폴백 필터링
+        if (params.keyword && !queryParams.SUB_NAME) {
           const kw = params.keyword.toLowerCase();
           rows = rows.filter((row) => {
             const subName = String(row.SUB_NAME ?? "").toLowerCase();

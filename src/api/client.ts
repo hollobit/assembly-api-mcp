@@ -326,6 +326,9 @@ async function fetchWithErrorHandling(url: string): Promise<unknown> {
     response = await fetch(url, {
       signal: controller.signal,
       keepalive: true,
+      headers: {
+        "User-Agent": "assembly-api-mcp/0.3.0",
+      },
     });
   } catch (err: unknown) {
     if (err instanceof Error && err.name === "AbortError") {
