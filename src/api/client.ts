@@ -163,6 +163,9 @@ export function createApiClient(config: AppConfig) {
   return { fetchOpenAssembly, fetchDataGoKr, cache, monitor, rateLimiter };
 }
 
+/** createApiClient 반환 타입 */
+export type ApiClient = ReturnType<typeof createApiClient>;
+
 // ---------------------------------------------------------------------------
 // Internal helpers
 // ---------------------------------------------------------------------------

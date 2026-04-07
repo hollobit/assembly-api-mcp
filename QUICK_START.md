@@ -39,7 +39,112 @@ Claude Desktop 설정 예시 (`~/Library/Application Support/Claude/claude_deskt
 
 > `sample` 키로 최대 10건까지 테스트할 수 있습니다. 설정 후 Claude Desktop을 완전 종료(Cmd+Q) 후 재시작하세요.
 
-원격 서버만으로 충분하다면 아래 단계는 건너뛰어도 됩니다.
+원격 서버만으로 충분하다면 아래의 로컬 설치 단계는 건너뛰어도 됩니다.
+
+---
+
+## claude.ai (웹)에서 사용하기
+
+설치 없이 브라우저에서 바로 사용할 수 있습니다. **Pro 이상 플랜**이 필요합니다.
+
+1. [claude.ai](https://claude.ai) 접속 → 로그인
+2. 좌측 하단 **프로필 아이콘** → **Settings** (설정)
+3. **Integrations** 탭 → **Add More** 클릭
+4. **Custom MCP server** 선택
+5. 이름: `국회 API` (원하는 이름)
+6. URL 입력:
+
+```
+https://assembly-api-mcp.fly.dev/mcp?key=YOUR_API_KEY&profile=lite
+```
+
+7. **Save** 후 새 대화에서 바로 질문
+
+> 도구가 처음 호출될 때 **"Allow"** (허용) 버튼을 눌러야 합니다.
+
+---
+
+## Claude 모바일 앱 (iOS / Android)에서 사용하기
+
+모바일 앱에서도 원격 MCP 서버를 연결할 수 있습니다. **Pro 이상 플랜**이 필요합니다.
+
+1. Claude 앱 실행 → **설정** (⚙️)
+2. **Integrations** (통합) 메뉴 진입
+3. **Add Integration** → **Custom MCP server**
+4. URL 입력:
+
+```
+https://assembly-api-mcp.fly.dev/mcp?key=YOUR_API_KEY&profile=lite
+```
+
+5. 저장 후 새 대화에서 바로 질문
+
+> 모바일에서는 로컬 서버(stdio)를 실행할 수 없으므로, 반드시 원격 서버 URL 방식을 사용해야 합니다.
+
+---
+
+## ChatGPT (GPTs)에서 사용하기
+
+ChatGPT GPTs의 **Actions** 기능으로 국회 API를 사용할 수 있습니다. ChatGPT Plus 이상 플랜이 필요합니다.
+
+### GPT 생성 시 Actions 설정
+
+1. [ChatGPT](https://chat.openai.com) → **Explore GPTs** → **Create**
+2. **Configure** 탭 → **Actions** → **Create new action**
+3. **Import from URL** 클릭 후 아래 URL 입력:
+
+```
+https://assembly-api-mcp.fly.dev/openapi.json?profile=full
+```
+
+4. **Authentication** 설정:
+   - Type: **API Key**
+   - Auth Type: **Custom**
+   - Custom Header Name: 비워두기 (쿼리 파라미터 방식)
+   - 또는 각 요청의 `key` 파라미터에 API 키를 직접 포함
+
+5. **Privacy policy URL** 입력 후 저장
+
+> Lite 프로필만 사용하려면 URL에서 `profile=full`을 `profile=lite`로 변경하세요.
+
+### REST API 직접 호출 (개발자용)
+
+GPTs 외에도 REST API를 직접 호출할 수 있습니다:
+
+```bash
+# 의원 검색
+curl "https://assembly-api-mcp.fly.dev/api/members?name=이해민&key=YOUR_API_KEY"
+
+# 의안 검색
+curl "https://assembly-api-mcp.fly.dev/api/bills?bill_name=교육&key=YOUR_API_KEY"
+
+# OpenAPI 스펙 확인
+curl "https://assembly-api-mcp.fly.dev/openapi.json?profile=full"
+```
+
+### REST API 엔드포인트 목록
+
+| 엔드포인트 | 설명 | 프로필 |
+|-----------|------|--------|
+| `GET /api/members` | 국회의원 검색 | Lite |
+| `GET /api/bills` | 의안 검색 | Lite |
+| `GET /api/schedule` | 국회 일정 | Lite |
+| `GET /api/meetings` | 회의록 검색 | Lite |
+| `GET /api/votes` | 표결 결과 | Lite |
+| `GET /api/legislators/{name}/analysis` | 의원 종합분석 | Lite |
+| `GET /api/legislation/track` | 법안 추적 | Lite |
+| `GET /api/discover` | API 탐색 | Lite |
+| `GET /api/query/{api_code}` | 범용 API 호출 | Lite |
+| `GET /api/bills/{bill_id}` | 의안 상세 | Full |
+| `GET /api/bills/review` | 의안 심사정보 | Full |
+| `GET /api/bills/history` | 의안 이력 | Full |
+| `GET /api/committees` | 위원회 목록 | Full |
+| `GET /api/petitions` | 청원 검색 | Full |
+| `GET /api/legislation/notices` | 입법예고 | Full |
+| `GET /api/library` | 국회도서관 검색 | Full |
+| `GET /api/budget` | 예산분석 자료 | Full |
+| `GET /api/research` | 입법조사 보고서 | Full |
+| `GET /openapi.json` | OpenAPI 스펙 | - |
 
 ---
 
@@ -260,13 +365,15 @@ claude mcp add assembly-api -- node /absolute/path/to/assembly-api-mcp/dist/inde
 
 | 클라이언트 | Transport | MCP 지원 |
 |-----------|-----------|----------|
-| Claude Desktop | stdio | ✅ 네이티브 |
+| claude.ai (웹) | HTTP | ✅ Integrations (Pro 이상) |
+| Claude 모바일 (iOS/Android) | HTTP | ✅ Integrations (Pro 이상) |
+| Claude Desktop | stdio / HTTP | ✅ 네이티브 |
 | Claude Code (CLI) | stdio | ✅ 네이티브 |
 | Gemini CLI | stdio | ✅ 네이티브 |
 | VS Code (Copilot/Claude) | stdio | ✅ 네이티브 |
 | Cursor | stdio | ✅ 네이티브 |
 | Windsurf | stdio | ✅ 네이티브 |
-| ChatGPT (GPTs) | HTTP | ⚠️ Actions에서 REST 변환 필요 |
+| ChatGPT (GPTs) | HTTP | ✅ OpenAPI Actions (REST API) |
 | Docker / 원격 서버 | HTTP | ✅ Streamable HTTP |
 
 ---

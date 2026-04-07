@@ -13,6 +13,7 @@ Claude, Gemini, ChatGPT 등 AI 도구에서 국회의원, 의안, 일정, 회의
 - **36개 검증된 API 코드** — 실제 데이터 반환 확인
 - **CLI 지원** — 터미널에서 직접 국회 데이터 조회
 - **이중 Transport** — stdio (Claude Desktop) + HTTP (원격 서버)
+- **REST API + OpenAPI 스펙** — ChatGPT GPTs Actions 지원 (`/openapi.json`)
 - **인메모리 캐싱** — TTL 기반, 정적/동적 데이터 구분
 - **API 모니터링** — 응답 시간 추적, Rate Limit 관리
 
@@ -210,6 +211,25 @@ claude mcp add assembly-api -- node /absolute/path/to/assembly-api-mcp/dist/inde
 }
 ```
 
+### claude.ai (웹) / Claude 모바일
+
+설치 없이 원격 서버 URL을 등록하여 사용합니다. **Pro 이상 플랜** 필요.
+
+1. Settings → Integrations → Add More → Custom MCP server
+2. URL: `https://assembly-api-mcp.fly.dev/mcp?key=YOUR_API_KEY&profile=lite`
+
+> 자세한 설정 방법은 [QUICK_START.md](QUICK_START.md)를 참조하세요.
+
+### ChatGPT (GPTs Actions)
+
+ChatGPT GPTs에서 OpenAPI Actions로 국회 API를 사용할 수 있습니다.
+
+1. GPT 생성 → Configure → Actions → Create new action
+2. **Import from URL**: `https://assembly-api-mcp.fly.dev/openapi.json?profile=full`
+3. 각 요청의 `key` 파라미터에 API 키 포함
+
+> REST API를 직접 호출할 수도 있습니다. 엔드포인트 목록은 [QUICK_START.md](QUICK_START.md)를 참조하세요.
+
 ### HTTP 모드 (원격 클라이언트용)
 
 stdio를 지원하지 않는 클라이언트는 HTTP 모드로 서버를 실행하여 연결할 수 있습니다:
@@ -217,6 +237,8 @@ stdio를 지원하지 않는 클라이언트는 HTTP 모드로 서버를 실행�
 ```bash
 ASSEMBLY_API_KEY=your-api-key MCP_TRANSPORT=http MCP_PORT=3000 npm start
 # → MCP 엔드포인트: http://localhost:3000/mcp
+# → REST API: http://localhost:3000/api/members?key=YOUR_KEY
+# → OpenAPI 스펙: http://localhost:3000/openapi.json
 # → 상태 확인: http://localhost:3000/health
 ```
 
@@ -236,7 +258,9 @@ ngrok http 3000
 | VS Code (Copilot/Claude) | stdio | ✅ 네이티브 |
 | Cursor | stdio | ✅ 네이티브 |
 | Windsurf | stdio | ✅ 네이티브 |
-| ChatGPT (GPTs) | HTTP | ⚠️ Actions에서 REST 변환 필요 |
+| claude.ai (웹) | HTTP | ✅ Integrations (Pro 이상) |
+| Claude 모바일 (iOS/Android) | HTTP | ✅ Integrations (Pro 이상) |
+| ChatGPT (GPTs) | HTTP | ✅ OpenAPI Actions (REST API) |
 | Docker / 원격 서버 | HTTP | ✅ Streamable HTTP |
 
 ## MCP 도구 목록
@@ -475,6 +499,10 @@ assembly-api/
 │   │   └── rate-limiter.ts   # Rate Limit 추적
 │   ├── tools/                # MCP 도구 (16개 파일, 23개 도구)
 │   │   ├── lite/             # Lite 프로필 도구 (9개)
+│   ├── openapi/              # OpenAPI REST 브릿지
+│   │   ├── router.ts         # REST 라우터 (/api/*)
+│   │   ├── handlers.ts       # REST 핸들러 (18개 엔드포인트)
+│   │   └── spec.ts           # OpenAPI 3.1 스펙 생성
 │   ├── resources/            # MCP 정적 리소스
 │   └── prompts/              # MCP 프롬프트 템플릿
 ├── tests/                    # 단위 테스트 (248개)

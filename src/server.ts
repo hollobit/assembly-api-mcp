@@ -15,6 +15,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { type AppConfig, overrideConfigFromParams } from "./config.js";
+import { handleRestRequest } from "./openapi/router.js";
 import { registerLiteTools } from "./tools/lite/index.js";
 import { registerBillDetailTool } from "./tools/bills.js";
 import { registerCommitteeTools } from "./tools/committees.js";
@@ -121,6 +122,17 @@ async function startHttpTransport(config: AppConfig): Promise<McpServer> {
       if (url === "/health" && req.method === "GET") {
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ status: "ok", sessions: sessions.size }));
+        return;
+      }
+
+      // OpenAPI REST endpoints (/api/*, /openapi.json)
+      if (url.startsWith("/api/") || url.startsWith("/openapi.json")) {
+        void handleRestRequest(req, res, config).then((handled) => {
+          if (!handled) {
+            res.writeHead(404, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: "Not found" }));
+          }
+        });
         return;
       }
 
