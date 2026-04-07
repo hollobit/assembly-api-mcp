@@ -268,7 +268,6 @@ function buildContent(id, key, profile) {
           { label: "3. 각 API 호출 시 key 파라미터에 API 키 포함", type: "text" },
         ]
       };
-    }
 
     default:
       return { steps: [] };
