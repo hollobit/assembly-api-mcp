@@ -14,22 +14,19 @@
 
 아무것도 설치하지 않고 URL만 등록하면 바로 사용할 수 있습니다.
 
-AI 클라이언트 설정에 아래 URL을 추가하세요:
+### 설정 도우미로 시작하기 (권장)
+
+**[https://assembly-api-mcp.fly.dev/](https://assembly-api-mcp.fly.dev/)** 에 접속하여 API 키를 입력하면, 사용 중인 AI 클라이언트에 맞는 설정 코드를 자동으로 생성해 줍니다. 복사해서 붙여넣기만 하면 됩니다.
+
+- claude.ai, Claude Desktop, Claude Code, Cursor, VS Code, Gemini CLI, ChatGPT GPTs 지원
+- `sample` 키로 먼저 체험해 볼 수 있습니다
+
+### 직접 URL 구성하기
+
+설정 도우미를 사용하지 않고 직접 URL을 구성할 수도 있습니다:
 
 ```
 https://assembly-api-mcp.fly.dev/mcp?key=YOUR_API_KEY&profile=lite
-```
-
-Claude Desktop 설정 예시 (`~/Library/Application Support/Claude/claude_desktop_config.json`):
-
-```json
-{
-  "mcpServers": {
-    "assembly-api": {
-      "url": "https://assembly-api-mcp.fly.dev/mcp?key=YOUR_API_KEY&profile=lite"
-    }
-  }
-}
 ```
 
 | 파라미터 | 필수 | 기본값 | 설명 |
@@ -46,6 +43,8 @@ Claude Desktop 설정 예시 (`~/Library/Application Support/Claude/claude_deskt
 ## claude.ai (웹)에서 사용하기
 
 설치 없이 브라우저에서 바로 사용할 수 있습니다. **Pro 이상 플랜**이 필요합니다.
+
+> **[설정 도우미](https://assembly-api-mcp.fly.dev/)**에서 "claude.ai" 탭을 선택하면 URL을 자동 생성해 줍니다.
 
 1. [claude.ai](https://claude.ai) 접속 → 로그인
 2. 좌측 하단 **프로필 아이콘** → **Settings** (설정)
@@ -68,6 +67,8 @@ https://assembly-api-mcp.fly.dev/mcp?key=YOUR_API_KEY&profile=lite
 
 모바일 앱에서도 원격 MCP 서버를 연결할 수 있습니다. **Pro 이상 플랜**이 필요합니다.
 
+> **[설정 도우미](https://assembly-api-mcp.fly.dev/)**에서 URL을 미리 복사해 두면 편리합니다.
+
 1. Claude 앱 실행 → **설정** (⚙️)
 2. **Integrations** (통합) 메뉴 진입
 3. **Add Integration** → **Custom MCP server**
@@ -86,6 +87,8 @@ https://assembly-api-mcp.fly.dev/mcp?key=YOUR_API_KEY&profile=lite
 ## ChatGPT (GPTs)에서 사용하기
 
 ChatGPT GPTs의 **Actions** 기능으로 국회 API를 사용할 수 있습니다. ChatGPT Plus 이상 플랜이 필요합니다.
+
+> **[설정 도우미](https://assembly-api-mcp.fly.dev/)**에서 "ChatGPT GPTs" 탭을 선택하면 Import URL을 자동 생성해 줍니다.
 
 ### GPT 생성 시 Actions 설정
 
