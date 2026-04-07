@@ -127,9 +127,9 @@ assembly-api-mcp setup
 
 | Task | 내용 | DoD | Depends | Status |
 |------|------|-----|---------|--------|
-| 16.1 | 도구 수 불일치 수정 — 문서 (QUICK_START.md, README.md, .env.example) | Lite "7개"→"9개", Full "23개"→"18개" 일괄 반영, 관련 수치 정합 | - | cc:完了 |
-| 16.2 | 도구 수 불일치 수정 — 소스코드 주석/메시지 (config.ts, setup.ts, static-data.ts, lite/index.ts) | 소스 내 "7개"→"9개", "23개"→"18개" 수정, 빌드 통과 | 16.1 | cc:完了 |
-| 16.3 | server.ts MCP 버전 동기화 | version: "0.2.0" → "0.3.0" (package.json과 일치) | - | cc:完了 |
+| 16.1 | 도구 수 불일치 수정 — 문서 (QUICK_START.md, README.md, .env.example) | Lite "7개"→"9개", Full "23개"→"18개" 일괄 반영, 관련 수치 정합 | - | cc:完了 [b009e56] |
+| 16.2 | 도구 수 불일치 수정 — 소스코드 주석/메시지 (config.ts, setup.ts, static-data.ts, lite/index.ts) | 소스 내 "7개"→"9개", "23개"→"18개" 수정, 빌드 통과 | 16.1 | cc:完了 [b009e56] |
+| 16.3 | server.ts MCP 버전 동기화 | version: "0.2.0" → "0.3.0" (package.json과 일치) | - | cc:完了 [b009e56] |
 
 ---
 
