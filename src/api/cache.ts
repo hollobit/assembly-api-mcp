@@ -14,6 +14,7 @@ import type { CacheConfig } from "../config.js";
 export interface CacheEntry<T> {
   readonly data: T;
   readonly expiresAt: number;
+  readonly staleAt?: number;
 }
 
 export interface CacheStats {
@@ -24,6 +25,8 @@ export interface CacheStats {
 
 export interface Cache {
   get<T>(key: string): T | undefined;
+  /** Stale-While-Revalidate: 만료 데이터 즉시 반환, revalidateFn을 백그라운드 실행 */
+  getOrRevalidate<T>(key: string, revalidateFn: () => Promise<T>, ttlSeconds: number): T | undefined;
   set<T>(key: string, data: T, ttlSeconds: number): void;
   invalidate(key: string): void;
   clear(): void;
@@ -42,6 +45,9 @@ export function createCache(config: CacheConfig): Cache {
   function isExpired(entry: CacheEntry<unknown>): boolean {
     return Date.now() > entry.expiresAt;
   }
+
+  /** 백그라운드 갱신 진행 중인 키 (중복 갱신 방지) */
+  const revalidating = new Set<string>();
 
   function get<T>(key: string): T | undefined {
     if (!config.enabled) {
@@ -66,6 +72,46 @@ export function createCache(config: CacheConfig): Cache {
     store.set(key, entry);
 
     hits += 1;
+    return entry.data as T;
+  }
+
+  function getOrRevalidate<T>(
+    key: string,
+    revalidateFn: () => Promise<T>,
+    ttlSeconds: number,
+  ): T | undefined {
+    if (!config.enabled) return undefined;
+
+    const entry = store.get(key);
+    if (!entry) return undefined;
+
+    // 아직 유효 — 일반 get과 동일
+    if (!isExpired(entry)) {
+      store.delete(key);
+      store.set(key, entry);
+      hits += 1;
+      return entry.data as T;
+    }
+
+    // 만료됨 — stale 데이터 즉시 반환하면서 백그라운드 갱신
+    hits += 1;
+
+    if (!revalidating.has(key)) {
+      revalidating.add(key);
+      revalidateFn()
+        .then((freshData) => {
+          set(key, freshData, ttlSeconds);
+        })
+        .catch(() => {
+          // 갱신 실패 시 stale 데이터 유지 (TTL 연장)
+          store.delete(key);
+          store.set(key, { ...entry, expiresAt: Date.now() + 60_000 });
+        })
+        .finally(() => {
+          revalidating.delete(key);
+        });
+    }
+
     return entry.data as T;
   }
 
@@ -105,7 +151,7 @@ export function createCache(config: CacheConfig): Cache {
     return { size: store.size, hits, misses };
   }
 
-  return { get, set, invalidate, clear, stats };
+  return { get, getOrRevalidate, set, invalidate, clear, stats };
 }
 
 // ---------------------------------------------------------------------------

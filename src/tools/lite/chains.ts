@@ -7,11 +7,40 @@
 
 import { z } from "zod";
 import { type McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { ServerNotification } from "@modelcontextprotocol/sdk/types.js";
 import { type AppConfig } from "../../config.js";
 import { createApiClient } from "../../api/client.js";
 import { API_CODES, CURRENT_AGE } from "../../api/codes.js";
 import { type ApiResult } from "../../api/client.js";
 import { formatToolError } from "../helpers.js";
+
+// ---------------------------------------------------------------------------
+// Progress notification helper
+// ---------------------------------------------------------------------------
+
+interface ProgressSender {
+  sendNotification: (notification: ServerNotification) => Promise<void>;
+  _meta?: { progressToken?: string | number };
+}
+
+async function sendProgress(
+  extra: ProgressSender,
+  progress: number,
+  total: number,
+  message: string,
+): Promise<void> {
+  const token = extra._meta?.progressToken;
+  if (token === undefined) return;
+
+  try {
+    await extra.sendNotification({
+      method: "notifications/progress",
+      params: { progressToken: token, progress, total, message },
+    });
+  } catch {
+    // progress 알림 실패는 무시 (도구 실행에 영향 없음)
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Types
@@ -198,11 +227,12 @@ export function registerLiteChainTools(
         .optional()
         .describe(`대수 (기본: ${CURRENT_AGE} = 제${CURRENT_AGE}대 국회)`),
     },
-    async (params) => {
+    async (params, extra) => {
       try {
         const age = params.age ?? CURRENT_AGE;
 
         // Step 1: 의원 인적사항 조회
+        await sendProgress(extra, 1, 3, "의원 인적사항 조회 중...");
         const memberResult = await api.fetchOpenAssembly(
           API_CODES.MEMBER_INFO,
           { HG_NM: params.name, pSize: 1 },
@@ -220,6 +250,7 @@ export function registerLiteChainTools(
         const memberInfo = extractMemberInfo(memberResult.rows[0]);
 
         // Step 2: 발의법안 + 표결 병렬 조회
+        await sendProgress(extra, 2, 3, "발의법안 및 표결 조회 중...");
         const [billsResult, votesResult] = await Promise.all([
           api.fetchOpenAssembly(API_CODES.MEMBER_BILLS, {
             AGE: age,
@@ -231,6 +262,7 @@ export function registerLiteChainTools(
             pSize: 10,
           }),
         ]);
+        await sendProgress(extra, 3, 3, "종합 분석 완료");
 
         const bills = billsResult.rows.map(extractBillSummary);
 
@@ -285,11 +317,12 @@ export function registerLiteChainTools(
         .optional()
         .describe("키워드별 결과 수 (기본: 10)"),
     },
-    async (params) => {
+    async (params, extra) => {
       try {
         const age = params.age ?? CURRENT_AGE;
         const includeHistory = params.include_history ?? false;
         const pageSize = params.page_size ?? 10;
+        const totalSteps = includeHistory ? 4 : 2;
 
         // Step 1: 키워드 분리 및 병렬 검색
         const keywordList = params.keywords
@@ -318,6 +351,7 @@ export function registerLiteChainTools(
           };
         }
 
+        await sendProgress(extra, 1, totalSteps, `키워드 ${keywordList.length}개 법안 검색 중...`);
         const searchResults: readonly ApiResult[] = await Promise.all(
           keywordList.map((keyword) =>
             api.fetchOpenAssembly(API_CODES.MEMBER_BILLS, {
@@ -334,10 +368,13 @@ export function registerLiteChainTools(
         );
         const uniqueBills = deduplicateBills(allBills);
 
+        await sendProgress(extra, 2, totalSteps, `법안 ${uniqueBills.length}건 발견, 정리 중...`);
+
         // Step 3: 심사 이력 조회 (상위 5건, 옵션)
         const histories = new Map<string, readonly Record<string, unknown>[]>();
 
         if (includeHistory && uniqueBills.length > 0) {
+          await sendProgress(extra, 3, totalSteps, "심사 이력 조회 중...");
           const top5 = uniqueBills.slice(0, 5);
           const historyResults = await Promise.all(
             top5.map((bill) =>
@@ -366,6 +403,8 @@ export function registerLiteChainTools(
             histories.set(billNo, rows);
           }
         }
+
+        await sendProgress(extra, totalSteps, totalSteps, "법안 추적 완료");
 
         // Step 4: 결과 포맷팅 (pure JSON)
         const historiesObj: Record<string, readonly Record<string, unknown>[]> = {};

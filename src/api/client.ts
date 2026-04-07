@@ -65,12 +65,19 @@ export function createApiClient(config: AppConfig) {
     return !("BILL_ID" in params);
   }
 
+  /** 요청 중복 제거: 동일 URL에 대해 진행 중인 Promise를 공유 */
+  const inflight = new Map<string, Promise<ApiResult>>();
+
   /**
    * 열린국회정보 API 호출
    *
    * Base URL: https://open.assembly.go.kr/portal/openapi/{apiCode}
    * 인증: KEY 파라미터
    * 응답: JSON (Type=json)
+   *
+   * 성능 최적화:
+   * - Stale-While-Revalidate: TTL 만료 시 stale 데이터 즉시 반환 + 백그라운드 갱신
+   * - Request Deduplication: 동일 요청 동시 호출 시 Promise 공유
    */
   async function fetchOpenAssembly(
     apiCode: string,
@@ -87,11 +94,44 @@ export function createApiClient(config: AppConfig) {
     const cacheable = shouldCache(params);
     const cacheKey = cacheable ? buildCacheKey(apiCode, queryParams) : "";
     if (cacheable) {
+      // 1) 유효한 캐시 히트
       const cached = cache.get<ApiResult>(cacheKey);
       if (cached) return cached;
+
+      // 2) Stale-While-Revalidate: 만료 캐시라도 즉시 반환, 백그라운드 갱신
+      const fetchFresh = () => doFetch(apiCode, queryParams, cacheKey, cacheable);
+      const stale = cache.getOrRevalidate<ApiResult>(cacheKey, fetchFresh, getTtl(apiCode));
+      if (stale) return stale;
     }
 
-    // URL 구성 — KEY를 raw string으로 append하여 이중 인코딩 방지
+    // 3) 캐시 미스 — 실제 fetch (중복 제거 적용)
+    return doFetch(apiCode, queryParams, cacheKey, cacheable);
+  }
+
+  /** 실제 API 호출 + 중복 제거 */
+  async function doFetch(
+    apiCode: string,
+    queryParams: Record<string, string | number>,
+    cacheKey: string,
+    cacheable: boolean,
+  ): Promise<ApiResult> {
+    // 요청 중복 제거: 동일 cacheKey에 대해 진행 중인 Promise 재사용
+    const dedupeKey = cacheKey || `${apiCode}:${JSON.stringify(queryParams)}`;
+    const existing = inflight.get(dedupeKey);
+    if (existing) return existing;
+
+    const promise = doFetchInner(apiCode, queryParams, cacheKey, cacheable);
+    inflight.set(dedupeKey, promise);
+    promise.finally(() => { inflight.delete(dedupeKey); });
+    return promise;
+  }
+
+  async function doFetchInner(
+    apiCode: string,
+    queryParams: Record<string, string | number>,
+    cacheKey: string,
+    cacheable: boolean,
+  ): Promise<ApiResult> {
     const entries = Object.entries(queryParams)
       .map(
         ([k, v]) =>
@@ -163,7 +203,28 @@ export function createApiClient(config: AppConfig) {
     return fetchWithErrorHandling(url);
   }
 
-  return { fetchOpenAssembly, fetchDataGoKr, cache, monitor, rateLimiter };
+  /**
+   * 캐시 Warm-up — 정적 API를 사전 로드하여 첫 도구 호출도 캐시 히트
+   * 서버 시작 직후 백그라운드에서 실행됩니다.
+   */
+  async function warmUp(): Promise<void> {
+    const targets: Array<{ code: string; params: Record<string, string | number> }> = [
+      { code: API_CODES.MEMBER_INFO, params: { pSize: 20 } },
+      { code: API_CODES.COMMITTEE_INFO, params: {} },
+      { code: API_CODES.META_API_LIST, params: { pSize: 300 } },
+    ];
+
+    const results = await Promise.allSettled(
+      targets.map(({ code, params }) => fetchOpenAssembly(code, params)),
+    );
+
+    const loaded = results.filter((r) => r.status === "fulfilled").length;
+    process.stderr.write(
+      `[assembly-api-mcp] 캐시 warm-up 완료: ${loaded}/${targets.length} API 사전 로드\n`,
+    );
+  }
+
+  return { fetchOpenAssembly, fetchDataGoKr, warmUp, cache, monitor, rateLimiter };
 }
 
 /** createApiClient 반환 타입 */

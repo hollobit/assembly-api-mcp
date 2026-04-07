@@ -17,6 +17,7 @@ import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/
 import { type AppConfig, overrideConfigFromParams } from "./config.js";
 import { handleRestRequest } from "./openapi/router.js";
 import { getLandingPageHtml } from "./pages/landing.js";
+import { createApiClient } from "./api/client.js";
 import { registerLiteTools } from "./tools/lite/index.js";
 import { registerBillDetailTool } from "./tools/bills.js";
 import { registerCommitteeTools } from "./tools/committees.js";
@@ -168,6 +169,12 @@ async function startHttpTransport(config: AppConfig): Promise<McpServer> {
       resolve();
     });
   });
+
+  // 캐시 Warm-up (백그라운드, 실패해도 서버 가동에 영향 없음)
+  if (config.apiKeys.assemblyApiKey && config.apiKeys.assemblyApiKey !== "sample") {
+    const warmClient = createApiClient(config);
+    void warmClient.warmUp();
+  }
 
   // Graceful shutdown
   const shutdown = async (): Promise<void> => {

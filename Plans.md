@@ -131,6 +131,59 @@ assembly-api-mcp setup
 | 16.2 | 도구 수 불일치 수정 — 소스코드 주석/메시지 (config.ts, setup.ts, static-data.ts, lite/index.ts) | 소스 내 "7개"→"9개", "23개"→"18개" 수정, 빌드 통과 | 16.1 | cc:完了 [b009e56] |
 | 16.3 | server.ts MCP 버전 동기화 | version: "0.2.0" → "0.3.0" (package.json과 일치) | - | cc:完了 [b009e56] |
 
+### Phase 17: MCP 프레임워크 및 성능 개선 검토
+
+#### 검토 배경
+
+Claude Desktop / claude.ai 에서 MCP 도구 응답이 느리고 연결이 매끄럽지 못한 문제.
+FastMCP 등 대안 프레임워크와 Pydantic 등 기술 스택으로 성능 개선 가능성을 조사.
+
+#### 조사 결과 요약
+
+**A. FastMCP (Python, PrefectHQ) — 부적합**
+- Python 전용. 프로젝트 전체를 Python으로 재작성해야 함
+- 24K 스타, 공식 MCP Python SDK에 채택됨
+- 캐싱 미들웨어, Pydantic 통합 등 우수하나 언어 전환 비용이 너무 큼
+- **결론: 채택 불가 (TypeScript 프로젝트)**
+
+**B. FastMCP (TypeScript, punkpeye/fastmcp) — 검토 가치 있음**
+- 3K 스타, @modelcontextprotocol/sdk를 래핑
+- Progress notification, Streaming output, Session 관리, 인증 내장
+- 마이그레이션 난이도: 중간 (도구 정의 패턴 변경 필요)
+- **핵심 이점: 진행 상황 알림으로 UX 개선 가능**
+
+**C. 현재 SDK에서 직접 개선 — 가장 현실적**
+- @modelcontextprotocol/sdk v1.12.0이 progress notification을 이미 지원
+- FastMCP 없이도 핵심 기능(진행 알림, 응답 최적화)을 직접 구현 가능
+- 기존 코드 변경 최소, 즉시 효과
+
+**D. Pydantic vs Zod — 해당 없음**
+- TypeScript 프로젝트에서 Zod이 적합, Pydantic은 Python 전용
+- MCP SDK v2 alpha에서 Standard Schema 지원 예정 (Zod v4 호환)
+
+#### 핵심 병목 분석
+
+| 병목 | 원인 | 현재 | 개선 가능성 |
+|------|------|------|------------|
+| 국회 API 응답 느림 | 외부 서버 1~5초 | 10초 타임아웃 | 제어 불가 (캐시로 완화) |
+| 체인 도구 다중 호출 | analyze: 3회, track: N+5회 | Promise.all 병렬화 | 이미 최적화됨 |
+| 진행 상황 무피드백 | MCP progress 미사용 | 빈 화면 대기 | **큰 개선 가능** |
+| 응답 크기 | 전체 row JSON 반환 | 6~90KB | 필드 축소로 개선 가능 |
+| Fly.dev Cold start | min_machines=0 | 첫 요청 수초 지연 | min=1로 해결 |
+| 캐시 미스 시 지연 | 첫 호출 느림 | 캐시 히트율 99% | warm-up 추가 가능 |
+
+#### 권장 방안: 현재 SDK 기반 점진적 개선
+
+FastMCP(TS) 마이그레이션보다 현재 SDK에서 3가지 핵심 개선이 ROI가 높음:
+
+| Task | 내용 | DoD | Depends | Status |
+|------|------|-----|---------|--------|
+| 17.1 | MCP Progress Notification 도입 — 체인 도구(analyze_legislator, track_legislation)에 단계별 진행 알림 | 도구 실행 중 progress 이벤트가 클라이언트에 전달됨 | - | cc:完了 |
+| 17.2 | Fly.dev Cold start 제거 — min_machines_running=1 설정 | fly.toml 수정, 배포 후 첫 요청 응답 < 2초 | - | cc:完了 |
+| 17.3 | 캐시 Warm-up — 서버 시작 시 정적 API(의원, 위원회) 사전 로드 | 서버 시작 후 첫 도구 호출이 캐시 히트 | - | cc:完了 |
+| 17.4 | Stale-While-Revalidate 캐시 — TTL 만료 시 즉시 stale 반환 + 백그라운드 갱신 | 캐시 만료 순간에도 0ms 응답, 백그라운드에서 데이터 갱신됨 | - | cc:完了 |
+| 17.5 | 요청 중복 제거 (Deduplication) — 동일 API 동시 호출 시 Promise 공유 | 같은 API 코드+파라미터의 동시 요청이 1회만 fetch 실행 | - | cc:完了 |
+
 ---
 
 ## 현재 프로젝트 수치
