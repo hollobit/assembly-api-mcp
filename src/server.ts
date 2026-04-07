@@ -16,6 +16,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { type AppConfig, overrideConfigFromParams } from "./config.js";
 import { handleRestRequest } from "./openapi/router.js";
+import { getLandingPageHtml } from "./pages/landing.js";
 import { registerLiteTools } from "./tools/lite/index.js";
 import { registerBillDetailTool } from "./tools/bills.js";
 import { registerCommitteeTools } from "./tools/committees.js";
@@ -117,6 +118,14 @@ async function startHttpTransport(config: AppConfig): Promise<McpServer> {
   const httpServer = createHttpServer(
     (req: IncomingMessage, res: ServerResponse) => {
       const url = req.url ?? "/";
+
+      // Landing page (setup helper)
+      if (url === "/" && req.method === "GET") {
+        const baseUrl = `${req.headers["x-forwarded-proto"] ?? "http"}://${req.headers.host ?? "localhost:" + String(config.server.port)}`;
+        res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+        res.end(getLandingPageHtml(baseUrl));
+        return;
+      }
 
       // Health-check endpoint
       if (url === "/health" && req.method === "GET") {
