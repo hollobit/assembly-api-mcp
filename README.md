@@ -27,7 +27,7 @@ Claude, Gemini, ChatGPT 등 AI 도구에서 국회의원, 의안, 일정, 회의
 
 - **6개 Lite / 10개 Full 프로필 도구** — 도메인 엔티티 기반 통합 ([활용 사례 100선](USECASE.md))
 - **276개 국회 API 100% 접근** — `discover_apis` + `query_assembly` 범용 도구
-- **44개 검증된 API 코드** — 실제 데이터 반환 확인
+- **271개 API 코드 발굴 (98.2%)** — 276개 중 271개 코드 확인, `query_assembly`로 즉시 호출
 - **CLI 지원** — 터미널에서 직접 국회 데이터 조회
 - **이중 Transport** — stdio (Claude Desktop) + HTTP (원격 서버)
 - **REST API + OpenAPI 스펙** — ChatGPT GPTs Actions 지원 (`/openapi.json`)
