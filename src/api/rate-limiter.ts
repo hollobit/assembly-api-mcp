@@ -2,8 +2,10 @@
  * 월간 API 호출 횟수 제한 추적
  *
  * 열린국회정보 개발계정 기본 제한: 10,000건/월
- * 80% 소진 시 stderr 경고를 출력합니다.
+ * 80% 소진 시 MCP 클라이언트와 stderr에 경고를 출력합니다.
  */
+
+import { mcpLogger } from "./mcp-logger.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -67,14 +69,18 @@ export function createRateLimiter(
 
     if (!warned && count >= monthlyLimit * WARN_THRESHOLD) {
       warned = true;
-      process.stderr.write(
-        `[assembly:rate-limiter] 경고: 월간 API 호출 ${String(count)}/${String(monthlyLimit)} — 80% 이상 소진\n`,
+      mcpLogger.log(
+        "warning",
+        "rate-limiter",
+        `월간 API 호출 ${String(count)}/${String(monthlyLimit)} — 80% 이상 소진`,
       );
     }
 
     if (count >= monthlyLimit) {
-      process.stderr.write(
-        `[assembly:rate-limiter] 경고: 월간 API 호출 한도 도달 (${String(count)}/${String(monthlyLimit)})\n`,
+      mcpLogger.log(
+        "error",
+        "rate-limiter",
+        `월간 API 호출 한도 도달 (${String(count)}/${String(monthlyLimit)})`,
       );
     }
   }

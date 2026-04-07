@@ -13,6 +13,7 @@ import { createApiClient } from "../../api/client.js";
 import { API_CODES, CURRENT_AGE } from "../../api/codes.js";
 import { type ApiResult } from "../../api/client.js";
 import { formatToolError } from "../helpers.js";
+import { mcpLogger } from "../../api/mcp-logger.js";
 
 // ---------------------------------------------------------------------------
 // Progress notification helper
@@ -388,8 +389,10 @@ export function registerLiteChainTools(
                 }))
                 .catch((err: unknown) => {
                   const msg = err instanceof Error ? err.message : String(err);
-                  process.stderr.write(
-                    `[assembly:track] 심사이력 조회 실패 [${bill.billNo}]: ${msg}\n`,
+                  mcpLogger.log(
+                    "warning",
+                    "track-legislation",
+                    `심사이력 조회 실패 [${bill.billNo}]: ${msg}`,
                   );
                   return {
                     billNo: bill.billNo,

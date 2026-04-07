@@ -4,6 +4,8 @@
  * API 호출의 지속 시간, 성공률, 느린 호출을 추적합니다.
  */
 
+import { mcpLogger } from "./mcp-logger.js";
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -67,8 +69,10 @@ export function createMonitor(): Monitor {
       }
       slowCallsList.push(metric);
 
-      process.stderr.write(
-        `[assembly:monitor] 느린 API 호출: ${metric.apiCode} — ${String(metric.durationMs)}ms\n`,
+      mcpLogger.log(
+        "warning",
+        "monitor",
+        `느린 API 호출: ${metric.apiCode} — ${String(metric.durationMs)}ms`,
       );
     }
   }

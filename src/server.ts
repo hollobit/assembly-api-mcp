@@ -18,6 +18,7 @@ import { type AppConfig, overrideConfigFromParams } from "./config.js";
 import { handleRestRequest } from "./openapi/router.js";
 import { getLandingPageHtml } from "./pages/landing.js";
 import { createApiClient } from "./api/client.js";
+import { mcpLogger } from "./api/mcp-logger.js";
 import { registerLiteTools } from "./tools/lite/index.js";
 import { registerBillDetailTool } from "./tools/bills.js";
 import { registerCommitteeTools } from "./tools/committees.js";
@@ -58,6 +59,9 @@ function buildMcpServer(config: AppConfig): McpServer {
     // Lite 프로필 (기본): 9개 도구
     registerLiteTools(server, config);
   }
+
+  // MCP Logging 연결 — 도구/모니터 로그가 클라이언트에 전달됨
+  mcpLogger.attach((params) => server.sendLoggingMessage(params));
 
   // 리소스 등록
   registerResources(server, config);

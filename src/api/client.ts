@@ -13,6 +13,7 @@ import {
   API_BASE_URLS,
 } from "../config.js";
 import { createCache, buildCacheKey, type Cache } from "./cache.js";
+import { mcpLogger } from "./mcp-logger.js";
 import { API_CODES } from "./codes.js";
 import { createMonitor, type Monitor, type ApiCallMetric } from "./monitor.js";
 import { createRateLimiter, type RateLimiter } from "./rate-limiter.js";
@@ -219,8 +220,10 @@ export function createApiClient(config: AppConfig) {
     );
 
     const loaded = results.filter((r) => r.status === "fulfilled").length;
-    process.stderr.write(
-      `[assembly-api-mcp] 캐시 warm-up 완료: ${loaded}/${targets.length} API 사전 로드\n`,
+    mcpLogger.log(
+      "info",
+      "cache",
+      `캐시 warm-up 완료: ${loaded}/${targets.length} API 사전 로드`,
     );
   }
 
