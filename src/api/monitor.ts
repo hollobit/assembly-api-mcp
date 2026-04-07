@@ -34,6 +34,7 @@ export interface Monitor {
 // ---------------------------------------------------------------------------
 
 const SLOW_THRESHOLD_MS = 3000;
+const MAX_METRICS_STORED = 1000;
 const MAX_SLOW_CALLS_STORED = 100;
 
 // ---------------------------------------------------------------------------
@@ -41,18 +42,30 @@ const MAX_SLOW_CALLS_STORED = 100;
 // ---------------------------------------------------------------------------
 
 export function createMonitor(): Monitor {
-  let metrics: readonly ApiCallMetric[] = [];
-  let slowCallsList: readonly ApiCallMetric[] = [];
+  const metrics: ApiCallMetric[] = [];
+  const slowCallsList: ApiCallMetric[] = [];
+  let totalCalls = 0;
+  let successCount = 0;
+  let totalDurationMs = 0;
 
   function record(metric: ApiCallMetric): void {
-    metrics = [...metrics, metric];
+    // Sliding window: drop oldest when at capacity
+    if (metrics.length >= MAX_METRICS_STORED) {
+      const removed = metrics.shift()!;
+      if (removed.success) successCount -= 1;
+      totalDurationMs -= removed.durationMs;
+    }
+
+    metrics.push(metric);
+    totalCalls += 1;
+    totalDurationMs += metric.durationMs;
+    if (metric.success) successCount += 1;
 
     if (metric.durationMs > SLOW_THRESHOLD_MS) {
-      const updated = [...slowCallsList, metric];
-      slowCallsList =
-        updated.length > MAX_SLOW_CALLS_STORED
-          ? updated.slice(-MAX_SLOW_CALLS_STORED)
-          : updated;
+      if (slowCallsList.length >= MAX_SLOW_CALLS_STORED) {
+        slowCallsList.shift();
+      }
+      slowCallsList.push(metric);
 
       process.stderr.write(
         `[assembly:monitor] 느린 API 호출: ${metric.apiCode} — ${String(metric.durationMs)}ms\n`,
@@ -61,25 +74,12 @@ export function createMonitor(): Monitor {
   }
 
   function stats(): MonitorStats {
-    const totalCalls = metrics.length;
-    if (totalCalls === 0) {
-      return {
-        totalCalls: 0,
-        successCount: 0,
-        failureCount: 0,
-        avgDurationMs: 0,
-        slowCallCount: 0,
-      };
-    }
-
-    const successCount = metrics.filter((m) => m.success).length;
-    const totalDuration = metrics.reduce((sum, m) => sum + m.durationMs, 0);
-
+    const windowSize = metrics.length;
     return {
       totalCalls,
       successCount,
-      failureCount: totalCalls - successCount,
-      avgDurationMs: Math.round(totalDuration / totalCalls),
+      failureCount: windowSize - successCount,
+      avgDurationMs: windowSize > 0 ? Math.round(totalDurationMs / windowSize) : 0,
       slowCallCount: slowCallsList.length,
     };
   }

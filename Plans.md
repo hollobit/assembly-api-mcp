@@ -95,6 +95,31 @@ npm install -g assembly-api-mcp
 assembly-api-mcp setup
 ```
 
+### Phase 15: 성능 개선
+
+#### 분석 요약
+
+**가장 심각한 병목:**
+
+1. **REST 라우터 — `createApiClient` 매 요청 재생성** (`router.ts:180`): REST API 요청마다 새 캐시, 새 모니터, 새 Rate Limiter 인스턴스가 생성됨. 이전 요청의 캐시가 버려지므로 REST 모드에서 캐시 히트율 0%. MCP 세션에서는 세션당 1번만 생성되므로 문제없었지만, REST API에서는 치명적.
+
+2. **Monitor `metrics` 배열 무한 증가** (`monitor.ts:48`): `metrics = [...metrics, metric]`로 매 호출마다 전체 배열을 복사. 10,000 호출 시 매번 10,000개 항목 복사 — O(n) 메모리 + O(n) 시간.
+
+3. **캐시 LRU 동작 불완전** (`cache.ts:46-66`): `get()` 시 접근 순서를 갱신하지 않아 자주 사용하는 항목도 삽입 순서대로 evict될 수 있음.
+
+4. **정적 API 캐시 범위 부족**: `MEMBER_INFO`만 24h TTL. `COMMITTEE_INFO`, `META_API_LIST` 등 거의 변하지 않는 데이터도 1h TTL 적용.
+
+5. **fetch 타임아웃 없음** (`client.ts:105`): 국회 API가 응답하지 않으면 무한 대기.
+
+| Task | 내용 | DoD | Depends | Status |
+|------|------|-----|---------|--------|
+| 15.1 | REST 라우터 — API 클라이언트 재사용 | 동일 API 키에 대해 캐시된 클라이언트 인스턴스 반환, 캐시/모니터/Rate Limiter 공유 | - | cc:完了 |
+| 15.2 | Monitor — 메트릭 배열 무한 증가 수정 | 슬라이딩 윈도우 (최대 1000건) + mutable push로 변경, O(1) append | - | cc:完了 |
+| 15.3 | 캐시 LRU 순서 갱신 | `get()` 시 Map delete→re-insert로 최근 사용 항목 보호 | - | cc:完了 |
+| 15.4 | 정적 API 코드 확대 | COMMITTEE_INFO, META_API_LIST, VOTE_PLENARY를 정적 캐시(24h) 대상에 추가 | - | cc:完了 |
+| 15.5 | fetch AbortController 타임아웃 (10초) | 느린 API 호출 10초 후 자동 중단, 타임아웃 에러 반환 | - | cc:完了 |
+| 15.6 | REST 응답 Cache-Control 헤더 | 정적 데이터에 `Cache-Control: public, max-age=3600`, 동적 데이터에 `max-age=60` | 15.4 | cc:完了 |
+
 ---
 
 ## 현재 프로젝트 수치

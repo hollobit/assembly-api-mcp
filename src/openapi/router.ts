@@ -7,7 +7,7 @@
 
 import { type IncomingMessage, type ServerResponse } from "node:http";
 import { type AppConfig, overrideConfigFromParams } from "../config.js";
-import { createApiClient } from "../api/client.js";
+import { createApiClient, type ApiClient } from "../api/client.js";
 import { generateOpenApiSpec } from "./spec.js";
 import {
   type HandlerContext,
@@ -41,7 +41,16 @@ interface RouteEntry {
   readonly handler: RouteHandler;
   readonly pathParamNames: readonly string[];
   readonly profile: "lite" | "full";
+  /** Max-age in seconds for Cache-Control header. 0 = no-cache. */
+  readonly cacheMaxAge: number;
 }
+
+/** 정적 데이터 (위원회, API 목록 등): 1시간 캐시 */
+const CACHE_STATIC = 3600;
+/** 동적 데이터 (의안, 일정 등): 1분 캐시 */
+const CACHE_DYNAMIC = 60;
+/** 캐시 불가 (분석, 추적 등): no-cache */
+const CACHE_NONE = 0;
 
 /**
  * Route order matters: more specific patterns must come before generic ones.
@@ -49,25 +58,25 @@ interface RouteEntry {
  */
 const ROUTES: readonly RouteEntry[] = [
   // Lite routes
-  { pattern: /^\/api\/members$/, handler: searchMembers, pathParamNames: [], profile: "lite" },
-  { pattern: /^\/api\/bills\/review$/, handler: getBillReview, pathParamNames: [], profile: "full" },
-  { pattern: /^\/api\/bills\/history$/, handler: getBillHistory, pathParamNames: [], profile: "full" },
-  { pattern: /^\/api\/bills\/([^/]+)$/, handler: getBillDetail, pathParamNames: ["bill_id"], profile: "full" },
-  { pattern: /^\/api\/bills$/, handler: searchBills, pathParamNames: [], profile: "lite" },
-  { pattern: /^\/api\/schedule$/, handler: getSchedule, pathParamNames: [], profile: "lite" },
-  { pattern: /^\/api\/meetings$/, handler: searchMeetings, pathParamNames: [], profile: "lite" },
-  { pattern: /^\/api\/votes$/, handler: getVotes, pathParamNames: [], profile: "lite" },
-  { pattern: /^\/api\/legislators\/([^/]+)\/analysis$/, handler: analyzeLegislator, pathParamNames: ["name"], profile: "lite" },
-  { pattern: /^\/api\/legislation\/track$/, handler: trackLegislation, pathParamNames: [], profile: "lite" },
-  { pattern: /^\/api\/legislation\/notices$/, handler: getLegislationNotices, pathParamNames: [], profile: "full" },
-  { pattern: /^\/api\/discover$/, handler: discoverApis, pathParamNames: [], profile: "lite" },
-  { pattern: /^\/api\/query\/([^/]+)$/, handler: queryAssembly, pathParamNames: ["api_code"], profile: "lite" },
+  { pattern: /^\/api\/members$/, handler: searchMembers, pathParamNames: [], profile: "lite", cacheMaxAge: CACHE_STATIC },
+  { pattern: /^\/api\/bills\/review$/, handler: getBillReview, pathParamNames: [], profile: "full", cacheMaxAge: CACHE_DYNAMIC },
+  { pattern: /^\/api\/bills\/history$/, handler: getBillHistory, pathParamNames: [], profile: "full", cacheMaxAge: CACHE_DYNAMIC },
+  { pattern: /^\/api\/bills\/([^/]+)$/, handler: getBillDetail, pathParamNames: ["bill_id"], profile: "full", cacheMaxAge: CACHE_DYNAMIC },
+  { pattern: /^\/api\/bills$/, handler: searchBills, pathParamNames: [], profile: "lite", cacheMaxAge: CACHE_DYNAMIC },
+  { pattern: /^\/api\/schedule$/, handler: getSchedule, pathParamNames: [], profile: "lite", cacheMaxAge: CACHE_DYNAMIC },
+  { pattern: /^\/api\/meetings$/, handler: searchMeetings, pathParamNames: [], profile: "lite", cacheMaxAge: CACHE_DYNAMIC },
+  { pattern: /^\/api\/votes$/, handler: getVotes, pathParamNames: [], profile: "lite", cacheMaxAge: CACHE_DYNAMIC },
+  { pattern: /^\/api\/legislators\/([^/]+)\/analysis$/, handler: analyzeLegislator, pathParamNames: ["name"], profile: "lite", cacheMaxAge: CACHE_NONE },
+  { pattern: /^\/api\/legislation\/track$/, handler: trackLegislation, pathParamNames: [], profile: "lite", cacheMaxAge: CACHE_NONE },
+  { pattern: /^\/api\/legislation\/notices$/, handler: getLegislationNotices, pathParamNames: [], profile: "full", cacheMaxAge: CACHE_DYNAMIC },
+  { pattern: /^\/api\/discover$/, handler: discoverApis, pathParamNames: [], profile: "lite", cacheMaxAge: CACHE_STATIC },
+  { pattern: /^\/api\/query\/([^/]+)$/, handler: queryAssembly, pathParamNames: ["api_code"], profile: "lite", cacheMaxAge: CACHE_DYNAMIC },
   // Full-only routes
-  { pattern: /^\/api\/committees$/, handler: getCommittees, pathParamNames: [], profile: "full" },
-  { pattern: /^\/api\/petitions$/, handler: searchPetitions, pathParamNames: [], profile: "full" },
-  { pattern: /^\/api\/library$/, handler: searchLibrary, pathParamNames: [], profile: "full" },
-  { pattern: /^\/api\/budget$/, handler: getBudgetAnalysis, pathParamNames: [], profile: "full" },
-  { pattern: /^\/api\/research$/, handler: searchResearchReports, pathParamNames: [], profile: "full" },
+  { pattern: /^\/api\/committees$/, handler: getCommittees, pathParamNames: [], profile: "full", cacheMaxAge: CACHE_STATIC },
+  { pattern: /^\/api\/petitions$/, handler: searchPetitions, pathParamNames: [], profile: "full", cacheMaxAge: CACHE_DYNAMIC },
+  { pattern: /^\/api\/library$/, handler: searchLibrary, pathParamNames: [], profile: "full", cacheMaxAge: CACHE_DYNAMIC },
+  { pattern: /^\/api\/budget$/, handler: getBudgetAnalysis, pathParamNames: [], profile: "full", cacheMaxAge: CACHE_DYNAMIC },
+  { pattern: /^\/api\/research$/, handler: searchResearchReports, pathParamNames: [], profile: "full", cacheMaxAge: CACHE_DYNAMIC },
 ];
 
 // ---------------------------------------------------------------------------
@@ -87,6 +96,35 @@ function parseUrl(raw: string): { pathname: string; queryParams: Record<string, 
   }
 
   return { pathname, queryParams };
+}
+
+// ---------------------------------------------------------------------------
+// API Client cache — reuse across REST requests with the same API key
+// ---------------------------------------------------------------------------
+
+const clientCache = new Map<string, { client: ApiClient; lastUsed: number }>();
+const CLIENT_CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes
+
+function getOrCreateClient(config: AppConfig): ApiClient {
+  const cacheKey = config.apiKeys.assemblyApiKey;
+  const entry = clientCache.get(cacheKey);
+
+  if (entry) {
+    entry.lastUsed = Date.now();
+    return entry.client;
+  }
+
+  // Evict stale entries
+  const now = Date.now();
+  for (const [key, val] of clientCache) {
+    if (now - val.lastUsed > CLIENT_CACHE_TTL_MS) {
+      clientCache.delete(key);
+    }
+  }
+
+  const client = createApiClient(config);
+  clientCache.set(cacheKey, { client, lastUsed: now });
+  return client;
 }
 
 // ---------------------------------------------------------------------------
@@ -131,7 +169,10 @@ export async function handleRestRequest(
     const host = req.headers.host ?? "localhost:3000";
     const baseUrl = `${proto}://${host}`;
     const spec = generateOpenApiSpec(baseUrl, profile);
-    res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+    res.writeHead(200, {
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "public, max-age=86400",
+    });
     res.end(JSON.stringify(spec, null, 2));
     return true;
   }
@@ -177,7 +218,7 @@ export async function handleRestRequest(
     }
 
     const ctx: HandlerContext = {
-      api: createApiClient(sessionConfig),
+      api: getOrCreateClient(sessionConfig),
       config: sessionConfig,
     };
 
@@ -185,7 +226,15 @@ export async function handleRestRequest(
 
     try {
       const result = await route.handler(ctx, queryParams, pathParams);
-      res.writeHead(result.status, { "Content-Type": "application/json; charset=utf-8" });
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json; charset=utf-8",
+      };
+      if (route.cacheMaxAge > 0 && result.status === 200) {
+        headers["Cache-Control"] = `public, max-age=${route.cacheMaxAge}`;
+      } else {
+        headers["Cache-Control"] = "no-cache";
+      }
+      res.writeHead(result.status, headers);
       res.end(JSON.stringify(result.body));
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);

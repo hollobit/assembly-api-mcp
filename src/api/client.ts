@@ -47,9 +47,12 @@ export function createApiClient(config: AppConfig) {
   const monitor: Monitor = createMonitor();
   const rateLimiter: RateLimiter = createRateLimiter();
 
-  /** MEMBER_INFO는 정적 데이터 — ttlStatic 사용 */
+  /** 거의 변하지 않는 정적 데이터 — ttlStatic(24h) 사용 */
   const STATIC_API_CODES: ReadonlySet<string> = new Set([
     API_CODES.MEMBER_INFO,
+    API_CODES.COMMITTEE_INFO,
+    API_CODES.META_API_LIST,
+    API_CODES.VOTE_PLENARY,
   ]);
 
   function getTtl(apiCode: string): number {
@@ -170,13 +173,23 @@ export type ApiClient = ReturnType<typeof createApiClient>;
 // Internal helpers
 // ---------------------------------------------------------------------------
 
+const FETCH_TIMEOUT_MS = 10_000;
+
 async function fetchWithErrorHandling(url: string): Promise<unknown> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
   let response: Response;
   try {
-    response = await fetch(url);
+    response = await fetch(url, { signal: controller.signal });
   } catch (err: unknown) {
+    if (err instanceof Error && err.name === "AbortError") {
+      throw new Error(`API 요청 시간 초과 (${FETCH_TIMEOUT_MS / 1000}초). 잠시 후 다시 시도하세요.`);
+    }
     const message = err instanceof Error ? err.message : String(err);
     throw new Error(`네트워크 오류: ${message}`);
+  } finally {
+    clearTimeout(timer);
   }
 
   if (!response.ok) {

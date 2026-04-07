@@ -61,6 +61,10 @@ export function createCache(config: CacheConfig): Cache {
       return undefined;
     }
 
+    // LRU: move to end of Map insertion order (most recently used)
+    store.delete(key);
+    store.set(key, entry);
+
     hits += 1;
     return entry.data as T;
   }
