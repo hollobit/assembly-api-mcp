@@ -6,7 +6,49 @@
  */
 
 import { type IncomingMessage, type ServerResponse } from "node:http";
+import { gzip } from "node:zlib";
+import { promisify } from "node:util";
 import { type AppConfig, overrideConfigFromParams } from "../config.js";
+
+const gzipAsync = promisify(gzip);
+
+/** gzip 압축하여 응답 전송. Accept-Encoding에 gzip이 없으면 비압축 전송. */
+function sendJson(
+  req: IncomingMessage,
+  res: ServerResponse,
+  statusCode: number,
+  body: unknown,
+  extraHeaders: Record<string, string> = {},
+): void {
+  const json = JSON.stringify(body);
+  const acceptEncoding = req.headers["accept-encoding"] ?? "";
+
+  if (acceptEncoding.includes("gzip") && json.length > 1024) {
+    gzipAsync(Buffer.from(json, "utf-8"))
+      .then((compressed) => {
+        res.writeHead(statusCode, {
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Encoding": "gzip",
+          ...extraHeaders,
+        });
+        res.end(compressed);
+      })
+      .catch(() => {
+        // gzip 실패 시 비압축 전송
+        res.writeHead(statusCode, {
+          "Content-Type": "application/json; charset=utf-8",
+          ...extraHeaders,
+        });
+        res.end(json);
+      });
+  } else {
+    res.writeHead(statusCode, {
+      "Content-Type": "application/json; charset=utf-8",
+      ...extraHeaders,
+    });
+    res.end(json);
+  }
+}
 import { createApiClient, type ApiClient } from "../api/client.js";
 import { generateOpenApiSpec } from "./spec.js";
 import {
@@ -169,11 +211,7 @@ export async function handleRestRequest(
     const host = req.headers.host ?? "localhost:3000";
     const baseUrl = `${proto}://${host}`;
     const spec = generateOpenApiSpec(baseUrl, profile);
-    res.writeHead(200, {
-      "Content-Type": "application/json; charset=utf-8",
-      "Cache-Control": "public, max-age=86400",
-    });
-    res.end(JSON.stringify(spec, null, 2));
+    sendJson(req, res, 200, spec, { "Cache-Control": "public, max-age=86400" });
     return true;
   }
 
@@ -226,20 +264,13 @@ export async function handleRestRequest(
 
     try {
       const result = await route.handler(ctx, queryParams, pathParams);
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json; charset=utf-8",
-      };
-      if (route.cacheMaxAge > 0 && result.status === 200) {
-        headers["Cache-Control"] = `public, max-age=${route.cacheMaxAge}`;
-      } else {
-        headers["Cache-Control"] = "no-cache";
-      }
-      res.writeHead(result.status, headers);
-      res.end(JSON.stringify(result.body));
+      const cacheHeader = (route.cacheMaxAge > 0 && result.status === 200)
+        ? `public, max-age=${route.cacheMaxAge}`
+        : "no-cache";
+      sendJson(req, res, result.status, result.body, { "Cache-Control": cacheHeader });
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
-      res.writeHead(500, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ success: false, error: msg }));
+      sendJson(req, res, 500, { success: false, error: msg });
     }
 
     return true;

@@ -183,6 +183,11 @@ FastMCP(TS) 마이그레이션보다 현재 SDK에서 3가지 핵심 개선이 R
 | 17.3 | 캐시 Warm-up — 서버 시작 시 정적 API(의원, 위원회) 사전 로드 | 서버 시작 후 첫 도구 호출이 캐시 히트 | - | cc:完了 |
 | 17.4 | Stale-While-Revalidate 캐시 — TTL 만료 시 즉시 stale 반환 + 백그라운드 갱신 | 캐시 만료 순간에도 0ms 응답, 백그라운드에서 데이터 갱신됨 | - | cc:完了 |
 | 17.5 | 요청 중복 제거 (Deduplication) — 동일 API 동시 호출 시 Promise 공유 | 같은 API 코드+파라미터의 동시 요청이 1회만 fetch 실행 | - | cc:完了 |
+| 17.6 | 백그라운드 주기 갱신 — 정적 API 30분마다 자동 리프레시 | setInterval로 MEMBER_INFO/COMMITTEE_INFO/META_API_LIST 갱신, 캐시 미스 0% | - | cc:完了 |
+| 17.7 | HTTP Keep-Alive 명시적 설정 — fetch keepalive: true 명시 | TCP 재사용 보장, 2회차 이후 핸드셰이크 절감 | - | cc:完了 |
+| 17.8 | REST API gzip 응답 압축 — Accept-Encoding: gzip 요청 시 압축 전송 | /openapi.json 34KB→~12KB, 대량 응답 60-70% 절감 | - | cc:完了 |
+| 17.9 | 예측 프리패치 — 의원 검색 시 발의법안+표결 백그라운드 프리패치 | search_members 후 analyze_legislator 호출 시 캐시 히트 | - | cc:完了 |
+| 17.10 | DNS 캐시 — open.assembly.go.kr DNS 조회 결과 인메모리 캐시 (5분 TTL) | API 호출당 ~10ms DNS 조회 절감 | - | cc:完了 |
 
 ---
 

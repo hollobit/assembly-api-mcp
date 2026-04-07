@@ -9,7 +9,7 @@ import { z } from "zod";
 import { type McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { type AppConfig } from "../../config.js";
 import { createApiClient } from "../../api/client.js";
-import { API_CODES } from "../../api/codes.js";
+import { API_CODES, CURRENT_AGE } from "../../api/codes.js";
 import { formatToolError } from "../helpers.js";
 
 // ---------------------------------------------------------------------------
@@ -146,6 +146,20 @@ export function registerLiteMemberTools(
         // 결과가 1건이면 상세 정보 반환 (items 배열로 통일)
         if (rows.length === 1) {
           const detail = formatRow(rows[0], DETAIL_FIELDS);
+          const memberName = String(rows[0].HG_NM ?? "");
+
+          // 예측 프리패치: analyze_legislator에서 필요한 발의법안+표결을 백그라운드 로드
+          if (memberName) {
+            void Promise.allSettled([
+              api.fetchOpenAssembly(API_CODES.MEMBER_BILLS, {
+                AGE: CURRENT_AGE, PROPOSER: memberName, pSize: 10,
+              }),
+              api.fetchOpenAssembly(API_CODES.VOTE_PLENARY, {
+                AGE: CURRENT_AGE, pSize: 10,
+              }),
+            ]);
+          }
+
           return {
             content: [{
               type: "text" as const,

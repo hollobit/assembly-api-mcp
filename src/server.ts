@@ -174,10 +174,11 @@ async function startHttpTransport(config: AppConfig): Promise<McpServer> {
     });
   });
 
-  // 캐시 Warm-up (백그라운드, 실패해도 서버 가동에 영향 없음)
+  // 캐시 Warm-up + 주기 갱신 (백그라운드, 실패해도 서버 가동에 영향 없음)
   if (config.apiKeys.assemblyApiKey && config.apiKeys.assemblyApiKey !== "sample") {
     const warmClient = createApiClient(config);
     void warmClient.warmUp();
+    warmClient.startPeriodicRefresh(); // 30분마다 정적 API 리프레시
   }
 
   // Graceful shutdown

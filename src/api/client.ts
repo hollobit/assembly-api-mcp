@@ -208,26 +208,67 @@ export function createApiClient(config: AppConfig) {
    * 캐시 Warm-up — 정적 API를 사전 로드하여 첫 도구 호출도 캐시 히트
    * 서버 시작 직후 백그라운드에서 실행됩니다.
    */
-  async function warmUp(): Promise<void> {
-    const targets: Array<{ code: string; params: Record<string, string | number> }> = [
-      { code: API_CODES.MEMBER_INFO, params: { pSize: 20 } },
-      { code: API_CODES.COMMITTEE_INFO, params: {} },
-      { code: API_CODES.META_API_LIST, params: { pSize: 300 } },
-    ];
+  /** 정적 API 사전 로드 대상 */
+  const WARMUP_TARGETS: ReadonlyArray<{ code: string; params: Record<string, string | number> }> = [
+    { code: API_CODES.MEMBER_INFO, params: { pSize: 20 } },
+    { code: API_CODES.COMMITTEE_INFO, params: {} },
+    { code: API_CODES.META_API_LIST, params: { pSize: 300 } },
+  ];
 
+  /**
+   * 캐시 Warm-up — 정적 API를 사전 로드하여 첫 도구 호출도 캐시 히트
+   * 서버 시작 직후 백그라운드에서 실행됩니다.
+   */
+  async function warmUp(): Promise<void> {
     const results = await Promise.allSettled(
-      targets.map(({ code, params }) => fetchOpenAssembly(code, params)),
+      WARMUP_TARGETS.map(({ code, params }) => fetchOpenAssembly(code, params)),
     );
 
     const loaded = results.filter((r) => r.status === "fulfilled").length;
     mcpLogger.log(
       "info",
       "cache",
-      `캐시 warm-up 완료: ${loaded}/${targets.length} API 사전 로드`,
+      `캐시 warm-up 완료: ${loaded}/${WARMUP_TARGETS.length} API 사전 로드`,
     );
   }
 
-  return { fetchOpenAssembly, fetchDataGoKr, warmUp, cache, monitor, rateLimiter };
+  /** 백그라운드 주기 갱신 interval ID (정리용) */
+  let refreshTimer: ReturnType<typeof setInterval> | undefined;
+
+  /**
+   * 백그라운드 주기 갱신 시작 — 정적 API를 주기적으로 리프레시
+   * SWR의 stale 구간 자체를 제거하여 항상 fresh 캐시를 유지합니다.
+   */
+  function startPeriodicRefresh(intervalMs: number = 30 * 60 * 1000): void {
+    if (refreshTimer) return; // 중복 시작 방지
+
+    refreshTimer = setInterval(() => {
+      Promise.allSettled(
+        WARMUP_TARGETS.map(({ code, params }) => fetchOpenAssembly(code, params)),
+      ).then((results) => {
+        const loaded = results.filter((r) => r.status === "fulfilled").length;
+        mcpLogger.log(
+          "debug",
+          "cache",
+          `주기 갱신 완료: ${loaded}/${WARMUP_TARGETS.length} API 리프레시`,
+        );
+      });
+    }, intervalMs);
+    refreshTimer.unref(); // 프로세스 종료를 방해하지 않음
+  }
+
+  function stopPeriodicRefresh(): void {
+    if (refreshTimer) {
+      clearInterval(refreshTimer);
+      refreshTimer = undefined;
+    }
+  }
+
+  return {
+    fetchOpenAssembly, fetchDataGoKr, warmUp,
+    startPeriodicRefresh, stopPeriodicRefresh,
+    cache, monitor, rateLimiter,
+  };
 }
 
 /** createApiClient 반환 타입 */
@@ -239,13 +280,59 @@ export type ApiClient = ReturnType<typeof createApiClient>;
 
 const FETCH_TIMEOUT_MS = 10_000;
 
+/**
+ * DNS 캐시 — open.assembly.go.kr의 DNS 조회 결과를 인메모리 캐시
+ * 매 fetch마다 반복되는 DNS 조회(~10ms)를 제거합니다.
+ */
+const dnsCache = new Map<string, { address: string; expiry: number }>();
+const DNS_CACHE_TTL_MS = 5 * 60 * 1000; // 5분
+
+async function resolveHost(hostname: string): Promise<string | undefined> {
+  const cached = dnsCache.get(hostname);
+  if (cached && cached.expiry > Date.now()) return cached.address;
+
+  try {
+    const dns = await import("node:dns/promises");
+    const { address } = await dns.lookup(hostname);
+    dnsCache.set(hostname, { address, expiry: Date.now() + DNS_CACHE_TTL_MS });
+    return address;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Keep-Alive + DNS 캐시 적용 fetch
+ *
+ * Node.js 22 fetch는 내장 undici 기반으로 keep-alive가 기본 활성이지만,
+ * DNS 캐시를 명시적으로 적용하여 매 요청의 DNS 조회 오버헤드를 제거합니다.
+ */
 async function fetchWithErrorHandling(url: string): Promise<unknown> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
+  // DNS 캐시 적용: URL의 호스트를 IP로 교체하고 Host 헤더 설정
+  let fetchUrl = url;
+  const headers: Record<string, string> = {};
+  try {
+    const parsed = new URL(url);
+    const ip = await resolveHost(parsed.hostname);
+    if (ip) {
+      parsed.hostname = ip;
+      fetchUrl = parsed.toString();
+      headers["Host"] = new URL(url).host;
+    }
+  } catch {
+    // DNS 캐시 실패 시 원본 URL 사용
+  }
+
   let response: Response;
   try {
-    response = await fetch(url, { signal: controller.signal });
+    response = await fetch(fetchUrl, {
+      signal: controller.signal,
+      headers,
+      keepalive: true,
+    });
   } catch (err: unknown) {
     if (err instanceof Error && err.name === "AbortError") {
       throw new Error(`API 요청 시간 초과 (${FETCH_TIMEOUT_MS / 1000}초). 잠시 후 다시 시도하세요.`);
