@@ -20,14 +20,10 @@ import { getLandingPageHtml } from "./pages/landing.js";
 import { createApiClient } from "./api/client.js";
 import { mcpLogger } from "./api/mcp-logger.js";
 import { registerLiteTools } from "./tools/lite/index.js";
-import { registerBillDetailTool } from "./tools/bills.js";
-import { registerCommitteeTools } from "./tools/committees.js";
-import { registerPetitionTools } from "./tools/petitions.js";
-import { registerLegislationTools } from "./tools/legislation.js";
-import { registerLibraryTools } from "./tools/library.js";
-import { registerBudgetTools } from "./tools/budget.js";
-import { registerResearchTools } from "./tools/research.js";
-import { registerBillExtraTools } from "./tools/bill-extras.js";
+import { registerBillDetailTool } from "./tools/full/bill-detail.js";
+import { registerCommitteeDetailTool } from "./tools/full/committee-detail.js";
+import { registerPetitionDetailTool } from "./tools/full/petition-detail.js";
+import { registerResearchDataTool } from "./tools/full/research-data.js";
 import { registerResources } from "./resources/static-data.js";
 import { registerPrompts } from "./prompts/templates.js";
 
@@ -43,20 +39,16 @@ function buildMcpServer(config: AppConfig): McpServer {
 
   // 도구 등록 — 프로필에 따라 분기
   if (config.profile === "full") {
-    // Lite 도구 9개 전체 먼저 등록
+    // Lite 도구 6개 먼저 등록
     registerLiteTools(server, config);
 
-    // Full 전용: Lite에 없는 고유 도구만 추가 등록
-    registerBillDetailTool(server, config);   // get_bill_detail
-    registerBillExtraTools(server, config);   // get_bill_review, get_bill_history, get_bill_proposers
-    registerCommitteeTools(server, config);   // get_committees
-    registerPetitionTools(server, config);    // search_petitions
-    registerLegislationTools(server, config); // get_legislation_notices
-    registerLibraryTools(server, config);     // search_library
-    registerBudgetTools(server, config);      // get_budget_analysis
-    registerResearchTools(server, config);    // search_research_reports
+    // Full 전용 심층 도구 4개 추가 (총 10개)
+    registerBillDetailTool(server, config);      // bill_detail (상세+심사+이력+제안자+회의)
+    registerCommitteeDetailTool(server, config);  // committee_detail (위원회+위원명단)
+    registerPetitionDetailTool(server, config);   // petition_detail (청원 상세)
+    registerResearchDataTool(server, config);     // research_data (도서관+조사처+예산처)
   } else {
-    // Lite 프로필 (기본): 9개 도구
+    // Lite 프로필 (기본): 6개 도구
     registerLiteTools(server, config);
   }
 
