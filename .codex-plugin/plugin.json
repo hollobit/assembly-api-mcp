@@ -1,0 +1,16 @@
+{
+  "name": "assembly-api-mcp",
+  "version": "0.1.0",
+  "description": "\uad6d\ud68c API\ub4e4\uc5d0 \ub300\ud55c MCP |  276\uac1c \uad6d\ud68c API 100% \uc811\uadfc | 9\uac1c Lite / 18\uac1c Full \ud504\ub85c\ud544 \ub3c4\uad6c | 36\uac1c \uac80\uc99d\ub41c API \ucf54\ub4dc",
+  "author": {
+    "name": "hollobit",
+    "url": "https://github.com/hollobit"
+  },
+  "homepage": "https://github.com/hollobit/assembly-api-mcp",
+  "repository": "https://github.com/hollobit/assembly-api-mcp",
+  "keywords": [
+    "mcp",
+    "codex"
+  ],
+  "mcpServers": "./.mcp.json"
+}
