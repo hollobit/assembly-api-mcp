@@ -327,7 +327,7 @@ async function fetchWithErrorHandling(url: string): Promise<unknown> {
       signal: controller.signal,
       keepalive: true,
       headers: {
-        "User-Agent": "assembly-api-mcp/0.3.0",
+        "User-Agent": "assembly-api-mcp/0.4.0",
       },
     });
   } catch (err: unknown) {

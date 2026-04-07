@@ -6,11 +6,28 @@ Claude, Gemini, ChatGPT 등 AI 도구에서 국회의원, 의안, 일정, 회의
 
 ***국가 AI 전환(AX)은 AI 챗봇쓴다고 되지 않죠. 국민들의 일상이 AI로 편리해져야 그것이 진정한 네이티브 AI 시대겠죠***
 
+## v0.4.0 업데이트 안내
+
+> **Breaking Change**: Lite/Full 도구명이 변경되었습니다.
+
+| v0.3 (이전) | v0.4 (현재) |
+|------------|------------|
+| `search_members` + `analyze_legislator` | **`assembly_member`** |
+| `search_bills` + `track_legislation` | **`assembly_bill`** |
+| `get_schedule` + `search_meetings` + `get_votes` | **`assembly_session`** |
+| `get_committees` + `search_petitions` + `get_legislation_notices` | **`assembly_org`** |
+| `get_bill_detail` + `get_bill_review` + `get_bill_history` + `get_bill_proposers` | **`bill_detail`** (Full) |
+| `search_library` + `search_research_reports` + `get_budget_analysis` | **`research_data`** (Full) |
+
+**영향**: 원격 서버(fly.dev) 사용자는 Claude Desktop 재시작만으로 자동 반영됩니다. REST API(`/api/*`)와 ChatGPT GPTs는 변경 없음.
+
+자세한 도구 매핑은 [docs/tool-mapping.md](docs/tool-mapping.md)를 참조하세요.
+
 ## 주요 기능
 
-- **9개 Lite / 18개 Full 프로필 도구** — 기본 Lite 프로필로 핵심 기능 제공 ([활용 사례 100선](USECASE.md))
+- **6개 Lite / 10개 Full 프로필 도구** — 도메인 엔티티 기반 통합 ([활용 사례 100선](USECASE.md))
 - **276개 국회 API 100% 접근** — `discover_apis` + `query_assembly` 범용 도구
-- **36개 검증된 API 코드** — 실제 데이터 반환 확인
+- **44개 검증된 API 코드** — 실제 데이터 반환 확인
 - **CLI 지원** — 터미널에서 직접 국회 데이터 조회
 - **이중 Transport** — stdio (Claude Desktop) + HTTP (원격 서버)
 - **REST API + OpenAPI 스펙** — ChatGPT GPTs Actions 지원 (`/openapi.json`)
@@ -243,43 +260,35 @@ ngrok http 3000
 
 ## MCP 도구 목록
 
-### Lite 프로필 (9개, 기본)
+### Lite 프로필 (6개, 기본)
 
-AI가 효율적으로 사용할 수 있도록 핵심 기능을 통합한 프로필입니다.
+도메인 엔티티(사람/법안/회의/기관) 기반으로 통합된 프로필입니다.
 
 | 도구 | 설명 |
 |------|------|
-| `search_members` | 의원 검색 (이름/정당/선거구/위원회, 1건이면 자동 상세) |
-| `search_bills` | 의안 검색+상세+상태필터 (계류/처리/최근, bill_id로 상세) |
-| `get_schedule` | 국회 일정 조회 (날짜/위원회/키워드) |
-| `search_meetings` | 회의록 검색 (본회의/위원회/소위/국감/인사청문회/공청회) |
-| `get_votes` | 표결 조회 (전체 본회의 표결 또는 의안별 상세) |
-| `analyze_legislator` | 의원 종합분석 (인적+발의+표결 한 번에) |
-| `track_legislation` | 주제별 법안 추적 (다중 키워드, 심사이력) |
+| `assembly_member` | 의원 검색+분석 (이름 1건이면 자동 상세+발의+표결) |
+| `assembly_bill` | 의안 검색+추적+통계 (keywords로 추적, mode=stats로 통계) |
+| `assembly_session` | 일정+회의록+표결 (type=schedule/meeting/vote) |
+| `assembly_org` | 위원회+청원+입법예고 (type=committee/petition/legislation_notice) |
 | `discover_apis` | 276개 API 키워드 검색 |
 | `query_assembly` | 범용 API 직접 호출 |
 
-> 활용 예시는 [활용 사례 100선](USECASE.md)을 참조하세요.
+> 활용 예시는 [활용 사례 100선](USECASE.md)을 참조하세요. 도구 매핑 상세는 [docs/tool-mapping.md](docs/tool-mapping.md)를 참조하세요.
 
-### Full 프로필 (18개)
+### Full 프로필 (10개)
 
-`MCP_PROFILE=full`로 전환하면 Lite 9개 + Full 전용 9개를 사용할 수 있습니다.
+`MCP_PROFILE=full`로 전환하면 Lite 6개 + Full 전용 4개를 사용할 수 있습니다.
 
-#### Lite 도구 (9개) — 위와 동일
+#### Lite 도구 (6개) — 위와 동일
 
-#### Full 전용 (9개)
+#### Full 전용 (4개)
 
 | 도구 | 설명 |
 |------|------|
-| `get_bill_detail` | 의안 상세 조회 (제안이유, 주요내용) |
-| `get_bill_review` | 의안 심사정보 |
-| `get_bill_history` | 의안 접수/처리 이력 |
-| `get_committees` | 위원회 목록 |
-| `search_petitions` | 국민동의청원 검색 |
-| `get_legislation_notices` | 입법예고 조회 |
-| `search_library` | 국회도서관 자료 검색 |
-| `get_budget_analysis` | 예산정책처 분석 자료 |
-| `search_research_reports` | 입법조사처 보고서 |
+| `bill_detail` | 의안 심층 조회 (상세+심사+이력+제안자+회의 통합) |
+| `committee_detail` | 위원회 심층 (현황+위원명단) |
+| `petition_detail` | 청원 심층 (목록+상세) |
+| `research_data` | 연구자료 통합 (도서관+입법조사처+예산정책처) |
 
 ## CLI 사용법
 

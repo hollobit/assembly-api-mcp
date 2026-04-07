@@ -120,42 +120,27 @@ export function registerResources(
             description: "국회 API MCP 서버 도구 가이드",
             profile: config.profile,
             lite: {
-              description: "Lite 프로필 (9개 도구) — AI 에이전트 최적화, 토큰 73% 절감",
+              description: "Lite 프로필 (6개 도구) — 도메인 엔티티 기반 통합, 토큰 최적화",
               tools: [
                 {
-                  name: "search_members",
-                  description: "의원 검색+상세. 1건이면 자동 상세 반환",
-                  example: { name: "이해민" },
+                  name: "assembly_member",
+                  description: "의원 검색+분석. 이름 1건이면 자동 상세+발의+표결 분석",
+                  example: { name: "이해민", analyze: true },
                 },
                 {
-                  name: "search_bills",
-                  description: "의안 검색+상세+상태필터. bill_id로 상세, status로 계류/처리 구분",
+                  name: "assembly_bill",
+                  description: "의안 검색+추적+통계. keywords로 추적, mode=stats로 통계",
                   example: { bill_name: "교육", status: "pending" },
                 },
                 {
-                  name: "get_schedule",
-                  description: "국회 일정 조회 (날짜/위원회/키워드)",
-                  example: { date_from: "2026-04-01" },
+                  name: "assembly_session",
+                  description: "일정+회의록+표결. type으로 구분 또는 자동 감지",
+                  example: { type: "meeting", keyword: "인공지능" },
                 },
                 {
-                  name: "search_meetings",
-                  description: "회의록 검색 (본회의/위원회/소위/국감/인사청문회/공청회)",
-                  example: { meeting_type: "위원회", keyword: "교육" },
-                },
-                {
-                  name: "get_votes",
-                  description: "표결 조회 (전체 본회의 표결 또는 의안별 상세)",
-                  example: { age: 22 },
-                },
-                {
-                  name: "analyze_legislator",
-                  description: "의원 종합분석 (인적+발의+표결 한 번에)",
-                  example: { name: "이해민" },
-                },
-                {
-                  name: "track_legislation",
-                  description: "주제별 법안 추적 (다중 키워드, 심사이력)",
-                  example: { keywords: "AI,인공지능", include_history: true },
+                  name: "assembly_org",
+                  description: "위원회+청원+입법예고. type으로 구분",
+                  example: { type: "committee", committee_name: "국토교통위원회" },
                 },
                 {
                   name: "discover_apis",
@@ -164,17 +149,24 @@ export function registerResources(
                 },
                 {
                   name: "query_assembly",
-                  description: "API 코드로 직접 호출 (위원회/청원/입법예고 등)",
+                  description: "API 코드로 직접 호출",
                   example: { api_code: "nxrvzonlafugpqjuh", params: {} },
                 },
               ],
             },
             full: {
-              description: "Full 프로필 (18개 도구) — Lite 9개 + Full 전용 9개",
-              toolCount: 18,
+              description: "Full 프로필 (10개 도구) — Lite 6개 + 심층 4개",
+              toolCount: 10,
+              additionalTools: [
+                "bill_detail — 의안 1건의 모든 정보 (상세+심사+이력+제안자+회의)",
+                "committee_detail — 위원회 상세 + 위원명단",
+                "petition_detail — 청원 상세 조회",
+                "research_data — 도서관+입법조사처+예산정책처 통합 검색",
+              ],
             },
             tips: [
-              "Lite에서 위원회/청원/입법예고 조회 → query_assembly 사용",
+              "Lite에서 위원회/청원/입법예고 → assembly_org(type=...)",
+              "의안 통계 → assembly_bill(mode='stats')",
               "API 코드를 모르면 → discover_apis로 검색",
               "환경변수 MCP_PROFILE=full로 전환 가능",
             ],
