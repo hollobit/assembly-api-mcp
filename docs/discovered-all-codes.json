@@ -1,0 +1,2218 @@
+{
+  "discoveredAt": "2026-04-07T23:05:48.588Z",
+  "apiKey": "4548...1e53",
+  "total": 276,
+  "discovered": 271,
+  "failed": 0,
+  "noCode": 5,
+  "apis": [
+    {
+      "infId": "OZN379001174FW17905",
+      "name": "NABO 경제재정수첩",
+      "category": "보고서ㆍ발간물>국회예산정책처",
+      "orgName": "국회예산정책처",
+      "code": "ncnpwqimabagvdmky",
+      "status": "discovered"
+    },
+    {
+      "infId": "ODI720001121MP14647",
+      "name": "국회도서관 정책에 관한 행정정보 공표",
+      "category": "주제별 공개>국민참여",
+      "orgName": "국회도서관",
+      "code": "nxycgjkkayfqaynjz",
+      "status": "discovered"
+    },
+    {
+      "infId": "O13FRZ001177X318752",
+      "name": "NABO 추계 세제 이슈",
+      "category": "보고서ㆍ발간물>국회예산정책처",
+      "orgName": "국회예산정책처",
+      "code": "njnuvjckavvwaohhj",
+      "status": "discovered"
+    },
+    {
+      "infId": "O71AP8001122ZZ10743",
+      "name": "국회사무처 정보목록",
+      "category": "주제별 공개>국민참여>국회 민원",
+      "orgName": "국회사무처",
+      "code": "ntmgtbxwaqrkrklzn",
+      "status": "discovered"
+    },
+    {
+      "infId": "OB5IBW001180FQ10640",
+      "name": "NABO Focus",
+      "category": "보고서ㆍ발간물>국회예산정책처",
+      "orgName": "국회예산정책처",
+      "code": "npbizvcmabezbhcez",
+      "status": "discovered"
+    },
+    {
+      "infId": "OMGXFT001182IV12099",
+      "name": "예산춘추",
+      "category": "보고서ㆍ발간물>국회예산정책처",
+      "orgName": "국회예산정책처",
+      "code": "nbxjdyrjaommhkiza",
+      "status": "discovered"
+    },
+    {
+      "infId": "O4W19G001189TV11044",
+      "name": "인사청문회",
+      "category": "의정활동별 공개>인사청문회",
+      "orgName": "국회사무처",
+      "code": "nrvsawtaauyihadij",
+      "status": "discovered"
+    },
+    {
+      "infId": "OVDCJU001123OF14595",
+      "name": "국회도서관 정보목록",
+      "category": "주제별 공개>국민참여>국회 민원",
+      "orgName": "국회도서관",
+      "code": "nksbnuwbamgztpotg",
+      "status": "discovered"
+    },
+    {
+      "infId": "OBL7NF0011935G18076",
+      "name": "역대 국회의원 인적사항",
+      "category": "국회의원>역대 국회 정보",
+      "orgName": "국회사무처",
+      "code": "npffdutiapkzbfyvr",
+      "status": "discovered"
+    },
+    {
+      "infId": "OH473Z0011245H13792",
+      "name": "국회예산정책처 정보목록",
+      "category": "주제별 공개>국민참여>국회 민원",
+      "orgName": "국회예산정책처",
+      "code": "nzdoatdlaxeaqolvx",
+      "status": "discovered"
+    },
+    {
+      "infId": "O4K6HM0012064I15889",
+      "name": "법률안 심사 및 처리(의안검색)",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "TVBPMBILL11",
+      "status": "discovered"
+    },
+    {
+      "infId": "OU749A0011256511253",
+      "name": "국회입법조사처 정보목록",
+      "category": "주제별 공개>국민참여>국회 민원",
+      "orgName": "국회입법조사처",
+      "code": "nyrggptbaislycxyt",
+      "status": "discovered"
+    },
+    {
+      "infId": "OF8AJV000972OP11430",
+      "name": "종료된 입법예고",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "nohgwtzsamojdozky",
+      "status": "discovered"
+    },
+    {
+      "infId": "OAUD9V000973QN17203",
+      "name": "국회뉴스ON_국회는 지금",
+      "category": "주제별 공개>언론·미디어·국회일정",
+      "orgName": "국회사무처",
+      "code": "nkyhxppmamrzejhij",
+      "status": "discovered"
+    },
+    {
+      "infId": "OQ0WH1000975M912523",
+      "name": "국회뉴스ON_상임위·본회의",
+      "category": "주제별 공개>언론·미디어·국회일정",
+      "orgName": "국회사무처",
+      "code": "ngnldmexasfdsgjaa",
+      "status": "discovered"
+    },
+    {
+      "infId": "O5MSQF0009823A15643",
+      "name": "국회뉴스ON_의원 입법안",
+      "category": "주제별 공개>언론·미디어·국회일정",
+      "orgName": "국회사무처",
+      "code": "ntbzdcigaongnbfxc",
+      "status": "discovered"
+    },
+    {
+      "infId": "OL39BM000986V214201",
+      "name": "국회뉴스ON_부의장동향",
+      "category": "주제별 공개>언론·미디어·국회일정",
+      "orgName": "국회사무처",
+      "code": "ncnyddauatqkofnfe",
+      "status": "discovered"
+    },
+    {
+      "infId": "O3VXPE000987AB14703",
+      "name": "국회뉴스ON_사무총장동향",
+      "category": "주제별 공개>언론·미디어·국회일정",
+      "orgName": "국회사무처",
+      "code": "navxqzpzafxazsobg",
+      "status": "discovered"
+    },
+    {
+      "infId": "OJAMPB0011929O11426",
+      "name": "국회도서관 행정감시 행정정보 공표",
+      "category": "주제별 공개>국민참여",
+      "orgName": "국회도서관",
+      "code": "nmpmwlsxaavvjbizm",
+      "status": "discovered"
+    },
+    {
+      "infId": "OU29AR0009890A11079",
+      "name": "국회뉴스ON_국회동향기타",
+      "category": "주제별 공개>언론·미디어·국회일정",
+      "orgName": "국회사무처",
+      "code": "noxbiocwawvechjkc",
+      "status": "discovered"
+    },
+    {
+      "infId": "ORNDP7000993P115502",
+      "name": "국회의원 위원회 경력",
+      "category": "국회의원>국회의원 현황 정보",
+      "orgName": "국회사무처",
+      "code": "nyzrglyvagmrypezq",
+      "status": "discovered"
+    },
+    {
+      "infId": "OI75DS001208ZW14781",
+      "name": "국회 기자회견장 사용현황",
+      "category": "주제별 공개>언론·미디어·국회일정",
+      "orgName": "국회사무처",
+      "code": "TBPRESSCONF",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOBAOA001213RL17443",
+      "name": "OPEN API 전체 현황",
+      "category": "보고서ㆍ발간물>국회사무처",
+      "orgName": "국회사무처",
+      "code": null,
+      "status": "no_code"
+    },
+    {
+      "infId": "OEUJQB0012145514537",
+      "name": "전원위원회 일정",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "nomxleneanjcruaez",
+      "status": "discovered"
+    },
+    {
+      "infId": "OPR1MQ000998LC12535",
+      "name": "국회의원 본회의 표결정보",
+      "category": "국회의원>국회의원 현황 정보",
+      "orgName": "국회사무처",
+      "code": "nojepdqqaweusdfbi",
+      "status": "discovered"
+    },
+    {
+      "infId": "ORL1S4001007HM19790",
+      "name": "국회채용정보",
+      "category": "주제별 공개>행정>인사",
+      "orgName": "국회사무처",
+      "code": "nswsyvysaidgdhsch",
+      "status": "discovered"
+    },
+    {
+      "infId": "OO1X9P001017YF13038",
+      "name": "본회의 회의록",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "nzbyfwhwaoanttzje",
+      "status": "discovered"
+    },
+    {
+      "infId": "OBX2DO001030E516625",
+      "name": "보도자료",
+      "category": "주제별 공개>언론·미디어·국회일정",
+      "orgName": "국회사무처",
+      "code": "ninnagrlaelvtzfnt",
+      "status": "discovered"
+    },
+    {
+      "infId": "OZ2W6L0011539T11384",
+      "name": "국회도서관 행정정보 공표목록",
+      "category": "주제별 공개>국민참여",
+      "orgName": "국회도서관",
+      "code": "ndauywbhawaofrtlq",
+      "status": "discovered"
+    },
+    {
+      "infId": "O2U9RG001168QQ15766",
+      "name": "NABO 조세분석 및 연구",
+      "category": "보고서ㆍ발간물>국회예산정책처",
+      "orgName": "국회예산정책처",
+      "code": "ncsrgzrwabonoefxi",
+      "status": "discovered"
+    },
+    {
+      "infId": "O0IS020011724J12768",
+      "name": "NABO 대한민국 지방재정",
+      "category": "보고서ㆍ발간물>국회예산정책처",
+      "orgName": "국회예산정책처",
+      "code": "naqdzohuagtisumcw",
+      "status": "discovered"
+    },
+    {
+      "infId": "OJ2LTJ001101KO19739",
+      "name": "국회의원 정책자료실",
+      "category": "국회의원>국회의원 현황 정보>정책자료보고서",
+      "orgName": "국회도서관",
+      "code": "npggiwnfaihlruyso",
+      "status": "discovered"
+    },
+    {
+      "infId": "OSPS4X001105IL17344",
+      "name": "국회입법조사처 연구보고서(이슈와 논점)",
+      "category": "보고서ㆍ발간물>국회입법조사처",
+      "orgName": "국회입법조사처",
+      "code": "nxlcxbbkapsrjayur",
+      "status": "discovered"
+    },
+    {
+      "infId": "OXZDRJ0011169E17589",
+      "name": "국회입법조사처 알림지(국회입법조사처보)",
+      "category": "보고서ㆍ발간물>국회입법조사처",
+      "orgName": "국회입법조사처",
+      "code": "nezimfsfayvtciyvx",
+      "status": "discovered"
+    },
+    {
+      "infId": "O5C2PY001120OH19574",
+      "name": "국회입법조사처 기타자료",
+      "category": "보고서ㆍ발간물>국회입법조사처",
+      "orgName": "국회입법조사처",
+      "code": "ngsyzvtlaqffhhthc",
+      "status": "discovered"
+    },
+    {
+      "infId": "OTA0YC001127RJ11880",
+      "name": "국회도서관 업무추진비 집행현황",
+      "category": "주제별 공개>행정>기획·조정",
+      "orgName": "국회도서관",
+      "code": "ngqoyjbkaxutcpmot",
+      "status": "discovered"
+    },
+    {
+      "infId": "O6JXFI0011292O12073",
+      "name": "국회입법조사처 업무추진비 집행현황",
+      "category": "주제별 공개>행정>기획·조정",
+      "orgName": "국회입법조사처",
+      "code": "nlmqzojlayoicbxhw",
+      "status": "discovered"
+    },
+    {
+      "infId": "OWSSC6001134T516707",
+      "name": "국회의원 인적사항",
+      "category": "국회의원>국회의원 현황 정보",
+      "orgName": "국회사무처",
+      "code": "nwvrqwxyaytdsfvhu",
+      "status": "discovered"
+    },
+    {
+      "infId": "OQ0A0T0011366V19103",
+      "name": "국회의원 정책 세미나 개최 현황",
+      "category": "국회의원>국회의원 현황 정보>정책자료보고서",
+      "orgName": "국회도서관",
+      "code": "nbqbmccpamsvwebkn",
+      "status": "discovered"
+    },
+    {
+      "infId": "OITFOE000968XH15981",
+      "name": "지방의회 연수 교육일정",
+      "category": "주제별 공개",
+      "orgName": "국회사무처",
+      "code": "nmkoorezaqwzfsixy",
+      "status": "discovered"
+    },
+    {
+      "infId": "O5K6OC001166I215604",
+      "name": "NABO 결산 분석",
+      "category": "보고서ㆍ발간물>국회예산정책처",
+      "orgName": "국회예산정책처",
+      "code": "negjnychalvyrcifv",
+      "status": "discovered"
+    },
+    {
+      "infId": "OBV24T000974AX17644",
+      "name": "법률안 심사 및 처리(본회의부의안건)",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "nayjnliqaexiioauy",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOG5NZ000976EC12112",
+      "name": "국회뉴스ON_그건 이렇습니다",
+      "category": "주제별 공개>언론·미디어·국회일정",
+      "orgName": "국회사무처",
+      "code": "ngwksdbiacfrifqsi",
+      "status": "discovered"
+    },
+    {
+      "infId": "O01TEW000977U011862",
+      "name": "국회뉴스ON_발행물 및 보고서",
+      "category": "주제별 공개>언론·미디어·국회일정",
+      "orgName": "국회사무처",
+      "code": "nyazvvwaarapcotdp",
+      "status": "discovered"
+    },
+    {
+      "infId": "OG88RA000978S210177",
+      "name": "법률안 심사 및 처리(위원회안, 대안)",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "nxtkyptyaolzcbfwl",
+      "status": "discovered"
+    },
+    {
+      "infId": "O93OTI000979JV17987",
+      "name": "국회뉴스ON_의원의 맛과멋",
+      "category": "주제별 공개>언론·미디어·국회일정",
+      "orgName": "국회사무처",
+      "code": "nzsmstfjaswvtbzii",
+      "status": "discovered"
+    },
+    {
+      "infId": "O9KCDC000980U619570",
+      "name": "국회뉴스ON_보좌진 이야기",
+      "category": "주제별 공개>언론·미디어·국회일정",
+      "orgName": "국회사무처",
+      "code": "nepfnxudavtvchtlu",
+      "status": "discovered"
+    },
+    {
+      "infId": "OB61LZ000981FC12253",
+      "name": "법률안 심사 및 처리(계류의안)",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "nwbqublzajtcqpdae",
+      "status": "discovered"
+    },
+    {
+      "infId": "O4BV430009830710440",
+      "name": "국회뉴스ON_의원실 행사",
+      "category": "주제별 공개>언론·미디어·국회일정",
+      "orgName": "국회사무처",
+      "code": "nkulntiravezskrjd",
+      "status": "discovered"
+    },
+    {
+      "infId": "OJUGHY0009848Z17162",
+      "name": "국회뉴스ON_의장동향",
+      "category": "주제별 공개>언론·미디어·국회일정",
+      "orgName": "국회사무처",
+      "code": "nknsekyoahvonwlll",
+      "status": "discovered"
+    },
+    {
+      "infId": "OM5S9O0009857U12121",
+      "name": "법률안 심사 및 처리(처리의안)",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "nzpltgfqabtcpsmai",
+      "status": "discovered"
+    },
+    {
+      "infId": "OFZZ1G001167FC10024",
+      "name": "NABO 비용추계 및 재정전망",
+      "category": "보고서ㆍ발간물>국회예산정책처",
+      "orgName": "국회예산정책처",
+      "code": "npsofwddayuhqhfgh",
+      "status": "discovered"
+    },
+    {
+      "infId": "O3YBRH0011715419177",
+      "name": "NABO 대한민국 재정",
+      "category": "보고서ㆍ발간물>국회예산정책처",
+      "orgName": "국회예산정책처",
+      "code": "nxrkedghaikxodlja",
+      "status": "discovered"
+    },
+    {
+      "infId": "OXJNQM001195IT17281",
+      "name": "역대 국회의원 위원회 경력",
+      "category": "국회의원>역대 국회 정보",
+      "orgName": "국회사무처",
+      "code": "nqbeopthavwwfbekw",
+      "status": "discovered"
+    },
+    {
+      "infId": "OAFHCY001008NN11647",
+      "name": "위원회 자료실",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "nbiwfpqbaipwgkhfr",
+      "status": "discovered"
+    },
+    {
+      "infId": "O78HKE0010099W15881",
+      "name": "국회의원 연구단체 등록현황",
+      "category": "국회의원>국회의원 현황 정보",
+      "orgName": "국회사무처",
+      "code": "numwhtqhavaqssfle",
+      "status": "discovered"
+    },
+    {
+      "infId": "OR137O001023MZ19321",
+      "name": "위원회 회의록",
+      "category": "의정활동별 공개>위원회 정보",
+      "orgName": "국회사무처",
+      "code": "ncwgseseafwbuheph",
+      "status": "discovered"
+    },
+    {
+      "infId": "OPP4KM0012097716578",
+      "name": "국회미래연구원 브리프형 심층분석 보고서",
+      "category": "보고서ㆍ발간물>미래연구원",
+      "orgName": "국회미래연구원",
+      "code": "BRIEF",
+      "status": "discovered"
+    },
+    {
+      "infId": "OLH92R0011733J15777",
+      "name": "NABO 대한민국 공공기관",
+      "category": "보고서ㆍ발간물>국회예산정책처",
+      "orgName": "국회예산정책처",
+      "code": "nmwywvbbajlawfrsk",
+      "status": "discovered"
+    },
+    {
+      "infId": "OVRNQQ001062CO16787",
+      "name": "NATV 뉴스_토론회/세미나",
+      "category": "주제별 공개>언론·미디어·국회일정",
+      "orgName": "국회사무처",
+      "code": "nzdppcljavkxnylqs",
+      "status": "discovered"
+    },
+    {
+      "infId": "OB1YJN001063U411224",
+      "name": "NATV 뉴스_기타",
+      "category": "주제별 공개>언론·미디어·국회일정",
+      "orgName": "국회사무처",
+      "code": "nshnpsvaalefpwslj",
+      "status": "discovered"
+    },
+    {
+      "infId": "ODFFIG001072OX10139",
+      "name": "본회의 처리안건_기타",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "nbslryaradshbpbpm",
+      "status": "discovered"
+    },
+    {
+      "infId": "O8YX0U001110EM14308",
+      "name": "의회외교 동향과 분석",
+      "category": "보고서ㆍ발간물>국회입법조사처",
+      "orgName": "국회입법조사처",
+      "code": "nlpoxcnfacjeiankg",
+      "status": "discovered"
+    },
+    {
+      "infId": "OR0YT0001112TD13067",
+      "name": "국회입법조사처 연구보고서(국제통계 동향과 분석)",
+      "category": "보고서ㆍ발간물>국회입법조사처",
+      "orgName": "국회입법조사처",
+      "code": "nhtegpibasggyssce",
+      "status": "discovered"
+    },
+    {
+      "infId": "ORMXPX0011135N18074",
+      "name": "국회입법조사처 연구보고서(국정감사관련(보고서))",
+      "category": "보고서ㆍ발간물>국회입법조사처",
+      "orgName": "국회입법조사처",
+      "code": "nlfmqyizaorhysrgf",
+      "status": "discovered"
+    },
+    {
+      "infId": "OUK015001119KD17086",
+      "name": "국회입법조사처 정책연구용역자료",
+      "category": "보고서ㆍ발간물>국회입법조사처",
+      "orgName": "국회입법조사처",
+      "code": "nijtjlghaowvisahk",
+      "status": "discovered"
+    },
+    {
+      "infId": "OH01G5001175B914429",
+      "name": "NABO 조세수첩",
+      "category": "보고서ㆍ발간물>국회예산정책처",
+      "orgName": "국회예산정책처",
+      "code": "nfhoxrreafqmtsesg",
+      "status": "discovered"
+    },
+    {
+      "infId": "O2QQLK001176HI14481",
+      "name": "NABO 재정동향 이슈",
+      "category": "보고서ㆍ발간물>국회예산정책처",
+      "orgName": "국회예산정책처",
+      "code": "nsjmwljyauxvdodgh",
+      "status": "discovered"
+    },
+    {
+      "infId": "OB3OEN0011786012232",
+      "name": "NABO 경제ㆍ산업동향 이슈",
+      "category": "보고서ㆍ발간물>국회예산정책처",
+      "orgName": "국회예산정책처",
+      "code": "nsenmxrjatgxxndrm",
+      "status": "discovered"
+    },
+    {
+      "infId": "O927U9001135M913005",
+      "name": "국회의원 의정보고서",
+      "category": "국회의원>국회의원 현황 정보>정책자료보고서",
+      "orgName": "국회도서관",
+      "code": "nmfcjtvmajsbhhckf",
+      "status": "discovered"
+    },
+    {
+      "infId": "OAUJIX001138TP16525",
+      "name": "지역현안 입법지원 토론회 개최 내역",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "nyioaasianxlkcqxs",
+      "status": "discovered"
+    },
+    {
+      "infId": "OQG5IZ0011449610187",
+      "name": "역대 국회의원 현황",
+      "category": "국회의원>역대 국회 정보",
+      "orgName": "국회사무처",
+      "code": "nprlapfmaufmqytet",
+      "status": "discovered"
+    },
+    {
+      "infId": "O6P4Y5001146KI12348",
+      "name": "역대 국회의장단 정보",
+      "category": "국회의원>역대 국회 정보",
+      "orgName": "국회사무처",
+      "code": "nubbgpxmawmzkclkc",
+      "status": "discovered"
+    },
+    {
+      "infId": "OLI05G0011283N16926",
+      "name": "국회예산정책처 업무추진비 집행현황",
+      "category": "주제별 공개>행정>기획·조정",
+      "orgName": "국회예산정책처",
+      "code": "nknmvzexapgiarqcd",
+      "status": "discovered"
+    },
+    {
+      "infId": "ORDPSW001070QH19059",
+      "name": "본회의 일정",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "nekcaiymatialqlxr",
+      "status": "discovered"
+    },
+    {
+      "infId": "OTUNFG0008834Q19898",
+      "name": "9급 공개경쟁 채용현황",
+      "category": "주제별 공개>행정>인사",
+      "orgName": "국회사무처",
+      "code": "ncdawwizazvcivann",
+      "status": "discovered"
+    },
+    {
+      "infId": "OLFZV7001148O518934",
+      "name": "역대 국회 선거일, 의원정수, 임기정보",
+      "category": "국회의원>역대 국회 정보",
+      "orgName": "국회사무처",
+      "code": "nokivirranikoinnk",
+      "status": "discovered"
+    },
+    {
+      "infId": "O0MH4O001149BH11948",
+      "name": "역대 국회 정당별 국회의원 지역분포",
+      "category": "국회의원>역대 국회 정보",
+      "orgName": "국회사무처",
+      "code": "nvarpwrqaklzxcmmp",
+      "status": "discovered"
+    },
+    {
+      "infId": "OKDE3A001150P113085",
+      "name": "역대 국회의원 재선 현황",
+      "category": "국회의원>역대 국회 정보",
+      "orgName": "국회사무처",
+      "code": "ngdeoqgoablceakpp",
+      "status": "discovered"
+    },
+    {
+      "infId": "O9RY2V0011518716129",
+      "name": "역대 여성 국회의원 현황",
+      "category": "국회의원>역대 국회 정보",
+      "orgName": "국회사무처",
+      "code": "nmkjkjpwaxfhwdnjl",
+      "status": "discovered"
+    },
+    {
+      "infId": "OK160H001152I912731",
+      "name": "국회도서관 사업에 관한 행정정보 공표",
+      "category": "주제별 공개>국민참여",
+      "orgName": "국회도서관",
+      "code": "nqxsurgrayxndzwjf",
+      "status": "discovered"
+    },
+    {
+      "infId": "O7OLVS0011544713501",
+      "name": "국회도서관 기타 행정정보 공표",
+      "category": "주제별 공개>국민참여",
+      "orgName": "국회도서관",
+      "code": "ncfunqmvaeyhftgsq",
+      "status": "discovered"
+    },
+    {
+      "infId": "OGM9FC001165FS12631",
+      "name": "NABO 예산 분석",
+      "category": "보고서ㆍ발간물>국회예산정책처",
+      "orgName": "국회예산정책처",
+      "code": "nxeytfqvawilyincp",
+      "status": "discovered"
+    },
+    {
+      "infId": "OCROAA001181NA17461",
+      "name": "예산정책연구",
+      "category": "보고서ㆍ발간물>국회예산정책처",
+      "orgName": "국회예산정책처",
+      "code": "nrbcmchtaaqktsbjf",
+      "status": "discovered"
+    },
+    {
+      "infId": "O7RUVD001183U610140",
+      "name": "정책연구용역",
+      "category": "보고서ㆍ발간물>국회예산정책처",
+      "orgName": "국회예산정책처",
+      "code": "nakxneqwaouwyagim",
+      "status": "discovered"
+    },
+    {
+      "infId": "OUSZ4M0011845C16071",
+      "name": "국회예산정책처 홍보물",
+      "category": "보고서ㆍ발간물>국회예산정책처",
+      "orgName": "국회예산정책처",
+      "code": "nozwevvqatjorgvoc",
+      "status": "discovered"
+    },
+    {
+      "infId": "O0KGG20011857W15853",
+      "name": "국회예산정책처 연차보고서",
+      "category": "주제별 공개>행정>기획·조정",
+      "orgName": "국회예산정책처",
+      "code": "nkcyfxwnanwqvlysg",
+      "status": "discovered"
+    },
+    {
+      "infId": "OC0RRQ000852J210654",
+      "name": "연도별 연구단체 건수",
+      "category": "주제별 공개>정책>국회의원 연구단체",
+      "orgName": "국회사무처",
+      "code": "nhllwdafacadantme",
+      "status": "discovered"
+    },
+    {
+      "infId": "OQEXW00012074114927",
+      "name": "국회입법조사처 연구보고서(외국입법·정책 분석)",
+      "category": "보고서ㆍ발간물>국회입법조사처",
+      "orgName": "국회사무처",
+      "code": "NARSBOOKDATA",
+      "status": "discovered"
+    },
+    {
+      "infId": "OHN9XR001210S614262",
+      "name": "국회미래연구원 미래포럼",
+      "category": "보고서ㆍ발간물>미래연구원",
+      "orgName": "국회미래연구원",
+      "code": "FORUM",
+      "status": "discovered"
+    },
+    {
+      "infId": "O0TLLI0008796R14875",
+      "name": "퇴직 공직자 취업이력 공시",
+      "category": "주제별 공개>행정>감사",
+      "orgName": "국회사무처",
+      "code": "nzkepuxpasyzvbrsu",
+      "status": "discovered"
+    },
+    {
+      "infId": "O1OS9V000880XH10851",
+      "name": "의원실 지원경비 현황",
+      "category": "주제별 공개>재정>국회의원 수당 및 지원예산",
+      "orgName": "국회사무처",
+      "code": "naqngwqyayereswlo",
+      "status": "discovered"
+    },
+    {
+      "infId": "OAIEX00008855613861",
+      "name": "입법고시(5급) 채용현황",
+      "category": "주제별 공개>행정>인사",
+      "orgName": "국회사무처",
+      "code": "nujtkaefaqkaqvsdm",
+      "status": "discovered"
+    },
+    {
+      "infId": "ORPY580008959U11813",
+      "name": "사업별 예산 편성 규모",
+      "category": "주제별 공개>재정>국회 예산현황",
+      "orgName": "국회사무처",
+      "code": "nztwkhgzakucszgls",
+      "status": "discovered"
+    },
+    {
+      "infId": "O8FQ4U000888KF14544",
+      "name": "국회 시설물 안내",
+      "category": "주제별 공개>국민참여",
+      "orgName": "국회사무처",
+      "code": "nabhvpvoadjjlckgw",
+      "status": "discovered"
+    },
+    {
+      "infId": "OMYCKJ0011621210030",
+      "name": "행정입법 분석연구",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "njwcdwalactbvidal",
+      "status": "discovered"
+    },
+    {
+      "infId": "OD21030011944P19666",
+      "name": "역대 국회의원 의원이력",
+      "category": "국회의원>역대 국회 정보",
+      "orgName": "국회사무처",
+      "code": "nfzegpkvaclgtscxt",
+      "status": "discovered"
+    },
+    {
+      "infId": "OFJHWN000881T019291",
+      "name": "국회사무처 2천만원 이상 수의계약 현황",
+      "category": "주제별 공개>재정>국회 예산현황",
+      "orgName": "국회사무처",
+      "code": "niqfwqfuaazozqwrj",
+      "status": "discovered"
+    },
+    {
+      "infId": "O2PLAU000882CD18776",
+      "name": "국회사무처 1억원 이상 계약 현황",
+      "category": "주제별 공개>재정>국회 예산현황",
+      "orgName": "국회사무처",
+      "code": "nwaglmniarckeuvuh",
+      "status": "discovered"
+    },
+    {
+      "infId": "OX4XHR001211RB17826",
+      "name": "국회미래연구원 연차보고서",
+      "category": "보고서ㆍ발간물>미래연구원",
+      "orgName": "국회미래연구원",
+      "code": "ANUREPORT",
+      "status": "discovered"
+    },
+    {
+      "infId": "O8WI650012155G10023",
+      "name": "전원위원회 회의록",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "ngytonzwavydlbbha",
+      "status": "discovered"
+    },
+    {
+      "infId": "O8OFB2000905T918825",
+      "name": "국회예산정책처 정보공개청구 처리현황 목록",
+      "category": "주제별 공개>국민참여>정보공개제도",
+      "orgName": "국회사무처",
+      "code": "niykgszzaqxzdejiz",
+      "status": "discovered"
+    },
+    {
+      "infId": "O0UBVR000906UG11689",
+      "name": "국회입법조사처 정보공개청구 처리현황 목록",
+      "category": "주제별 공개>국민참여>정보공개제도",
+      "orgName": "국회사무처",
+      "code": "nzygztwjapjjxayhe",
+      "status": "discovered"
+    },
+    {
+      "infId": "OXN4AR0009078I18280",
+      "name": "국회도서관 정보공개청구 처리현황 목록",
+      "category": "주제별 공개>국민참여>정보공개제도",
+      "orgName": "국회사무처",
+      "code": "nbtkkkcoaffclmwoc",
+      "status": "discovered"
+    },
+    {
+      "infId": "OD0T6I001156CA16296",
+      "name": "국회도서관 정책연구용역 보고서",
+      "category": "보고서ㆍ발간물>국회도서관",
+      "orgName": "국회도서관",
+      "code": "nzkdlzgoadvnlcubt",
+      "status": "discovered"
+    },
+    {
+      "infId": "O8685D0008489413266",
+      "name": "국회의원 소규모 연구용역 결과보고서",
+      "category": "주제별 공개>정책>국회의원 입법 및 정책개발",
+      "orgName": "국회사무처",
+      "code": "nfvmtaqoaldzhobsw",
+      "status": "discovered"
+    },
+    {
+      "infId": "ON9NSL000857D116126",
+      "name": "연구단체 활동실적",
+      "category": "주제별 공개>정책>국회의원 연구단체",
+      "orgName": "국회사무처",
+      "code": "nnzoijvcaiexypqaf",
+      "status": "discovered"
+    },
+    {
+      "infId": "O5VQRK0008587911609",
+      "name": "연구단체 연구활동비 집행현황",
+      "category": "주제별 공개>정책>국회의원 연구단체",
+      "orgName": "국회사무처",
+      "code": "nipnblofawwyxdhmx",
+      "status": "discovered"
+    },
+    {
+      "infId": "OCXHYA000859TX17626",
+      "name": "우수연구단체 현황",
+      "category": "주제별 공개>정책>국회의원 연구단체",
+      "orgName": "국회사무처",
+      "code": "nvbqusufapyxesqek",
+      "status": "discovered"
+    },
+    {
+      "infId": "O04X68000884BE13083",
+      "name": "8급 공개경쟁 채용현황",
+      "category": "주제별 공개>행정>인사",
+      "orgName": "국회사무처",
+      "code": "nlhssknfaoxiofyix",
+      "status": "discovered"
+    },
+    {
+      "infId": "O6PTDW000886NN18676",
+      "name": "국회채용_종합현황",
+      "category": "주제별 공개>행정>인사",
+      "orgName": "국회사무처",
+      "code": "nwutmjsuayhwupoxc",
+      "status": "discovered"
+    },
+    {
+      "infId": "OTL4B3000889YI11365",
+      "name": "국회 보유 자산(전체)",
+      "category": "주제별 공개>재정>국회 예산현황",
+      "orgName": "국회사무처",
+      "code": "nujvlukkawoxnwvmg",
+      "status": "discovered"
+    },
+    {
+      "infId": "OCLLF20008904J19487",
+      "name": "국회 보유 자산(건물)",
+      "category": "주제별 공개>재정>국회 예산현황",
+      "orgName": "국회사무처",
+      "code": "noahbdisawgzvhooq",
+      "status": "discovered"
+    },
+    {
+      "infId": "OWKPDF000891EB10683",
+      "name": "국회 보유 자산(토지)",
+      "category": "주제별 공개>재정>국회 예산현황",
+      "orgName": "국회사무처",
+      "code": "nvkhvcvvavafkjqca",
+      "status": "discovered"
+    },
+    {
+      "infId": "OHAC6C000892WC13765",
+      "name": "국회의원 겸직 결정 내역",
+      "category": "주제별 공개>행정>감사",
+      "orgName": "국회사무처",
+      "code": "nahfbzwvatmaxscwq",
+      "status": "discovered"
+    },
+    {
+      "infId": "O87UNV000897E818234",
+      "name": "국회의원 직무상 국외활동 신고 내역",
+      "category": "주제별 공개>의회외교>국회의원 직무상 국외활동",
+      "orgName": "국회사무처",
+      "code": "nasnutdbapnfphwyr",
+      "status": "discovered"
+    },
+    {
+      "infId": "OR95JZ001114RS11521",
+      "name": "국회입법조사처 학술지(입법과 정책)",
+      "category": "보고서ㆍ발간물>국회입법조사처",
+      "orgName": "국회입법조사처",
+      "code": "nakxubpbapfmxdzrc",
+      "status": "discovered"
+    },
+    {
+      "infId": "OEEG26001115LX11448",
+      "name": "국회입법조사처 세미나·간담회",
+      "category": "보고서ㆍ발간물>국회입법조사처",
+      "orgName": "국회입법조사처",
+      "code": "nyapimeoaczouxzhb",
+      "status": "discovered"
+    },
+    {
+      "infId": "OVA33G0011172J17084",
+      "name": "국회입법조사처 연차보고서",
+      "category": "주제별 공개>행정>기획·조정",
+      "orgName": "국회입법조사처",
+      "code": "nbeysefuaxfqkbynf",
+      "status": "discovered"
+    },
+    {
+      "infId": "OT9767000930ZL12696",
+      "name": "수입징수현황(수입항별)",
+      "category": "주제별 공개>재정>국회 예산현황",
+      "orgName": "국회사무처",
+      "code": "nryvgajaaeerxmdyb",
+      "status": "discovered"
+    },
+    {
+      "infId": "OU9HJK001126JG15339",
+      "name": "국회사무처 업무추진비 집행현황",
+      "category": "주제별 공개>행정>기획·조정",
+      "orgName": "국회사무처",
+      "code": "nalacaiwauxiynsxt",
+      "status": "discovered"
+    },
+    {
+      "infId": "O6DY4U000931SN17960",
+      "name": "수입징수현황(수입목별)",
+      "category": "주제별 공개>재정>국회 예산현황",
+      "orgName": "국회사무처",
+      "code": "ndaabdwcatyjpopzn",
+      "status": "discovered"
+    },
+    {
+      "infId": "O1O34T000932VG10613",
+      "name": "지출집행현황(단위사업별)",
+      "category": "주제별 공개>재정>국회 예산현황",
+      "orgName": "국회사무처",
+      "code": "nqflguqiachajqpaq",
+      "status": "discovered"
+    },
+    {
+      "infId": "O8D9RF000933S512258",
+      "name": "지출집행현황(세부사업별)",
+      "category": "주제별 공개>재정>국회 예산현황",
+      "orgName": "국회사무처",
+      "code": "njzofberazvhjncha",
+      "status": "discovered"
+    },
+    {
+      "infId": "O5IUE30009237O13905",
+      "name": "의원외교협의회 명단",
+      "category": "주제별 공개>의회외교",
+      "orgName": "국회사무처",
+      "code": "nxcxrdmpaonzzbkic",
+      "status": "discovered"
+    },
+    {
+      "infId": "ONVQB00009257H12418",
+      "name": "의원연맹별 보조금 예산",
+      "category": "주제별 공개>의회외교",
+      "orgName": "국회사무처",
+      "code": null,
+      "status": "no_code"
+    },
+    {
+      "infId": "O6HDE2001161LX18191",
+      "name": "법제실 발간자료",
+      "category": "보고서ㆍ발간물>국회사무처",
+      "orgName": "국회사무처",
+      "code": "npvzeftnakulkqsfg",
+      "status": "discovered"
+    },
+    {
+      "infId": "O6MZOL000912ZG15427",
+      "name": "국회사무처 정보공개청구 처리현황 목록",
+      "category": "주제별 공개>국민참여>정보공개제도",
+      "orgName": "국회사무처",
+      "code": "ngktubbaavswhlnle",
+      "status": "discovered"
+    },
+    {
+      "infId": "OVDKBQ000915NE11865",
+      "name": "정보공개청구 이의신청 처리현황",
+      "category": "주제별 공개>국민참여>정보공개제도",
+      "orgName": "국회사무처",
+      "code": "nfwzyvuxacqtkttvr",
+      "status": "discovered"
+    },
+    {
+      "infId": "ORRHLL000916DN12489",
+      "name": "정보공개청구 행정심판 결과현황",
+      "category": "주제별 공개>국민참여>정보공개제도",
+      "orgName": "국회사무처",
+      "code": "npryvxppapmxgwpxw",
+      "status": "discovered"
+    },
+    {
+      "infId": "OVRSWG000917L610310",
+      "name": "정보공개청구 행정소송 판결현황",
+      "category": "주제별 공개>국민참여>정보공개제도",
+      "orgName": "국회사무처",
+      "code": "nasphyhkaiaivedef",
+      "status": "discovered"
+    },
+    {
+      "infId": "OC9MRL000922KH15936",
+      "name": "국회 및 국회사무처 소관 법인별 보조금 예산",
+      "category": "주제별 공개>행정>법무",
+      "orgName": "국회사무처",
+      "code": "ntexdxjbamdpccvnt",
+      "status": "discovered"
+    },
+    {
+      "infId": "O7FHUO000928X018370",
+      "name": "역대 정당별 국회의원 선거결과",
+      "category": "국회의원>역대 국회 정보",
+      "orgName": "국회사무처",
+      "code": "nedjqrnlavrvcycue",
+      "status": "discovered"
+    },
+    {
+      "infId": "OKAPKX000929X915616",
+      "name": "역대 의안 통계",
+      "category": "국회의원>역대 국회 정보",
+      "orgName": "국회사무처",
+      "code": "nzivskufaliivfhpb",
+      "status": "discovered"
+    },
+    {
+      "infId": "OVUY5B0009241I13320",
+      "name": "의원친선협회 임·회원 명단",
+      "category": "주제별 공개>의회외교",
+      "orgName": "국회사무처",
+      "code": "nbicgazsalnfamoyp",
+      "status": "discovered"
+    },
+    {
+      "infId": "O4UTN7000934TV19125",
+      "name": "국회뉴스ON_외부기고",
+      "category": "주제별 공개>언론·미디어·국회일정",
+      "orgName": "국회사무처",
+      "code": "nrjoiyzqaxpwfzuut",
+      "status": "discovered"
+    },
+    {
+      "infId": "OK7XM1000938DS17215",
+      "name": "국회의원 발의법률안",
+      "category": "국회의원>국회의원 현황 정보",
+      "orgName": "국회사무처",
+      "code": "nzmimeepazxkubdpn",
+      "status": "discovered"
+    },
+    {
+      "infId": "O84OO9000939BC16536",
+      "name": "국회의원 보좌직원 채용",
+      "category": "국회의원>국회의원 현황 정보",
+      "orgName": "국회사무처",
+      "code": "nbdlhufiaebnmjfxf",
+      "status": "discovered"
+    },
+    {
+      "infId": "ORMEIR001164VQ17801",
+      "name": "NABO 재정사업 평가",
+      "category": "보고서ㆍ발간물>국회예산정책처",
+      "orgName": "국회예산정책처",
+      "code": "nzjvrirbauqmffblj",
+      "status": "discovered"
+    },
+    {
+      "infId": "OEQ77R000942NL11530",
+      "name": "연구단체 연구활동 보고서",
+      "category": "주제별 공개>정책>국회의원 연구단체",
+      "orgName": "국회사무처",
+      "code": "ncrwiahparxrpodcv",
+      "status": "discovered"
+    },
+    {
+      "infId": "OAB4WY0009432M10546",
+      "name": "의사일정공지",
+      "category": "주제별 공개",
+      "orgName": "국회사무처",
+      "code": "njlyptmbatwuwjtxf",
+      "status": "discovered"
+    },
+    {
+      "infId": "OP7W8M000944IF15092",
+      "name": "주요정치일정",
+      "category": "주제별 공개",
+      "orgName": "국회사무처",
+      "code": "nkhynxdkagqtlgsqg",
+      "status": "discovered"
+    },
+    {
+      "infId": "OTM7PV000945R113521",
+      "name": "국회의장 주요일정",
+      "category": "주제별 공개",
+      "orgName": "국회사무처",
+      "code": "nhedurlwawoquyxwn",
+      "status": "discovered"
+    },
+    {
+      "infId": "OSKTB0000948E917810",
+      "name": "국회문화극장 공연 일정",
+      "category": "주제별 공개>국민참여",
+      "orgName": "국회사무처",
+      "code": "npfoswpxawimahqlt",
+      "status": "discovered"
+    },
+    {
+      "infId": "OCFWMF000949MH18411",
+      "name": "국회문화극장 영화 일정",
+      "category": "주제별 공개>국민참여",
+      "orgName": "국회사무처",
+      "code": "nfzxkpetatunooatq",
+      "status": "discovered"
+    },
+    {
+      "infId": "O70WYZ000950T211169",
+      "name": "아트갤러리 전시 일정",
+      "category": "주제별 공개>국민참여",
+      "orgName": "국회사무처",
+      "code": "nptukpvcaxiaaaffa",
+      "status": "discovered"
+    },
+    {
+      "infId": "O610V6000952AV17729",
+      "name": "국회개방행사 일정",
+      "category": "주제별 공개>국민참여",
+      "orgName": "국회사무처",
+      "code": "nneiozjtawpqhaidq",
+      "status": "discovered"
+    },
+    {
+      "infId": "OCSMEJ000953O916134",
+      "name": "국회방송 편성표",
+      "category": "주제별 공개>국민참여",
+      "orgName": "국회사무처",
+      "code": "noqtcnaiatcpgepvt",
+      "status": "discovered"
+    },
+    {
+      "infId": "OHXILX000958DD14523",
+      "name": "위원회별 일정",
+      "category": "주제별 공개",
+      "orgName": "국회사무처",
+      "code": "nrsldhjpaemrmolla",
+      "status": "discovered"
+    },
+    {
+      "infId": "OTICJI000959B917394",
+      "name": "청원 계류현황",
+      "category": "주제별 공개>국민참여>국회 민원",
+      "orgName": "국회사무처",
+      "code": "nvqbafvaajdiqhehi",
+      "status": "discovered"
+    },
+    {
+      "infId": "O27DU0000960M511942",
+      "name": "위원회별 전체회의 일정",
+      "category": "주제별 공개",
+      "orgName": "국회사무처",
+      "code": "nttmdfdcaakvibdar",
+      "status": "discovered"
+    },
+    {
+      "infId": "O4UN9N000961PS11812",
+      "name": "위원회별 소위원회 일정",
+      "category": "주제별 공개",
+      "orgName": "국회사무처",
+      "code": "nrkqqbvfanfybishu",
+      "status": "discovered"
+    },
+    {
+      "infId": "OQ50H1000962NX16376",
+      "name": "청원 처리현황",
+      "category": "주제별 공개>국민참여>국회 민원",
+      "orgName": "국회사무처",
+      "code": "ncryefyuaflxnqbqo",
+      "status": "discovered"
+    },
+    {
+      "infId": "OKBFLN000963SS13091",
+      "name": "위원회별 공청회 일정",
+      "category": "주제별 공개",
+      "orgName": "국회사무처",
+      "code": "napvpafracrdkxmoq",
+      "status": "discovered"
+    },
+    {
+      "infId": "OND1KZ0009677M13515",
+      "name": "의안별 표결현황",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "ncocpgfiaoituanbr",
+      "status": "discovered"
+    },
+    {
+      "infId": "OA8HOU000969OM19602",
+      "name": "시민의정연수",
+      "category": "주제별 공개",
+      "orgName": "국회사무처",
+      "code": "nmykqpjxamciskklk",
+      "status": "discovered"
+    },
+    {
+      "infId": "OS18DL000970OU13480",
+      "name": "법률안 심사 및 처리(최근 본회의처리 의안)",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "nxjuyqnxadtotdrbw",
+      "status": "discovered"
+    },
+    {
+      "infId": "OVW2NU000937WK15521",
+      "name": "국회의원 상임위 활동",
+      "category": "국회의원>국회의원 현황 정보",
+      "orgName": "국회사무처",
+      "code": "nuvypcdgahexhvrjt",
+      "status": "discovered"
+    },
+    {
+      "infId": "OZHI8N000955DZ17739",
+      "name": "의회외교 실시내역",
+      "category": "주제별 공개>의회외교",
+      "orgName": "국회사무처",
+      "code": "nzhjpcyhahczgglqc",
+      "status": "discovered"
+    },
+    {
+      "infId": "OY3EE5000956Q913543",
+      "name": "의회외교포럼 활동보고",
+      "category": "주제별 공개>의회외교",
+      "orgName": "국회사무처",
+      "code": "nlcqadrmachptelsf",
+      "status": "discovered"
+    },
+    {
+      "infId": "O32948001073L213726",
+      "name": "본회의 처리안건_예산안",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "nzgjnvnraowulzqwl",
+      "status": "discovered"
+    },
+    {
+      "infId": "O67B1I001080WL10254",
+      "name": "국회의원 세미나 일정",
+      "category": "주제별 공개>의사일정",
+      "orgName": "국회도서관",
+      "code": "nfcoioopazrwmjrgs",
+      "status": "discovered"
+    },
+    {
+      "infId": "OXJ0OE001002XA11874",
+      "name": "진행중 입법예고",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "nknalejkafmvgzmpt",
+      "status": "discovered"
+    },
+    {
+      "infId": "OZY6M30010164K11655",
+      "name": "국회의원 기자회견",
+      "category": "국회의원>국회의원 현황 정보",
+      "orgName": "국회사무처",
+      "code": "npbzvuwvasdqldskm",
+      "status": "discovered"
+    },
+    {
+      "infId": "OFPR4Q001057VP11437",
+      "name": "NATV 뉴스_본회의",
+      "category": "주제별 공개>언론·미디어·국회일정",
+      "orgName": "국회사무처",
+      "code": "nufjqmgtawuzxhila",
+      "status": "discovered"
+    },
+    {
+      "infId": "OFOEZN001060N312362",
+      "name": "NATV 뉴스_인물",
+      "category": "주제별 공개>언론·미디어·국회일정",
+      "orgName": "국회사무처",
+      "code": "nauvppbxargkmyovh",
+      "status": "discovered"
+    },
+    {
+      "infId": "O8U5BW001076JT16522",
+      "name": "날짜별 의정활동",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "nqfvrbsdafrmuzixe",
+      "status": "discovered"
+    },
+    {
+      "infId": "OET0D9001078G318850",
+      "name": "국회의원 SNS정보",
+      "category": "국회의원>국회의원 현황 정보",
+      "orgName": "국회사무처",
+      "code": "negnlnyvatsjwocar",
+      "status": "discovered"
+    },
+    {
+      "infId": "OAJPOY0010182J19421",
+      "name": "국회의원 의원이력",
+      "category": "국회의원>국회의원 현황 정보",
+      "orgName": "국회사무처",
+      "code": "nexgtxtmaamffofof",
+      "status": "discovered"
+    },
+    {
+      "infId": "ODNHIU0010588P19122",
+      "name": "NATV 뉴스_위원회",
+      "category": "주제별 공개>언론·미디어·국회일정",
+      "orgName": "국회사무처",
+      "code": "nuizrfvoaepvwrjtz",
+      "status": "discovered"
+    },
+    {
+      "infId": "OZUY2X001061ON17910",
+      "name": "NATV 뉴스_정당",
+      "category": "주제별 공개>언론·미디어·국회일정",
+      "orgName": "국회사무처",
+      "code": "nbzyjjyoamdqqjorw",
+      "status": "discovered"
+    },
+    {
+      "infId": "OW1R4X0010744X17495",
+      "name": "본회의 처리안건_결산",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "nkalemivaqmoibxro",
+      "status": "discovered"
+    },
+    {
+      "infId": "OCAJQ4001000LI18751",
+      "name": "위원회 위원 명단",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "nktulghcadyhmiqxi",
+      "status": "discovered"
+    },
+    {
+      "infId": "OJ24FX001003FD16907",
+      "name": "정당 및 교섭단체 의석수 현황",
+      "category": "국회의원",
+      "orgName": "국회사무처",
+      "code": "nepjpxkkabqiqpbvk",
+      "status": "discovered"
+    },
+    {
+      "infId": "O2Q4ZT001004PV11014",
+      "name": "위원회 현황 정보",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "nxrvzonlafugpqjuh",
+      "status": "discovered"
+    },
+    {
+      "infId": "O8XZ8U001160SW12010",
+      "name": "법제사례 연구발표",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "nljgwkpgacamiyjod",
+      "status": "discovered"
+    },
+    {
+      "infId": "O3VTTM0010223D15681",
+      "name": "국회의원 영상회의록(발언영상)",
+      "category": "주제별 공개>언론·미디어·국회일정",
+      "orgName": "국회사무처",
+      "code": "npeslxqbanwkimebr",
+      "status": "discovered"
+    },
+    {
+      "infId": "O6V35E001197UE12021",
+      "name": "국회미래연구원 연구보고서",
+      "category": "보고서ㆍ발간물>미래연구원",
+      "orgName": "국회미래연구원",
+      "code": "RESREPORT",
+      "status": "discovered"
+    },
+    {
+      "infId": "O6MC3G0011698G17444",
+      "name": "NABO 경제전망",
+      "category": "보고서ㆍ발간물>국회예산정책처",
+      "orgName": "국회예산정책처",
+      "code": "npmbwjybaffxwvbbk",
+      "status": "discovered"
+    },
+    {
+      "infId": "OTSI7L0011705B12017",
+      "name": "NABO 경제 정책 및 동향 분석",
+      "category": "보고서ㆍ발간물>국회예산정책처",
+      "orgName": "국회예산정책처",
+      "code": "nlugechzaowgqlopk",
+      "status": "discovered"
+    },
+    {
+      "infId": "OK3DIS001059MR19626",
+      "name": "NATV 뉴스_의장단",
+      "category": "주제별 공개>언론·미디어·국회일정",
+      "orgName": "국회사무처",
+      "code": "ndkuweviadcqkbjdl",
+      "status": "discovered"
+    },
+    {
+      "infId": "OQ68B8001071ZB13418",
+      "name": "본회의 처리안건_법률안",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "nwbpacrgavhjryiph",
+      "status": "discovered"
+    },
+    {
+      "infId": "OY18U4001075AG16626",
+      "name": "위원회 계류법률안",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "ndiwuqmpambgvnfsj",
+      "status": "discovered"
+    },
+    {
+      "infId": "O6KN2D001106O610167",
+      "name": "국회입법조사처 연구보고서(지표로 보는 이슈)",
+      "category": "보고서ㆍ발간물>국회입법조사처",
+      "orgName": "국회입법조사처",
+      "code": "nduvpkzfatqsoonnc",
+      "status": "discovered"
+    },
+    {
+      "infId": "OJH286001107IK13829",
+      "name": "국회입법조사처 연구보고서(NARS 현안분석)",
+      "category": "보고서ㆍ발간물>국회입법조사처",
+      "orgName": "국회입법조사처",
+      "code": "nvkfeqbsacvlzjmea",
+      "status": "discovered"
+    },
+    {
+      "infId": "OFUAJ6001108BJ11284",
+      "name": "국회입법조사처 연구보고서(입법영향분석보고서)",
+      "category": "보고서ㆍ발간물>국회입법조사처",
+      "orgName": "국회입법조사처",
+      "code": "nusxjbgeahffxfrzl",
+      "status": "discovered"
+    },
+    {
+      "infId": "O8ZYOF001109VJ11181",
+      "name": "국회입법조사처 연구보고서(입법·정책보고서)",
+      "category": "보고서ㆍ발간물>국회입법조사처",
+      "orgName": "국회입법조사처",
+      "code": "njythywqasrxkjxpv",
+      "status": "discovered"
+    },
+    {
+      "infId": "O5UDG0001111CI11346",
+      "name": "국회입법조사처 연구보고서(외국입법 동향과 분석)",
+      "category": "보고서ㆍ발간물>국회입법조사처",
+      "orgName": "국회입법조사처",
+      "code": "ncydhlphalaqvuzph",
+      "status": "discovered"
+    },
+    {
+      "infId": "O575RS001118PF15881",
+      "name": "국회입법조사처 알림지(홍보책자)",
+      "category": "보고서ㆍ발간물>국회입법조사처",
+      "orgName": "국회입법조사처",
+      "code": "ndbehlnaagkjdvmdu",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11518",
+      "name": "공청회 회의록",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "VCONFPHCONFLIST",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11519",
+      "name": "소위원회 회의록",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "VCONFSUBCCONFLIST",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11520",
+      "name": "회의록별 상세정보",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "VCONFDETAIL",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11521",
+      "name": "시청각자료 목록",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "VCONFATTACRCLIST",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11522",
+      "name": "제안설명서 목록",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "VCONFATTEXPLANLIST",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11523",
+      "name": "시정조치 결과보고서 목록",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "VCONFATTATBLIST",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11524",
+      "name": "회의별 안건목록",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "VCONFBLLLIST",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11525",
+      "name": "회의별 의안목록",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "VCONFBILLLIST",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11526",
+      "name": "의안별 회의록 목록",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "VCONFBILLCONFLIST",
+      "status": "discovered"
+    },
+    {
+      "infId": "OU8JBT0015343C14378",
+      "name": "회의록 대별 위원회 목록",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "nkimylolanvseqagq",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11536",
+      "name": "의안정보 통합 API",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": null,
+      "status": "no_code"
+    },
+    {
+      "infId": "OOWY4R001216HX11537",
+      "name": "의안 접수목록",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": null,
+      "status": "no_code"
+    },
+    {
+      "infId": "OOWY4R001216HX11415",
+      "name": "국회의원 본회의 의사일정",
+      "category": "국회의원>국회의원 현황 정보",
+      "orgName": "국회사무처",
+      "code": "NAMEMBERLEGISCHEDULE",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11416",
+      "name": "시정 및 처리 요구사항에 대한 결과보고서",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "AUDITREPORTVISIBILITY",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11417",
+      "name": "국회의원 위원회 의사일정",
+      "category": "국회의원>국회의원 현황 정보",
+      "orgName": "국회사무처",
+      "code": "NAMEMBERCMITSCHEDULE",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11418",
+      "name": "국정조사 결과보고서",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "INVESTREPORTRESULT",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11419",
+      "name": "어린이국회 개최 결과",
+      "category": "주제별 공개>국민참여",
+      "orgName": "국회사무처",
+      "code": "CHILDRENOPENRESULT",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11420",
+      "name": "어린이국회 우수법률안 소개",
+      "category": "주제별 공개>국민참여",
+      "orgName": "국회사무처",
+      "code": "CHILDRENGREATBILL",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11421",
+      "name": "위원회별 개정대상 법률 현황",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "CLAWSTATE",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11422",
+      "name": "최근 헌재결정과 개정대상 법률",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "CLAWLEGI",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11423",
+      "name": "실시간 의사중계 현황",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "WEBCASTREALTIEM",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11424",
+      "name": "영상회의록 목록",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "WEBCASTVCONF",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11425",
+      "name": "국회의원 청원현황",
+      "category": "국회의원>국회의원 현황 정보",
+      "orgName": "국회사무처",
+      "code": "NAMEMBERLEGIPTT",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11426",
+      "name": "국회도서관 연간보고서",
+      "category": "보고서ㆍ발간물",
+      "orgName": "",
+      "code": "NANETPBLMYEAR",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11428",
+      "name": "최신외국입법정보",
+      "category": "보고서ㆍ발간물",
+      "orgName": "국회도서관",
+      "code": "NANETPBLMLEGINEW",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11429",
+      "name": "국회박물관 행사 일정",
+      "category": "주제별 공개>언론·미디어·국회일정",
+      "orgName": "국회사무처",
+      "code": "EVENTSCHEDULEMUSEUM",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11430",
+      "name": "현안,외국에선",
+      "category": "보고서ㆍ발간물",
+      "orgName": "국회사무처",
+      "code": "NANETPBLMLEGI",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11431",
+      "name": "의장단 주요일정",
+      "category": "국회의원>역대 국회 정보",
+      "orgName": "국회사무처",
+      "code": "SPGRPSCHEDULE",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11432",
+      "name": "토론회 결과보고서",
+      "category": "보고서ㆍ발간물",
+      "orgName": "국회사무처",
+      "code": "NABOPBLMDCSNREPORT",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11433",
+      "name": "대한민국 조세",
+      "category": "보고서ㆍ발간물",
+      "orgName": "국회사무처",
+      "code": "NABOPBLMTAXGOV",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11434",
+      "name": "의장단 보도자료",
+      "category": "국회의원>역대 국회 정보",
+      "orgName": "국회사무처",
+      "code": "SPGRPPRESS",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11435",
+      "name": "대한민국 경제",
+      "category": "보고서ㆍ발간물",
+      "orgName": "국회사무처",
+      "code": "NABOPBLMECNGOV",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11436",
+      "name": "의회외교 영문의회용어검색",
+      "category": "주제별 공개>의회외교",
+      "orgName": "국회사무처",
+      "code": "DIPLOMACYWORD",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11437",
+      "name": "국회일정 통합 API",
+      "category": "주제별 공개>언론·미디어·국회일정",
+      "orgName": "국회사무처",
+      "code": "ALLSCHEDULE",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11438",
+      "name": "의회외교 동향",
+      "category": "주제별 공개>의회외교",
+      "orgName": "국회사무처",
+      "code": "DIPLOMACYTREND",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11439",
+      "name": "국회의원 정보 통합 API",
+      "category": "국회의원>국회의원 현황 정보",
+      "orgName": "국회사무처",
+      "code": "ALLNAMEMBER",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11440",
+      "name": "의안정보 통합 API",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "ALLBILL",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11441",
+      "name": "국회발간물 통합 API",
+      "category": "보고서ㆍ발간물",
+      "orgName": "국회사무처",
+      "code": "ALLNASPBLM",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11442",
+      "name": "의회외교 해외주요법률 제개정",
+      "category": "주제별 공개>의회외교",
+      "orgName": "국회사무처",
+      "code": "DIPLOMACYREVLAW",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11443",
+      "name": "국회도서관 제공 자료 통합 API",
+      "category": "보고서ㆍ발간물",
+      "orgName": "국회사무처",
+      "code": "ALLNANETPBLM",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11444",
+      "name": "(영문)국회의장 주요동정",
+      "category": "국회의원>역대 국회 정보",
+      "orgName": "국회사무처",
+      "code": "ENSPEAKERACTIVITI",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11445",
+      "name": "(영문)국회의장 연설문",
+      "category": "국회의원>역대 국회 정보",
+      "orgName": "국회사무처",
+      "code": "ENSPEAKERSPEECHES",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11446",
+      "name": "국회입법조사처 제공 자료 통합 API",
+      "category": "보고서ㆍ발간물",
+      "orgName": "국회사무처",
+      "code": "ALLNARSPBLM",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11447",
+      "name": "(영문)국회의원 정보",
+      "category": "국회의원>국회의원 현황 정보",
+      "orgName": "국회사무처",
+      "code": "ENNAMEMBER",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11449",
+      "name": "(영문)위원회 정보",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "ENCMITINFO",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11450",
+      "name": "국회미래연구원 제공 자료 통합 API",
+      "category": "보고서ㆍ발간물",
+      "orgName": "국회사무처",
+      "code": "ALLNAFIPBLM",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11451",
+      "name": "(영문)국회일정",
+      "category": "주제별 공개>언론·미디어·국회일정",
+      "orgName": "국회사무처",
+      "code": "ENSCHEDULENOTICE",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11454",
+      "name": "(영문)국회 소식 및 보도자료",
+      "category": "주제별 공개>언론·미디어·국회일정",
+      "orgName": "국회사무처",
+      "code": "ENPRESS",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11458",
+      "name": "의안 접수목록",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "BILLRCP",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11460",
+      "name": "의안 제안자정보",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "BILLINFOPPSR",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11461",
+      "name": "의안 상세정보",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "BILLINFODETAIL",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11462",
+      "name": "의안 심사정보(예ㆍ결산 제외)",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "BILLJUDGE",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11468",
+      "name": "예결산 심사정보",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "BUDGETJUDGE",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11470",
+      "name": "회기정보",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "BILLSESSPROD",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11471",
+      "name": "처리 의안통계(총괄)",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "BILLCNTMAIN",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11472",
+      "name": "처리 의안통계(위원회별)",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "BILLCNTCMIT",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11473",
+      "name": "처리 의안통계(의안종류별ㆍ위원회별)",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "BILLCNTLAWDIV",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11475",
+      "name": "처리 의안통계(위원회별 법률안)",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "BILLCNTLAWCMIT",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11477",
+      "name": "처리 의안통계(발의주체별 법률안)",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "BILLCNTPRPSR",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11479",
+      "name": "계류의안 통계",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "BILLCNTRSVT",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11482",
+      "name": "청원 접수목록",
+      "category": "주제별 공개>국민참여>국회 민원",
+      "orgName": "국회사무처",
+      "code": "PTTRCP",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11486",
+      "name": "청원 소개의원 정보",
+      "category": "주제별 공개>국민참여>국회 민원",
+      "orgName": "국회사무처",
+      "code": "PTTINFOPPSR",
+      "status": "discovered"
+    },
+    {
+      "infId": "OS46YD0012559515463",
+      "name": "법률안 제안이유 및 주요내용",
+      "category": "의정활동별 공개>법률안 심사",
+      "orgName": "국회사무처",
+      "code": null,
+      "status": "no_code"
+    },
+    {
+      "infId": "OOWY4R001216HX11489",
+      "name": "청원 상세정보",
+      "category": "주제별 공개>국민참여>국회 민원",
+      "orgName": "국회사무처",
+      "code": "PTTINFODETAIL",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11490",
+      "name": "청원 심사정보",
+      "category": "주제별 공개>국민참여>국회 민원",
+      "orgName": "국회사무처",
+      "code": "PTTJUDGE",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11491",
+      "name": "연차보고서",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "BILLREPORT",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11492",
+      "name": "의안 위원회심사 회의정보 조회",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "BILLJUDGECONF",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11493",
+      "name": "의안 법사위 회의정보 조회",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "BILLLWJUDGECONF",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11494",
+      "name": "예결산 예비심사 정보 조회",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "BUDGETADJUDGE",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11495",
+      "name": "예결산 종합심사 회의정보 조회",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "BUDGETJUDGECONF",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11496",
+      "name": "청원 통계",
+      "category": "주제별 공개>국민참여>국회 민원",
+      "orgName": "국회사무처",
+      "code": "PTTCNTMAIN",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11497",
+      "name": "국정감사 결과보고서",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "AUDITREPORTRESULT",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11498",
+      "name": "(영문)최신 처리 의안",
+      "category": "주제별 공개>정책",
+      "orgName": "국회사무처",
+      "code": "ENBCONFBILL",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11500",
+      "name": "국회예산정책처 제공 자료 통합 API",
+      "category": "보고서ㆍ발간물",
+      "orgName": "국회사무처",
+      "code": "ALLNABOPBLM",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11501",
+      "name": "의원실 행사 정보",
+      "category": "국회의원>국회의원 현황 정보",
+      "orgName": "국회사무처",
+      "code": "NAMEMBEREVENT",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11505",
+      "name": "예결산특별위원회 회의록",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "VCONFBUDGETCONFLIST",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11506",
+      "name": "특별위원회 회의록",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "VCONFSPCCONFLIST",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11507",
+      "name": "국정감사 회의록",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "VCONFAPIGCONFLIST",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11508",
+      "name": "국정조사 회의록",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "VCONFPIPCONFLIST",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11509",
+      "name": "인사청문회 회의록",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "VCONFCFRMCONFLIST",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11510",
+      "name": "청문회 회의록",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "VCONFCHCONFLIST",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11511",
+      "name": "연석회의 회의록",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "VCONFJMCONFLIST",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11512",
+      "name": "대통령취임연설 포함 회의록",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "VCONFDNACONFLIST",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11513",
+      "name": "대통령시정연설 포함 회의록",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "VCONFSNACONFLIST",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11514",
+      "name": "외빈연설 포함 회의록",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "VCONFFDCONFLIST",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11516",
+      "name": "회의록별 부록 정보",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "VCONFATTAPPENDIXLIST",
+      "status": "discovered"
+    },
+    {
+      "infId": "OOWY4R001216HX11517",
+      "name": "서면질의답변서 목록",
+      "category": "의정활동별 공개",
+      "orgName": "국회사무처",
+      "code": "VCONFATTQNALIST",
+      "status": "discovered"
+    }
+  ]
+}
