@@ -64,21 +64,22 @@ export function registerLiteMeetingTools(
         const age = params.age ?? CURRENT_AGE;
         const queryParams: Record<string, string | number> = {};
 
-        // keyword는 클라이언트 측 필터링으로 처리 (API가 SUB_NAME 파라미터를 안정적으로 지원하지 않음)
+        // keyword는 클라이언트 측 필터링으로 처리 (API가 SUB_NAME 쿼리 파라미터를 지원하지 않음)
         if (params.page) queryParams.pIndex = params.page;
-        if (params.page_size) {
-          queryParams.pSize = Math.min(params.page_size, config.apiResponse.maxPageSize);
-        }
+
+        // 키워드 검색 시 충분한 건수 확보 (클라이언트 필터링 대상)
+        const effectivePageSize = params.keyword
+          ? Math.max(params.page_size ?? 100, 100)
+          : (params.page_size ?? config.apiResponse.defaultPageSize);
+        queryParams.pSize = Math.min(effectivePageSize, config.apiResponse.maxPageSize);
 
         let apiCode: string;
-        // keyword 검색 시 더 많은 결과를 가져와서 필터링
-        if (params.keyword && !params.page_size) {
-          queryParams.pSize = 100;
-        }
 
-        // CONF_DATE 기본값: 사용자가 연도를 지정하지 않으면
-        // 현재 연도로 시도하되, 결과가 0건이면 이전 연도로 폴백
+        // CONF_DATE 기본값: 사용자가 연도를 지정하지 않으면 현재 연도
         const confDateYear = params.date_from?.slice(0, 4);
+        const usesConfDate = !["국정감사", "인사청문회", "공청회"].includes(
+          params.meeting_type ?? "",
+        );
 
         switch (params.meeting_type) {
           case "본회의":
@@ -114,17 +115,21 @@ export function registerLiteMeetingTools(
 
         let result = await api.fetchOpenAssembly(apiCode, queryParams);
 
-        // CONF_DATE 기반 API에서 결과 0건이고 사용자가 연도 미지정 시 → 이전 연도 자동 폴백
-        if (
-          result.rows.length === 0 &&
-          !confDateYear &&
-          queryParams.CONF_DATE
-        ) {
-          const prevYear = String(Number(queryParams.CONF_DATE) - 1);
-          result = await api.fetchOpenAssembly(apiCode, {
-            ...queryParams,
-            CONF_DATE: prevYear,
-          });
+        // CONF_DATE 기반 API: 현재 연도 결과가 부족하면 이전 연도도 합산
+        if (usesConfDate && !confDateYear && queryParams.CONF_DATE) {
+          const currentRows = result.rows;
+          const needMore = params.keyword
+            ? currentRows.length < 20  // 키워드 필터링 전이므로 여유 있게 판단
+            : currentRows.length === 0;
+
+          if (needMore) {
+            const prevYear = String(Number(queryParams.CONF_DATE) - 1);
+            const prevResult = await api.fetchOpenAssembly(apiCode, {
+              ...queryParams,
+              CONF_DATE: prevYear,
+            });
+            result = { ...result, rows: [...currentRows, ...prevResult.rows] };
+          }
         }
 
         let rows = result.rows;
