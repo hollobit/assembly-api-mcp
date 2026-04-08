@@ -78,7 +78,7 @@ https://assembly-api-mcp.fly.dev/mcp?key=YOUR_API_KEY&profile=lite
 | 파라미터 | 필수 | 기본값 | 설명 |
 |---------|------|--------|------|
 | `key` | O | `sample` | 열린국회정보 API 키 |
-| `profile` | X | `lite` | `lite` (9개 도구) 또는 `full` (18개 도구) |
+| `profile` | X | `lite` | `lite` (6개 도구) 또는 `full` (10개 도구) |
 
 > `sample` 키로 최대 10건까지 테스트할 수 있습니다.
 
@@ -405,7 +405,7 @@ npx tsx src/cli.ts help
 |------|------|
 | [QUICK_START.md](QUICK_START.md) | 5분 안에 시작하는 빠른 설정 가이드 |
 | [docs/api-catalog.md](docs/api-catalog.md) | 국회 Open API 276개 전체 목록 (카테고리별 분류) |
-| [docs/mcp-api.md](docs/mcp-api.md) | MCP 도구 ↔ 국회 API 코드 매핑 (36개 검증 완료) |
+| [docs/mcp-api.md](docs/mcp-api.md) | MCP 도구 ↔ 국회 API 코드 매핑 (271개 발굴, 107개 통합) |
 | [docs/discovered-codes.md](docs/discovered-codes.md) | API 코드 발굴 과정 및 검증된 엔드포인트 파라미터 |
 | [docs/mcp-design-analysis.md](docs/mcp-design-analysis.md) | MCP 도구 설계 분석 — Lite/Full 프로필 결정 근거 |
 
@@ -497,15 +497,15 @@ assembly-api/
 │   │   ├── codes.ts          # 검증된 API 코드 매핑
 │   │   ├── monitor.ts        # API 응답 시간 모니터링
 │   │   └── rate-limiter.ts   # Rate Limit 추적
-│   ├── tools/                # MCP 도구 (Lite 9개 / Full 18개)
-│   │   ├── lite/             # Lite 프로필 도구 (9개)
+│   ├── tools/                # MCP 도구 (Lite 6개 / Full 10개)
+│   │   ├── lite/             # Lite 프로필 도구 (6개)
 │   ├── openapi/              # OpenAPI REST 브릿지
 │   │   ├── router.ts         # REST 라우터 (/api/*)
 │   │   ├── handlers.ts       # REST 핸들러 (18개 엔드포인트)
 │   │   └── spec.ts           # OpenAPI 3.1 스펙 생성
 │   ├── resources/            # MCP 정적 리소스
 │   └── prompts/              # MCP 프롬프트 템플릿
-├── tests/                    # 단위 테스트 (248개)
+├── tests/                    # 단위 테스트 (235개)
 ├── examples/
 │   └── api-tester.html       # 브라우저 API 테스터
 ├── docs/

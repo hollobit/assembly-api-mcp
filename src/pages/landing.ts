@@ -139,8 +139,8 @@ export function getLandingPageHtml(baseUrl: string): string {
   <div style="margin-top:1rem">
     <label>프로필</label>
     <div class="radio-group">
-      <label><input type="radio" name="profile" value="lite" checked> Lite (9개 도구, 권장)</label>
-      <label><input type="radio" name="profile" value="full"> Full (18개 도구)</label>
+      <label><input type="radio" name="profile" value="lite" checked> Lite (6개 도구, 권장)</label>
+      <label><input type="radio" name="profile" value="full"> Full (10개 도구)</label>
     </div>
   </div>
 

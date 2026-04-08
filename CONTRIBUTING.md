@@ -16,7 +16,7 @@ cp .env.example .env
 
 ```bash
 npm run build      # TypeScript 빌드
-npm test           # 테스트 실행 (248개)
+npm test           # 테스트 실행 (235개)
 npm run dev        # 개발 모드 (tsx)
 npm run lint       # 타입 체크
 ```
