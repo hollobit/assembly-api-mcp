@@ -89,6 +89,14 @@ bill_detail(bill_id="...") 호출 시:
 | `npeslxqbanwkimebr` | 발언영상 | `speeches` | 2 |
 | `NAMEMBERLEGIPTT` | 청원현황 | `petitions` | 2 |
 
+**추가 파라미터 (Tier 3)**:
+
+| 파라미터 | 동작 | 사용 API |
+|----------|------|---------|
+| `scope="history"` | 역대 국회 의원/선거/의장 데이터 | 13개 역대 API (3B) |
+| `mode="party_stats"` | 정당별 교섭단체 의석수 | `nepjpxkkabqiqpbvk` (3C) |
+| `lang="en"` | 영문 의원 정보 | ENNAMEMBER (3D) |
+
 ### 2. `assembly_bill` — 의안
 
 | 파라미터 | 동작 | 사용 API |
@@ -103,6 +111,7 @@ bill_detail(bill_id="...") 호출 시:
 | `mode="stats"` | 의안 통계 7종 | BILLCNTMAIN, BILLCNTCMIT, BILLCNTPRPSR, BILLCNTLAWDIV, BILLCNTLAWCMIT + BILLCNTRSVT + 역대통계 |
 | `status="pending"` + `committee` | 위원회별 계류법률안 | `ndiwuqmpambgvnfsj` |
 | `bill_type="alternative"` | 위원회안/대안 | `nxtkyptyaolzcbfwl` |
+| `lang="en"` + `status="recent"` | 영문 최신 처리 의안 | ENBCONFBILL (3D) |
 
 ### 3. `assembly_session` — 일정/회의록/표결
 
@@ -121,9 +130,14 @@ bill_detail(bill_id="...") 호출 시:
 | `meeting_type="특별위"` | 특별위 회의록 | VCONFSPCCONFLIST |
 | `conf_id` | 회의록 상세 | VCONFDETAIL |
 | `include_explanations=true` | 제안설명서 목록 | VCONFATTEXPLANLIST |
-| `meeting_type="국정감사"` | + 국감 결과보고서 | + AUDITREPORTRESULT |
+| `meeting_type="국정감사"` | + 국감 결과+시정조치+처리요구 보고서 | + AUDITREPORTRESULT + VCONFATTATBLIST + AUDITREPORTVISIBILIT |
+| `meeting_type="국정조사"` | 국정조사 회의록 + 결과보고서 | VCONFPIPCONFLIST + INVESTREPORTRESULT |
+| `meeting_type="시정연설"` | 대통령시정연설 회의록 | VCONFSNACONFLIST |
+| `meeting_type="인사청문"` | 인사청문회 정보 | `nrvsawtaauyihadij` |
+| `meeting_type="토론회"` | 토론회 + 결과보고서 | `nyioaasianxlkcqxs` + NABOPBLMDCSNREPORT |
+| `lang="en"` (schedule) | 영문 국회일정 | ENSCHEDULENOTICE |
 
-### 4. `assembly_org` — 위원회/청원/입법예고
+### 4. `assembly_org` — 위원회/청원/입법예고/보도자료
 
 | 파라미터 | 동작 | 사용 API |
 |----------|------|---------|
@@ -134,6 +148,9 @@ bill_detail(bill_id="...") 호출 시:
 | `petition_status="all"` | 청원 접수목록 | PETITION_LIST |
 | `type="legislation_notice"` | 입법예고 | LEGISLATION_ACTIVE |
 | `bill_name` (입법예고) | 법률안명 필터 (클라이언트) | LEGISLATION_ACTIVE |
+| `type="press"` | 보도자료 검색 | `ninnagrlaelvtzfnt` |
+| `type="press"` + `lang="en"` | 영문 보도자료 | ENPRESS |
+| `lang="en"` (committee) | 영문 위원회 정보 | ENCMITINFO |
 
 **흡수한 기존 도구**: `get_committees`, `search_petitions`, `get_legislation_notices`
 
@@ -350,6 +367,6 @@ Full 프로필은 Lite 6개를 모두 포함하며, 심층 분석용 4개 도구
 | Full 도구 수 | 19 | 10 | **10** |
 | 토큰 소비 (Lite) | ~3,800 | ~2,800 | **~2,800** |
 | API 코드 등록 | 39 | 44 | **271** (98.2%) |
-| 전용 도구에서 사용 | 39 | 44 | **71** |
-| 전용 도구 커버율 | 14% | 16% | **26%** |
+| 전용 도구에서 사용 | 39 | 44 | **107** |
+| 전용 도구 커버율 | 14% | 16% | **39%** |
 | 276개 API 접근 | 100% | 100% | **100%** |
