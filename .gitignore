@@ -8,6 +8,8 @@ coverage/
 *.tgz
 .DS_Store
 .claude/
+!.claude/agents/
+!.claude/skills/
 .mcp.json
 .playwright-mcp/
 _workspace/
