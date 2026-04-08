@@ -22,6 +22,7 @@ export function registerPetitionDetailTool(
     "국민동의청원을 검색하고 상세 조회합니다. 청원ID로 상세, status로 계류/처리 구분.",
     {
       petition_id: z.string().optional().describe("청원 ID (상세 조회 모드)"),
+      mode: z.enum(["search", "stats"]).optional().describe("모드: search(검색/상세, 기본), stats(청원 통계)"),
       status: z
         .enum(["pending", "processed", "all"])
         .optional()
@@ -32,6 +33,10 @@ export function registerPetitionDetailTool(
     },
     async (params) => {
       try {
+        if (params.mode === "stats") {
+          return await fetchPetitionStats(api);
+        }
+
         if (params.petition_id) {
           return await fetchPetitionDetail(api, params.petition_id);
         }
@@ -56,11 +61,17 @@ interface ListParams {
 }
 
 async function fetchPetitionDetail(api: Api, petitionId: string) {
-  const result = await api.fetchOpenAssembly(API_CODES.PETITION_DETAIL, {
-    PTT_ID: petitionId,
-  });
+  const [detailResult, reviewResult, sponsorsResult] = await Promise.allSettled([
+    api.fetchOpenAssembly(API_CODES.PETITION_DETAIL, { PTT_ID: petitionId }),
+    api.fetchOpenAssembly("PTTJUDGE", { BILL_ID: petitionId })
+      .catch(() => ({ rows: [] as readonly Record<string, unknown>[], totalCount: 0 })),
+    api.fetchOpenAssembly("PTTINFOPPSR", { PTT_ID: petitionId })
+      .catch(() => ({ rows: [] as readonly Record<string, unknown>[], totalCount: 0 })),
+  ]);
 
-  if (result.rows.length === 0) {
+  const detail = detailResult.status === "fulfilled" ? detailResult.value : { rows: [], totalCount: 0 };
+
+  if (detail.rows.length === 0) {
     return {
       content: [{
         type: "text" as const,
@@ -69,13 +80,41 @@ async function fetchPetitionDetail(api: Api, petitionId: string) {
     };
   }
 
+  const response: Record<string, unknown> = {
+    total: 1,
+    items: detail.rows,
+    petition_id: petitionId,
+  };
+
+  const reviewData = reviewResult.status === "fulfilled" ? reviewResult.value : { rows: [] };
+  const sponsorsData = sponsorsResult.status === "fulfilled" ? sponsorsResult.value : { rows: [] };
+
+  if (reviewData.rows.length > 0) {
+    response.review = reviewData.rows;
+  }
+  if (sponsorsData.rows.length > 0) {
+    response.sponsors = sponsorsData.rows;
+  }
+
+  return {
+    content: [{
+      type: "text" as const,
+      text: JSON.stringify(response),
+    }],
+  };
+}
+
+async function fetchPetitionStats(api: Api) {
+  const result = await api.fetchOpenAssembly("PTTCNTMAIN", {})
+    .catch(() => ({ rows: [] as readonly Record<string, unknown>[], totalCount: 0 }));
+
   return {
     content: [{
       type: "text" as const,
       text: JSON.stringify({
-        total: 1,
+        mode: "stats",
+        total: result.totalCount,
         items: result.rows,
-        petition_id: petitionId,
       }),
     }],
   };

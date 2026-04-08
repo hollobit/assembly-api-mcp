@@ -55,11 +55,11 @@ function formatVotePlenaryRow(row: Row): Record<string, unknown> {
 // -- Auto-detection -----------------------------------------------------------
 
 function detectType(params: {
-  type?: SessionType; bill_id?: string; vote_type?: string; meeting_type?: string;
+  type?: SessionType; bill_id?: string; vote_type?: string; meeting_type?: string; conf_id?: string;
 }): SessionType {
   if (params.type) return params.type;
   if (params.bill_id || params.vote_type) return "vote";
-  if (params.meeting_type) return "meeting";
+  if (params.meeting_type || params.conf_id) return "meeting";
   return "schedule";
 }
 
@@ -115,13 +115,22 @@ async function handleSchedule(
 
 async function handleMeeting(
   api: ApiClient,
-  params: { meeting_type?: string; keyword?: string; committee?: string; date_from?: string; age?: number; page?: number; page_size?: number },
+  params: { meeting_type?: string; keyword?: string; committee?: string; date_from?: string; age?: number; page?: number; page_size?: number; conf_id?: string; include_explanations?: boolean },
   config: AppConfig,
-): Promise<Record<string, unknown>[]> {
+): Promise<Record<string, unknown>[] | Record<string, unknown>> {
   const age = params.age ?? CURRENT_AGE;
+
+  // 회의록 상세 조회 (conf_id 제공 시)
+  if (params.conf_id) {
+    const detailResult = await api.fetchOpenAssembly("VCONFDETAIL", {
+      CONF_ID: params.conf_id,
+    });
+    return { detail: detailResult.rows.length > 0 ? detailResult.rows[0] : null, total: detailResult.rows.length };
+  }
+
   const confDateYear = params.date_from?.slice(0, 4);
   const currentYear = String(new Date().getFullYear());
-  const usesConfDate = !["국정감사", "인사청문회", "공청회"].includes(params.meeting_type ?? "");
+  const usesConfDate = !["국정감사", "인사청문회", "공청회", "소위원회", "예결위", "특별위"].includes(params.meeting_type ?? "");
   const q: Record<string, string | number> = {};
   if (params.page) q.pIndex = params.page;
   q.pSize = Math.min(params.page_size ?? config.apiResponse.defaultPageSize, config.apiResponse.maxPageSize);
@@ -147,7 +156,19 @@ async function handleMeeting(
       apiCode = API_CODES.MEETING_PUBLIC_HEARING;
       q.ERACO = `제${age}대`;
       break;
-    default: // 위원회 / 소위원회
+    case "소위원회":
+      apiCode = "VCONFSUBCCONFLIST";
+      q.ERACO = `제${age}대`;
+      break;
+    case "예결위":
+      apiCode = "VCONFBUDGETCONFLIST";
+      q.ERACO = `제${age}대`;
+      break;
+    case "특별위":
+      apiCode = "VCONFSPCCONFLIST";
+      q.ERACO = `제${age}대`;
+      break;
+    default: // 위원회
       apiCode = API_CODES.MEETING_COMMITTEE;
       q.DAE_NUM = age;
       q.CONF_DATE = confDateYear ?? currentYear;
@@ -176,7 +197,39 @@ async function handleMeeting(
       return fields.some((f) => f.includes(kw));
     });
   }
-  return rows.map(formatMeetingRow);
+
+  const meetingItems = rows.map(formatMeetingRow);
+
+  // 부가 데이터: 제안설명서 목록, 국감 결과보고서
+  const extras: Record<string, unknown> = {};
+
+  const extraFetches: Promise<void>[] = [];
+
+  if (params.include_explanations) {
+    extraFetches.push(
+      api.fetchOpenAssembly("VCONFATTEXPLANLIST", q)
+        .then((r) => { if (r.rows.length > 0) extras.explanations = r.rows; })
+        .catch(() => { /* 제안설명서 조회 실패 무시 */ }),
+    );
+  }
+
+  if (params.meeting_type === "국정감사") {
+    extraFetches.push(
+      api.fetchOpenAssembly("AUDITREPORTRESULT", { ERACO: `제${age}대` })
+        .then((r) => { if (r.rows.length > 0) extras.audit_reports = r.rows; })
+        .catch(() => { /* 국감 결과보고서 조회 실패 무시 */ }),
+    );
+  }
+
+  if (extraFetches.length > 0) {
+    await Promise.allSettled(extraFetches);
+  }
+
+  if (Object.keys(extras).length > 0) {
+    return { items: meetingItems, ...extras } as unknown as Record<string, unknown>[];
+  }
+
+  return meetingItems;
 }
 
 // -- Vote handler -------------------------------------------------------------
@@ -227,8 +280,10 @@ export function registerAssemblySessionTool(server: McpServer, config: AppConfig
         .describe("시작 날짜 (YYYY-MM-DD) 또는 연도 (YYYY). schedule: 날짜 필터, meeting: 연도 필터"),
       date_to: z.string().optional()
         .describe("종료 날짜 (YYYY-MM-DD). schedule 모드에서 범위 검색 시 사용"),
-      meeting_type: z.enum(["본회의", "위원회", "소위원회", "국정감사", "인사청문회", "공청회"]).optional()
+      meeting_type: z.enum(["본회의", "위원회", "소위원회", "국정감사", "인사청문회", "공청회", "예결위", "특별위"]).optional()
         .describe("회의 종류 (meeting 모드)"),
+      conf_id: z.string().optional().describe("회의록 ID (meeting 모드: 상세 조회)"),
+      include_explanations: z.boolean().optional().describe("제안설명서 목록 포함 여부 (meeting 모드, 기본: false)"),
       keyword: z.string().optional()
         .describe("검색 키워드. schedule: 일정 내용, meeting: 안건명/회의명"),
       committee: z.string().optional().describe("위원회명 (schedule/meeting 모드)"),
@@ -242,15 +297,24 @@ export function registerAssemblySessionTool(server: McpServer, config: AppConfig
     async (params) => {
       try {
         const mode = detectType(params);
-        let items: Record<string, unknown>[];
         switch (mode) {
-          case "schedule": items = await handleSchedule(api, params, config); break;
-          case "meeting":  items = await handleMeeting(api, params, config);  break;
-          case "vote":     items = await handleVote(api, params, config);     break;
+          case "schedule": {
+            const items = await handleSchedule(api, params, config);
+            return { content: [{ type: "text" as const, text: JSON.stringify({ mode, total: items.length, items }) }] };
+          }
+          case "meeting": {
+            const meetingResult = await handleMeeting(api, params, config);
+            // conf_id 상세 조회 또는 extras가 포함된 객체 형태
+            if (!Array.isArray(meetingResult)) {
+              return { content: [{ type: "text" as const, text: JSON.stringify({ mode, ...meetingResult }) }] };
+            }
+            return { content: [{ type: "text" as const, text: JSON.stringify({ mode, total: meetingResult.length, items: meetingResult }) }] };
+          }
+          case "vote": {
+            const items = await handleVote(api, params, config);
+            return { content: [{ type: "text" as const, text: JSON.stringify({ mode, total: items.length, items }) }] };
+          }
         }
-        return {
-          content: [{ type: "text" as const, text: JSON.stringify({ mode, total: items.length, items }) }],
-        };
       } catch (err: unknown) {
         return formatToolError(err);
       }

@@ -189,6 +189,19 @@ FastMCP(TS) 마이그레이션보다 현재 SDK에서 3가지 핵심 개선이 R
 | 17.9 | 예측 프리패치 — 의원 검색 시 발의법안+표결 백그라운드 프리패치 | search_members 후 analyze_legislator 호출 시 캐시 히트 | - | cc:完了 |
 | 17.10 | DNS 캐시 — open.assembly.go.kr DNS 조회 결과 인메모리 캐시 (5분 TTL) | API 호출당 ~10ms DNS 조회 절감 | - | cc:完了 |
 
+### Phase 18: API 커버율 확장 — Tier 1 (12건 통합, 도구 수 변경 없음)
+
+발굴된 271개 코드 중 고우선순위 12건을 기존 도구에 통합하여 커버율 16%→21% 향상.
+
+| Task | 내용 | DoD | Depends | Status |
+|------|------|-----|---------|--------|
+| 18.1 | assembly_member에 의원이력+표결+상임위+위원회경력+보고서+SNS+영상+청원 8개 API 통합 | analyze에서 이력/경력/표결/보고서/SNS/영상/청원 반환 | - | cc:完了 |
+| 18.2 | assembly_bill에 의안별회의록+계류통계+역대통계+위원회계류+대안 5개 API 통합 | track에 회의록, stats에 계류/역대, search에 위원회계류/대안 | - | cc:完了 |
+| 18.3 | bill_detail에 예결산 심사+예비심사 2개 API 통합 | bill_id 조회 시 예결산 심사 자동 포함 | - | cc:完了 |
+| 18.4 | petition_detail에 심사+소개의원+통계 3개 API 통합 | petition_id 상세에 심사/소개의원, mode=stats에 통계 | - | cc:完了 |
+| 18.5 | assembly_session에 소위/예결위/특위 회의록+상세+제안설명서+국감결과 6개 API 통합 | 회의록 유형 확장, 상세/설명서/국감결과 | - | cc:完了 |
+| 18.6 | committee_detail에 개정대상법률+자료실 2개 API 통합 | 위원회 상세에 개정법률/자료실 포함 | - | cc:完了 |
+
 ---
 
 ## 현재 프로젝트 수치

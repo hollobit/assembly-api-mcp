@@ -169,6 +169,7 @@ function detectMode(params: {
   readonly bill_id?: string;
   readonly keywords?: string;
   readonly mode?: string;
+  readonly bill_type?: string;
 }): BillMode | "detail" {
   if (params.bill_id) return "detail";
   if (params.keywords) return "track";
@@ -270,9 +271,48 @@ async function handleSearch(
     readonly age?: number;
     readonly page?: number;
     readonly page_size?: number;
+    readonly bill_type?: string;
   },
   maxPageSize: number,
 ): Promise<{ content: { type: "text"; text: string }[] }> {
+  // bill_type="alternative" → 위원회안/대안 API
+  if (params.bill_type === "alternative") {
+    const altParams: Record<string, string | number> = {
+      AGE: params.age ?? CURRENT_AGE,
+    };
+    if (params.page) altParams.pIndex = params.page;
+    if (params.page_size) altParams.pSize = Math.min(params.page_size, maxPageSize);
+    const result = await api.fetchOpenAssembly("nxtkyptyaolzcbfwl", altParams);
+    const formatted = result.rows.map(formatSearchRow);
+    return {
+      content: [{
+        type: "text" as const,
+        text: JSON.stringify({ total: result.totalCount, items: formatted }),
+      }],
+    };
+  }
+
+  // committee + status="pending" → 위원회 계류법률안 API
+  if (params.committee && params.status === "pending") {
+    const pendingParams: Record<string, string | number> = {};
+    if (params.page) pendingParams.pIndex = params.page;
+    if (params.page_size) pendingParams.pSize = Math.min(params.page_size, maxPageSize);
+    else pendingParams.pSize = 100;
+    const result = await api.fetchOpenAssembly("ndiwuqmpambgvnfsj", pendingParams);
+    const cmtKw = params.committee.toLowerCase();
+    const filteredRows = result.rows.filter((r) => {
+      const cmit = String(r.COMMITTEE ?? r.COMMITTEE_NM ?? "").toLowerCase();
+      return cmit.includes(cmtKw);
+    });
+    const formatted = filteredRows.map(formatSearchRow);
+    return {
+      content: [{
+        type: "text" as const,
+        text: JSON.stringify({ total: formatted.length, items: formatted }),
+      }],
+    };
+  }
+
   const { apiCode, queryParams } = buildSearchQuery(params, maxPageSize);
   const result = await api.fetchOpenAssembly(apiCode, queryParams);
   const formatted = result.rows.map(formatSearchRow);
@@ -350,6 +390,7 @@ async function handleTrack(
   // Step 3: 심사 이력 + 위원회심사 회의 조회 (상위 5건, 옵션)
   const histories = new Map<string, readonly Record<string, unknown>[]>();
   const committeeConfs = new Map<string, readonly Record<string, unknown>[]>();
+  const billMeetingsMap = new Map<string, readonly Record<string, unknown>[]>();
 
   if (includeHistory && uniqueBills.length > 0) {
     await sendProgress(extra, 3, totalSteps, "심사 이력 조회 중...");
@@ -401,6 +442,28 @@ async function handleTrack(
         committeeConfs.set(billNo, meetings);
       }
     }
+
+    // 의안별 회의록 목록 조회 (상위 5건)
+    const billMeetingResults = await Promise.all(
+      top5.map((bill) =>
+        api
+          .fetchOpenAssembly("VCONFBILLCONFLIST", { BILL_ID: bill.billNo })
+          .then((result) => ({
+            billNo: bill.billNo,
+            records: result.rows,
+          }))
+          .catch(() => ({
+            billNo: bill.billNo,
+            records: [] as readonly Record<string, unknown>[],
+          })),
+      ),
+    );
+
+    for (const { billNo, records } of billMeetingResults) {
+      if (records.length > 0) {
+        billMeetingsMap.set(billNo, records);
+      }
+    }
   }
 
   await sendProgress(extra, totalSteps, totalSteps, "법안 추적 완료");
@@ -414,6 +477,10 @@ async function handleTrack(
   for (const [billNo, meetings] of committeeConfs) {
     committeeConfsObj[billNo] = meetings;
   }
+  const billMeetingsObj: Record<string, readonly Record<string, unknown>[]> = {};
+  for (const [billNo, records] of billMeetingsMap) {
+    billMeetingsObj[billNo] = records;
+  }
 
   return {
     content: [{
@@ -425,6 +492,7 @@ async function handleTrack(
         items: uniqueBills,
         histories: Object.keys(historiesObj).length > 0 ? historiesObj : undefined,
         committee_meetings: Object.keys(committeeConfsObj).length > 0 ? committeeConfsObj : undefined,
+        bill_meetings: Object.keys(billMeetingsObj).length > 0 ? billMeetingsObj : undefined,
       }),
     }],
   };
@@ -453,9 +521,28 @@ async function handleStats(
     ),
   );
 
+  // 추가 통계 API: 계류의안 통계 + 역대 의안 통계
+  const [pendingStatsResult, historicalStatsResult] = await Promise.allSettled([
+    api.fetchOpenAssembly("BILLCNTRSVT", { AGE: age }),
+    api.fetchOpenAssembly("nzivskufaliivfhpb", { AGE: age }),
+  ]);
+
   const stats: Record<string, unknown> = { age };
   for (const { key, total, rows } of results) {
     stats[key] = { total, items: rows };
+  }
+
+  if (pendingStatsResult.status === "fulfilled" && pendingStatsResult.value.rows.length > 0) {
+    stats.pending_stats = {
+      total: pendingStatsResult.value.totalCount,
+      items: pendingStatsResult.value.rows,
+    };
+  }
+  if (historicalStatsResult.status === "fulfilled" && historicalStatsResult.value.rows.length > 0) {
+    stats.historical_stats = {
+      total: historicalStatsResult.value.totalCount,
+      items: historicalStatsResult.value.rows,
+    };
   }
 
   return {
@@ -502,6 +589,10 @@ export function registerAssemblyBillTool(
         .describe(
           "상태 필터: all(전체), pending(계류), processed(처리완료), recent(최근 본회의). 기본: all",
         ),
+      bill_type: z
+        .enum(["alternative"])
+        .optional()
+        .describe("의안 유형: alternative(위원회안/대안)"),
       keywords: z
         .string()
         .optional()
@@ -533,6 +624,7 @@ export function registerAssemblyBillTool(
           bill_id: params.bill_id,
           keywords: params.keywords,
           mode: params.mode,
+          bill_type: params.bill_type,
         });
 
         switch (resolvedMode) {
@@ -568,6 +660,7 @@ export function registerAssemblyBillTool(
                 age: params.age,
                 page: params.page,
                 page_size: params.page_size,
+                bill_type: params.bill_type,
               },
               config.apiResponse.maxPageSize,
             );

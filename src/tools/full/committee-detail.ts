@@ -62,31 +62,72 @@ export function registerCommitteeDetailTool(
           ?? (params.committee_name !== undefined && committees.length > 0);
 
         let members: readonly Record<string, unknown>[] = [];
+        let amendmentTargets: readonly Record<string, unknown>[] = [];
 
-        if (shouldIncludeMembers && committees.length > 0) {
+        // 위원회 지정 시 위원 명단 + 개정대상 법률 현황을 병렬 조회
+        if (params.committee_name && committees.length > 0) {
+          const parallelFetches: Promise<{ rows: readonly Record<string, unknown>[] }>[] = [];
+
+          // 위원 명단
+          if (shouldIncludeMembers) {
+            parallelFetches.push(
+              api.fetchOpenAssembly(API_CODES.COMMITTEE_MEMBERS, { pSize }),
+            );
+          } else {
+            parallelFetches.push(Promise.resolve({ rows: [] }));
+          }
+
+          // 개정대상 법률 현황
+          parallelFetches.push(
+            api.fetchOpenAssembly("CLAWSTATE", { pSize })
+              .catch(() => ({ rows: [] as readonly Record<string, unknown>[] })),
+          );
+
+          const [memberResult, amendmentResult] = await Promise.allSettled(parallelFetches);
+
+          if (shouldIncludeMembers && memberResult.status === "fulfilled") {
+            const committeeNames = new Set(
+              committees.map((c) => String(c.COMMITTEE_NAME ?? "")),
+            );
+            const filteredMembers = memberResult.value.rows.filter((row) =>
+              committeeNames.has(String(row.COMMITTEE_NAME ?? "")),
+            );
+            members = filteredMembers.map((row) => ({
+              위원회: row.COMMITTEE_NAME,
+              이름: row.HG_NM,
+              정당: row.POLY_NM,
+              선거구: row.ORIG_NM,
+              직위: row.JOB_RES_NM,
+            }));
+          }
+
+          if (amendmentResult.status === "fulfilled") {
+            amendmentTargets = amendmentResult.value.rows;
+          }
+        } else if (shouldIncludeMembers && committees.length > 0) {
           const memberParams: Record<string, string | number> = { pSize };
           const memberResult = await api.fetchOpenAssembly(
             API_CODES.COMMITTEE_MEMBERS,
             memberParams,
           );
-
-          const committeeNames = new Set(
-            committees.map((c) => String(c.COMMITTEE_NAME ?? "")),
-          );
-
-          const filteredMembers = params.committee_name
-            ? memberResult.rows.filter((row) =>
-                committeeNames.has(String(row.COMMITTEE_NAME ?? "")),
-              )
-            : memberResult.rows;
-
-          members = filteredMembers.map((row) => ({
+          members = memberResult.rows.map((row) => ({
             위원회: row.COMMITTEE_NAME,
             이름: row.HG_NM,
             정당: row.POLY_NM,
             선거구: row.ORIG_NM,
             직위: row.JOB_RES_NM,
           }));
+        }
+
+        // 위원회 자료실 (옵션)
+        let resources: readonly Record<string, unknown>[] = [];
+        if (params.include_resources && params.committee_name && committees.length > 0) {
+          try {
+            const resourceResult = await api.fetchOpenAssembly("nbiwfpqbaipwgkhfr", { pSize });
+            resources = resourceResult.rows;
+          } catch {
+            /* 자료실 조회 실패 무시 */
+          }
         }
 
         const response: Record<string, unknown> = {
@@ -97,6 +138,12 @@ export function registerCommitteeDetailTool(
         if (members.length > 0) {
           response.members = members;
           response.member_count = members.length;
+        }
+        if (amendmentTargets.length > 0) {
+          response.amendment_targets = amendmentTargets;
+        }
+        if (resources.length > 0) {
+          response.resources = resources;
         }
 
         return {

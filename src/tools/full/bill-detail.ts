@@ -58,7 +58,20 @@ export function registerBillDetailTool(
             : Promise.resolve(undefined),
         };
 
-        const results = await Promise.allSettled(Object.values(tasks));
+        // 예결산 관련 추가 API
+        const budgetTasks = {
+          budget_review: api.fetchOpenAssembly("BUDGETJUDGE", { BILL_ID: params.bill_id })
+            .catch(() => ({ rows: [] as readonly Record<string, unknown>[], totalCount: 0 })),
+          budget_preliminary: api.fetchOpenAssembly("BUDGETADJUDGE", { BILL_ID: params.bill_id })
+            .catch(() => ({ rows: [] as readonly Record<string, unknown>[], totalCount: 0 })),
+        };
+
+        const [mainResults, budgetResults] = await Promise.all([
+          Promise.allSettled(Object.values(tasks)),
+          Promise.allSettled(Object.values(budgetTasks)),
+        ]);
+
+        const results = mainResults;
         const keys = Object.keys(tasks) as BillField[];
 
         const response: Record<string, unknown> = { bill_id: params.bill_id };
@@ -68,6 +81,18 @@ export function registerBillDetailTool(
             response[key] = result.value;
           } else if (result.status === "rejected") {
             response[key] = { error: String(result.reason) };
+          }
+        });
+
+        // 예결산 심사정보
+        const budgetKeys = Object.keys(budgetTasks) as (keyof typeof budgetTasks)[];
+        budgetKeys.forEach((key, idx) => {
+          const result = budgetResults[idx];
+          if (result.status === "fulfilled" && result.value.rows.length > 0) {
+            response[key] = {
+              total: result.value.totalCount,
+              items: result.value.rows,
+            };
           }
         });
 

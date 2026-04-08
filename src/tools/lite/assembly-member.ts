@@ -168,23 +168,87 @@ export function registerAssemblyMemberTool(
           await sendProgress(extra, 1, 3, "의원 인적사항 조회 완료");
           await sendProgress(extra, 2, 3, "발의법안 및 표결 조회 중...");
 
-          const [billsResult, votesResult] = await Promise.all([
+          const monaCode = String(target.MONA_CD ?? "");
+
+          const [billsResult, votesResult, careerResult, voteDetailResult, committeeActivityResult, committeeCareerResult, reportsResult, snsResult, speechesResult, petitionsResult] = await Promise.allSettled([
             api.fetchOpenAssembly(API_CODES.MEMBER_BILLS, {
               AGE: age, PROPOSER: memberName, pSize: 10,
             }),
             api.fetchOpenAssembly(API_CODES.VOTE_PLENARY, {
               AGE: age, pSize: 10,
             }),
+            api.fetchOpenAssembly("nexgtxtmaamffofof", {
+              ...(monaCode ? { MONA_CD: monaCode } : { HG_NM: memberName }),
+            }).catch(() => ({ rows: [] as readonly Record<string, unknown>[], totalCount: 0 })),
+            api.fetchOpenAssembly("nojepdqqaweusdfbi", {
+              AGE: age, HG_NM: memberName, pSize: 10,
+            }).catch(() => ({ rows: [] as readonly Record<string, unknown>[], totalCount: 0 })),
+            api.fetchOpenAssembly("nuvypcdgahexhvrjt", {
+              HG_NM: memberName,
+            }).catch(() => ({ rows: [] as readonly Record<string, unknown>[], totalCount: 0 })),
+            api.fetchOpenAssembly("nyzrglyvagmrypezq", {
+              ...(monaCode ? { MONA_CD: monaCode } : { HG_NM: memberName }),
+            }).catch(() => ({ rows: [] as readonly Record<string, unknown>[], totalCount: 0 })),
+            api.fetchOpenAssembly("nmfcjtvmajsbhhckf", {
+              HG_NM: memberName,
+            }).catch(() => ({ rows: [] as readonly Record<string, unknown>[], totalCount: 0 })),
+            api.fetchOpenAssembly("negnlnyvatsjwocar", {
+              HG_NM: memberName,
+            }).catch(() => ({ rows: [] as readonly Record<string, unknown>[], totalCount: 0 })),
+            api.fetchOpenAssembly("npeslxqbanwkimebr", {
+              HG_NM: memberName,
+            }).catch(() => ({ rows: [] as readonly Record<string, unknown>[], totalCount: 0 })),
+            api.fetchOpenAssembly("NAMEMBERLEGIPTT", {
+              HG_NM: memberName,
+            }).catch(() => ({ rows: [] as readonly Record<string, unknown>[], totalCount: 0 })),
           ]);
 
           await sendProgress(extra, 3, 3, "종합 분석 완료");
 
-          return { content: [{ type: "text" as const, text: JSON.stringify({
+          const billsData = billsResult.status === "fulfilled" ? billsResult.value : { rows: [], totalCount: 0 };
+          const votesData = votesResult.status === "fulfilled" ? votesResult.value : { rows: [], totalCount: 0 };
+          const careerData = careerResult.status === "fulfilled" ? careerResult.value : { rows: [] };
+          const voteDetailData = voteDetailResult.status === "fulfilled" ? voteDetailResult.value : { rows: [] };
+          const committeeActivityData = committeeActivityResult.status === "fulfilled" ? committeeActivityResult.value : { rows: [] };
+          const committeeCareerData = committeeCareerResult.status === "fulfilled" ? committeeCareerResult.value : { rows: [] };
+          const reportsData = reportsResult.status === "fulfilled" ? reportsResult.value : { rows: [] };
+          const snsData = snsResult.status === "fulfilled" ? snsResult.value : { rows: [] };
+          const speechesData = speechesResult.status === "fulfilled" ? speechesResult.value : { rows: [] };
+          const petitionsData = petitionsResult.status === "fulfilled" ? petitionsResult.value : { rows: [] };
+
+          const response: Record<string, unknown> = {
             total: isSingle ? 1 : rows.length,
             member: { ...detail, photo },
-            bills: { total: billsResult.totalCount ?? 0, items: billsResult.rows.map(extractBill) },
-            votes: { total: votesResult.totalCount ?? 0, age, items: votesResult.rows.map(extractVote) },
-          }) }] };
+            bills: { total: billsData.totalCount ?? 0, items: (billsData.rows as readonly Row[]).map(extractBill) },
+            votes: { total: votesData.totalCount ?? 0, age, items: (votesData.rows as readonly Row[]).map(extractVote) },
+          };
+
+          if (careerData.rows.length > 0) {
+            response.career = careerData.rows;
+          }
+          if (voteDetailData.rows.length > 0) {
+            response.vote_detail = voteDetailData.rows;
+          }
+          if (committeeActivityData.rows.length > 0) {
+            response.committee_activity = committeeActivityData.rows;
+          }
+          if (committeeCareerData.rows.length > 0) {
+            response.committee_career = committeeCareerData.rows;
+          }
+          if (reportsData.rows.length > 0) {
+            response.reports = reportsData.rows;
+          }
+          if (snsData.rows.length > 0) {
+            response.sns = snsData.rows;
+          }
+          if (speechesData.rows.length > 0) {
+            response.speeches = speechesData.rows;
+          }
+          if (petitionsData.rows.length > 0) {
+            response.petitions = petitionsData.rows;
+          }
+
+          return { content: [{ type: "text" as const, text: JSON.stringify(response) }] };
         }
 
         // 여러 건이면 요약 목록 반환
