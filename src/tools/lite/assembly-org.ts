@@ -65,7 +65,7 @@ async function handleCommittee(
   if (params.include_members && params.committee_name && rows.length > 0) {
     const membersResult = await api.fetchOpenAssembly(
       API_CODES.COMMITTEE_MEMBERS,
-      { pSize: 300 },
+      { pSize: 600 },
     );
     const grouped = new Map<string, Record<string, unknown>[]>();
     for (const m of membersResult.rows) {
