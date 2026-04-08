@@ -107,9 +107,9 @@ async function handleMeeting(
   const usesConfDate = !["국정감사", "인사청문회", "공청회"].includes(params.meeting_type ?? "");
   const q: Record<string, string | number> = {};
   if (params.page) q.pIndex = params.page;
-  q.pSize = params.keyword
-    ? Math.min(100, config.apiResponse.maxPageSize)
-    : Math.min(params.page_size ?? config.apiResponse.defaultPageSize, config.apiResponse.maxPageSize);
+  q.pSize = Math.min(params.page_size ?? config.apiResponse.defaultPageSize, config.apiResponse.maxPageSize);
+  // 키워드 → API SUB_NAME 파라미터로 서버 측 검색
+  if (params.keyword) q.SUB_NAME = params.keyword;
 
   let apiCode: string;
   switch (params.meeting_type) {
@@ -151,7 +151,8 @@ async function handleMeeting(
   }
 
   let rows = result.rows;
-  if (params.keyword) {
+  // SUB_NAME이 지원되지 않는 API의 경우 클라이언트 측 폴백 필터링
+  if (params.keyword && !q.SUB_NAME) {
     const kw = params.keyword.toLowerCase();
     rows = rows.filter((r) => {
       const fields = [r.SUB_NAME, r.TITLE, r.COMM_NAME].map((v) => String(v ?? "").toLowerCase());
