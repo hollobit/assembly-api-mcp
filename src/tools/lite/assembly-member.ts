@@ -91,7 +91,10 @@ function extractVote(row: Row) {
   return {
     billNo: String(row.BILL_NO ?? row.BILL_ID ?? ""),
     billName: String(row.BILL_NAME ?? row.BILL_NM ?? ""),
-    result: String(row.RESULT ?? row.PROC_RESULT ?? ""),
+    result: String(row.PROC_RESULT_CD ?? row.RESULT ?? row.PROC_RESULT ?? ""),
+    yesCount: row.YES_TCNT ?? null,
+    noCount: row.NO_TCNT ?? null,
+    abstainCount: row.BLANK_TCNT ?? null,
   };
 }
 
