@@ -542,6 +542,12 @@ docker compose up -d
 - [korean-law-mcp](https://github.com/SeoNaRu/korean-law-mcp) — 한국 법률 MCP 서버
 - [data-go-mcp-servers](https://github.com/Koomook/data-go-mcp-servers) — 공공데이터 MCP 서버
 
+## Star history
+
+[![Star History Chart](https://starchart.cc/hollobit/assembly-api-mcp.svg)](https://starchart.cc/hollobit/assembly-api-mcp)
+
 ## 라이선스
 
 MIT License - [LICENSE](LICENSE) 참조
+
+Jonghong Jeon (hollobit@etri.re.kr)
