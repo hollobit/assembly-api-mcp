@@ -1,5 +1,50 @@
 # CHANGES.md
 
+## 2026-04-09 — v0.5.0 (API 커버율 대폭 확장)
+
+### 도구 구조 통합 (Breaking Change from v0.3)
+- Lite 9개 → **6개** 도구 (도메인 엔티티 기반: member/bill/session/org)
+- Full 19개 → **10개** 도구 (Lite 6 + 심층 4: bill_detail/committee_detail/petition_detail/research_data)
+- 토큰 소비 73% 절감 (v0.2 대비), LLM 최적 구간(6개) 진입
+
+### API 코드 일괄 발굴
+- 자동 발굴 스크립트 (`scripts/discover-all-codes.ts`) 구현
+- **271개 코드 발굴** (276개 중 98.2%)
+- `codes.ts`에 전체 등록, `query_assembly`로 즉시 호출 가능
+
+### API 커버율 확장 (Tier 1~3)
+- **107개 API** 전용 도구 통합 (39% 커버율)
+- Tier 1: 의원이력/표결/상임위/위원회경력 + 의안회의록/통계 + 예결산 + 청원심사 (12건)
+- Tier 2: 보고서/SNS/영상 + 소위/예결위/특위/상세/설명서 + 개정법률 (14건)
+- Tier 3: 역대국회(13)/국정감시(8)/영문(6)/통합API(6)/보도자료(2)/정당(1) (36건)
+- ALLBILL 의안정보 통합 API — 심사경과(소관위→법사위→본회의→공포) 자동 포함
+
+### 성능 개선 (11건)
+- MCP Progress Notification (체인 도구 진행 알림)
+- Stale-While-Revalidate 캐시 (만료 시 0ms 응답)
+- 요청 중복 제거 (동일 API 동시 호출 시 Promise 공유)
+- 캐시 Warm-up (서버 시작 시 정적 API 사전 로드)
+- 백그라운드 주기 갱신 (30분마다 정적 API 리프레시)
+- HTTP Keep-Alive 명시, DNS 프리워밍
+- REST API gzip 압축 (60~90% 전송 절감)
+- 예측 프리패치 (의원 검색→분석 패턴)
+- Fly.dev Cold start 제거 (min_machines=1)
+- MCP Logging primitive (클라이언트 진단 로그)
+
+### 보안 강화
+- Cache-Control: private, no-store for API key requests
+- 인메모리 Map 크기 제한 (sessions=200, inflight=100, DNS=50)
+- DNS 캐시 만료 엔트리 자동 정리
+
+### 기타
+- 웹 설정 도우미 랜딩 페이지 (`/`)
+- Codex CLI 플러그인 메타데이터
+- 영문 API 지원 (`lang="en"`)
+- 역대 국회 데이터 (`scope="history"`)
+- 정당 의석수 통계 (`mode="party_stats"`)
+
+---
+
 ## 2026-04-06 — v0.2.1 (품질 개선)
 
 ### 의원 사진 URL 추가
