@@ -1,7 +1,7 @@
 {
   "name": "assembly-api-mcp",
-  "version": "0.1.0",
-  "description": "\uad6d\ud68c API\ub4e4\uc5d0 \ub300\ud55c MCP |  276\uac1c \uad6d\ud68c API 100% \uc811\uadfc | 9\uac1c Lite / 18\uac1c Full \ud504\ub85c\ud544 \ub3c4\uad6c | 36\uac1c \uac80\uc99d\ub41c API \ucf54\ub4dc",
+  "version": "0.4.0",
+  "description": "국회 API MCP 서버 | 276개 국회 API 100% 접근 | 6개 Lite / 10개 Full 도구 | 271개 API 코드 발굴",
   "author": {
     "name": "hollobit",
     "url": "https://github.com/hollobit"
