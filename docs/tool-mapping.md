@@ -73,10 +73,21 @@ bill_detail(bill_id="...") 호출 시:
 |----------|------|---------|
 | `name`, `party`, `district` | 의원 목록 검색 | MEMBER_INFO |
 | `committee` | 소속위원회 필터 (클라이언트 측) | MEMBER_INFO |
-| `name` (결과 1건) | 자동 상세 + 분석 | MEMBER_INFO + MEMBER_BILLS + VOTE_PLENARY |
-| `analyze=true` | 종합 분석 강제 실행 | MEMBER_INFO + MEMBER_BILLS + VOTE_PLENARY |
+| `name` (결과 1건) | 자동 상세 + 분석 | MEMBER_INFO + MEMBER_BILLS + VOTE_PLENARY + 아래 8개 |
+| `analyze=true` | 종합 분석 강제 실행 | 위 전부 + 아래 Tier 1+2 API |
 
-**흡수한 기존 도구**: `search_members`, `analyze_legislator`
+**analyze 모드 추가 API (Tier 1+2, 11개)**:
+
+| API 코드 | API명 | 응답 키 | Tier |
+|----------|-------|---------|------|
+| `nexgtxtmaamffofof` | 의원이력 | `career` | 1 |
+| `nojepdqqaweusdfbi` | 본회의 표결정보 (의원별) | `vote_detail` | 1 |
+| `nuvypcdgahexhvrjt` | 상임위 활동 | `committee_activity` | 1 |
+| `nyzrglyvagmrypezq` | 위원회 경력 | `committee_career` | 1 |
+| `nmfcjtvmajsbhhckf` | 의정보고서 | `reports` | 2 |
+| `negnlnyvatsjwocar` | SNS정보 | `sns` | 2 |
+| `npeslxqbanwkimebr` | 발언영상 | `speeches` | 2 |
+| `NAMEMBERLEGIPTT` | 청원현황 | `petitions` | 2 |
 
 ### 2. `assembly_bill` — 의안
 
@@ -88,10 +99,10 @@ bill_detail(bill_id="...") 호출 시:
 | `status="processed"` | 처리의안 | BILL_PROCESSED |
 | `status="recent"` | 최근 본회의 처리 | RECENT_PLENARY_BILLS |
 | `keywords="AI,인공지능"` | 키워드 법안 추적 | MEMBER_BILLS (병렬) |
-| `keywords` + `include_history` | + 심사이력+회의 | + BILL_REVIEW + BILL_COMMITTEE_CONF |
-| `mode="stats"` | 의안 통계 5종 | BILLCNTMAIN, BILLCNTCMIT, BILLCNTPRPSR, BILLCNTLAWDIV, BILLCNTLAWCMIT |
-
-**흡수한 기존 도구**: `search_bills`, `track_legislation`
+| `keywords` + `include_history` | + 심사이력+회의+의안별회의록 | + BILL_REVIEW + BILL_COMMITTEE_CONF + VCONFBILLCONFLIST |
+| `mode="stats"` | 의안 통계 7종 | BILLCNTMAIN, BILLCNTCMIT, BILLCNTPRPSR, BILLCNTLAWDIV, BILLCNTLAWCMIT + BILLCNTRSVT + 역대통계 |
+| `status="pending"` + `committee` | 위원회별 계류법률안 | `ndiwuqmpambgvnfsj` |
+| `bill_type="alternative"` | 위원회안/대안 | `nxtkyptyaolzcbfwl` |
 
 ### 3. `assembly_session` — 일정/회의록/표결
 
@@ -105,8 +116,12 @@ bill_detail(bill_id="...") 호출 시:
 | `vote_type="법률안"` | 법률안 표결 | PLENARY_LAW |
 | `vote_type="예산안"` | 예산안 표결 | PLENARY_BUDGET |
 | `vote_type="기타"` | 기타 안건 표결 | PLENARY_ETC |
-
-**흡수한 기존 도구**: `get_schedule`, `search_meetings`, `get_votes`
+| `meeting_type="소위원회"` | 소위원회 회의록 | VCONFSUBCCONFLIST |
+| `meeting_type="예결위"` | 예결위 회의록 | VCONFBUDGETCONFLIST |
+| `meeting_type="특별위"` | 특별위 회의록 | VCONFSPCCONFLIST |
+| `conf_id` | 회의록 상세 | VCONFDETAIL |
+| `include_explanations=true` | 제안설명서 목록 | VCONFATTEXPLANLIST |
+| `meeting_type="국정감사"` | + 국감 결과보고서 | + AUDITREPORTRESULT |
 
 ### 4. `assembly_org` — 위원회/청원/입법예고
 
@@ -141,7 +156,7 @@ Full 프로필은 Lite 6개를 모두 포함하며, 심층 분석용 4개 도구
 | 파라미터 | 설명 |
 |----------|------|
 | `bill_id` (필수) | 의안 ID |
-| `fields` | 조회 항목 선택: `detail`, `review`, `history`, `proposers`, `meetings` |
+| `fields` | 조회 항목 선택: `detail`, `review`, `history`, `proposers`, `meetings`, `budget` |
 
 1회 호출로 의안의 모든 것을 반환합니다:
 
@@ -152,6 +167,7 @@ Full 프로필은 Lite 6개를 모두 포함하며, 심층 분석용 4개 도구
 | history | BILL_RECEIVED | 접수/처리 이력 |
 | proposers | BILL_PROPOSERS | 공동발의 의원 전체 목록 |
 | meetings | BILL_COMMITTEE_CONF + BILL_LAW_COMMITTEE_CONF | 위원회+법사위 회의 |
+| budget | BUDGETJUDGE + BUDGETADJUDGE | 예결산 심사+예비심사 (Tier 1) |
 
 **흡수한 기존 도구**: `get_bill_detail`, `get_bill_review`, `get_bill_history`, `get_bill_proposers`
 
@@ -161,6 +177,8 @@ Full 프로필은 Lite 6개를 모두 포함하며, 심층 분석용 4개 도구
 |----------|------|
 | `committee_name` | 위원회명 (미지정 시 전체 목록) |
 | `include_members` | 위원 명단 포함 (기본: true when name specified) |
+| `include_resources` | 위원회 자료실 포함 | `nbiwfpqbaipwgkhfr` (Tier 2) |
+| (위원회명 지정 시) | 개정대상 법률 자동 포함 | CLAWSTATE (Tier 2) |
 
 **흡수한 기존 도구**: `get_committees` (확장)
 
@@ -171,6 +189,8 @@ Full 프로필은 Lite 6개를 모두 포함하며, 심층 분석용 4개 도구
 | `petition_id` | 청원 ID (상세 모드) |
 | `status` | `pending` / `processed` / `all` |
 | `keyword` | 청원명 검색 (클라이언트 필터) |
+| `mode="stats"` | 청원 통계 | PTTCNTMAIN (Tier 1) |
+| (petition_id 지정 시) | + 심사정보+소개의원 자동 | + PTTJUDGE + PTTINFOPPSR (Tier 1) |
 
 **흡수한 기존 도구**: `search_petitions` (확장)
 
@@ -323,12 +343,12 @@ Full 프로필은 Lite 6개를 모두 포함하며, 심층 분석용 4개 도구
 
 ## 수치 요약
 
-| 항목 | 이전 (v0.3) | 현재 (v0.4) | 변화 |
-|------|------------|------------|------|
-| Lite 도구 수 | 9 | **6** | -33% |
-| Full 도구 수 | 19 | **10** | -47% |
-| 토큰 소비 (Lite) | ~3,800 | **~2,800** | -26% |
-| Cursor 슬롯 (Full) | 48% | **25%** | -23%p |
-| API 코드 수 | 39 | **44** | +5 |
-| LLM 도구 선택 | 양호 | **최적** | 6개 = 최적 구간 |
-| 276개 API 접근 | 100% | **100%** | 유지 |
+| 항목 | v0.3 | v0.4 초기 | v0.4 Tier 1+2 |
+|------|------|----------|--------------|
+| Lite 도구 수 | 9 | 6 | **6** |
+| Full 도구 수 | 19 | 10 | **10** |
+| 토큰 소비 (Lite) | ~3,800 | ~2,800 | **~2,800** |
+| API 코드 등록 | 39 | 44 | **271** (98.2%) |
+| 전용 도구에서 사용 | 39 | 44 | **70** |
+| 전용 도구 커버율 | 14% | 16% | **26%** |
+| 276개 API 접근 | 100% | 100% | **100%** |
