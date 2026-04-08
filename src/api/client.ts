@@ -66,8 +66,9 @@ export function createApiClient(config: AppConfig) {
     return !("BILL_ID" in params);
   }
 
-  /** 요청 중복 제거: 동일 URL에 대해 진행 중인 Promise를 공유 */
+  /** 요청 중복 제거: 동일 URL에 대해 진행 중인 Promise를 공유 (최대 100건) */
   const inflight = new Map<string, Promise<ApiResult>>();
+  const MAX_INFLIGHT = 100;
 
   /**
    * 열린국회정보 API 호출
@@ -120,6 +121,11 @@ export function createApiClient(config: AppConfig) {
     const dedupeKey = cacheKey || `${apiCode}:${JSON.stringify(queryParams)}`;
     const existing = inflight.get(dedupeKey);
     if (existing) return existing;
+
+    // 동시 요청 수 제한 (메모리 보호)
+    if (inflight.size >= MAX_INFLIGHT) {
+      return doFetchInner(apiCode, queryParams, cacheKey, cacheable);
+    }
 
     const promise = doFetchInner(apiCode, queryParams, cacheKey, cacheable);
     inflight.set(dedupeKey, promise);
@@ -286,14 +292,31 @@ const FETCH_TIMEOUT_MS = 10_000;
  */
 const dnsCache = new Map<string, { address: string; expiry: number }>();
 const DNS_CACHE_TTL_MS = 5 * 60 * 1000; // 5분
+const DNS_CACHE_MAX = 50; // 최대 50개 호스트
+
+// 만료 엔트리 주기 정리 (60초마다)
+const dnsCacheCleanup = setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of dnsCache) {
+    if (entry.expiry < now) dnsCache.delete(key);
+  }
+}, 60_000);
+dnsCacheCleanup.unref();
 
 async function resolveHost(hostname: string): Promise<string | undefined> {
   const cached = dnsCache.get(hostname);
   if (cached && cached.expiry > Date.now()) return cached.address;
+  // 만료 엔트리 즉시 삭제
+  if (cached) dnsCache.delete(hostname);
 
   try {
     const dns = await import("node:dns/promises");
     const { address } = await dns.lookup(hostname);
+    // 크기 제한: 오래된 엔트리 제거
+    if (dnsCache.size >= DNS_CACHE_MAX) {
+      const oldest = dnsCache.keys().next().value;
+      if (oldest !== undefined) dnsCache.delete(oldest);
+    }
     dnsCache.set(hostname, { address, expiry: Date.now() + DNS_CACHE_TTL_MS });
     return address;
   } catch {

@@ -94,6 +94,9 @@ const SESSION_TTL_MS = 30 * 60 * 1000;
 /** Session cleanup interval: 5 minutes */
 const SESSION_CLEANUP_INTERVAL_MS = 5 * 60 * 1000;
 
+/** Maximum concurrent sessions (memory protection) */
+const MAX_SESSIONS = 200;
+
 async function startHttpTransport(config: AppConfig): Promise<McpServer> {
   const sessions = new Map<string, SessionEntry>();
 
@@ -232,6 +235,12 @@ async function handleMcpRequest(
 
   // New session — only allowed via POST (initialization) or when no session ID
   if (!sessionId && req.method === "POST") {
+    // 세션 수 제한 (메모리 보호)
+    if (sessions.size >= MAX_SESSIONS) {
+      res.writeHead(503, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "Too many active sessions. Try again later." }));
+      return;
+    }
     // URL 쿼리 파라미터로 세션별 config 생성 (key, profile)
     const params = parseQueryParams(req.url ?? "");
     const sessionConfig = overrideConfigFromParams(config, params);

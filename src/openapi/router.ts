@@ -263,10 +263,17 @@ export async function handleRestRequest(
 
     try {
       const result = await route.handler(ctx, queryParams, pathParams);
-      const cacheHeader = (route.cacheMaxAge > 0 && result.status === 200)
-        ? `public, max-age=${route.cacheMaxAge}`
-        : "no-cache";
-      await sendJson(req, res, result.status, result.body, { "Cache-Control": cacheHeader });
+      // API 키가 URL에 포함되므로 private + no-store로 프록시 캐싱 방지
+      const hasApiKey = !!queryParams.key;
+      const cacheHeader = hasApiKey
+        ? "private, no-store, no-cache"
+        : (route.cacheMaxAge > 0 && result.status === 200)
+          ? `public, max-age=${route.cacheMaxAge}`
+          : "no-cache";
+      await sendJson(req, res, result.status, result.body, {
+        "Cache-Control": cacheHeader,
+        "Pragma": "no-cache",
+      });
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       await sendJson(req, res, 500, { success: false, error: msg });
