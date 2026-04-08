@@ -282,22 +282,24 @@ Full 프로필은 Lite 6개를 모두 포함하며, 심층 분석용 4개 도구
 | 43 | LIBRARY_SEARCH | `nywrpgoaatcpoqbiy` | 국회도서관 자료검색 | `research_data` (Full) |
 | 44 | BUDGET_ANALYSIS | `OZN379001174FW17905` | 예산정책처 분석자료 | `research_data` (Full) |
 
-### 카테고리별 요약
+### 카테고리별 요약 (v0.5.0)
 
-| 카테고리 | 등록 코드 | Lite 사용 | Full 추가 사용 | 미사용 |
-|---------|----------|----------|--------------|--------|
-| 국회의원 | 2 | 2 | 0 | 0 |
-| 의안 | 14 | 10 | 4 | 0 |
-| 표결 | 2 | 2 | 0 | 0 |
-| 의안 통계 | 5 | 5 | 0 | 0 |
-| 본회의 처리안건 | 3 | 3 | 0 | 0 |
-| 일정 | 3 | 1 | 0 | 2 (통합API가 커버) |
-| 회의록 | 5 | 5 | 0 | 0 |
-| 위원회 | 2 | 1 | 1 | 0 |
-| 청원 | 3 | 2 | 1 | 0 |
-| 입법예고 | 2 | 1 | 0 | 1 (query_assembly) |
-| 메타/기타 | 3 | 2 | 1 | 2 (리소스/대체) |
-| **합계** | **44** | **34** | **7** | **5** |
+| 카테고리 | 전용 도구 사용 | 주요 도구 |
+|---------|-------------|----------|
+| 국회의원 (현재+역대) | 15 | `assembly_member` (analyze, history, party_stats) |
+| 의안+통합 | 27 | `assembly_bill` + `bill_detail` + ALLBILL |
+| 표결+처리안건 | 5 | `assembly_session` (vote, vote_type) |
+| 회의록+국정감시 | 17 | `assembly_session` (meeting_type 확장) |
+| 일정 | 2 | `assembly_session` (schedule, lang=en) |
+| 위원회 | 4 | `assembly_org` + `committee_detail` |
+| 청원 | 6 | `assembly_org` + `petition_detail` |
+| 입법예고 | 1 | `assembly_org` |
+| 영문 API | 5 | 4개 도구 `lang=en` |
+| 보도자료 | 2 | `assembly_org(type=press)` |
+| 연구자료+예산+미래 | 8 | `research_data` (source 확장) |
+| 메타/범용 | 2 | `discover_apis` + `query_assembly` |
+| 나머지 (164건) | query_assembly | 276개 100% 접근 |
+| **전용 도구 합계** | **107** | **6 Lite + 4 Full = 10개 도구** |
 
 ### 전체 국회 API 276개 커버리지
 
@@ -306,24 +308,24 @@ Full 프로필은 Lite 6개를 모두 포함하며, 심층 분석용 4개 도구
 | 카테고리 | 전체 | 코드 발굴 | 전용 도구 | 접근 방법 |
 |---------|------|---------|---------|----------|
 | 1. 메타 | 1 | 1 | 1 | `discover_apis` |
-| 2. 통합 API | 8 | 7 | 0 | 개별 API로 대체, `query_assembly` |
-| 3. 국회의원 | 21 | 20 | 2 | `assembly_member` + `query_assembly` |
-| 4. 의안 | 24 | 23 | 14 | `assembly_bill` + `bill_detail` |
-| 5. 의안 통계 | 7 | 7 | 5 | `assembly_bill(mode=stats)` |
+| 2. 통합 API | 8 | 7 | 6 | `research_data(source=all_integrated)` + ALLBILL |
+| 3. 국회의원 | 21 | 20 | 15 | `assembly_member` (analyze+history+party_stats) |
+| 4. 의안 | 24 | 23 | 20 | `assembly_bill` + `bill_detail` + ALLBILL |
+| 5. 의안 통계 | 7 | 7 | 7 | `assembly_bill(mode=stats)` — 전부 통합 |
 | 6. 본회의 처리안건 | 4 | 4 | 3 | `assembly_session(vote_type=...)` |
-| 7. 회의록 | 21 | 21 | 5 | `assembly_session` + `query_assembly` |
-| 8. 일정 | 13 | 13 | 1 | `assembly_session` + `query_assembly` |
-| 9. 위원회 | 5 | 5 | 2 | `assembly_org` + `committee_detail` |
-| 10. 청원 | 7 | 7 | 3 | `assembly_org` + `petition_detail` |
-| 11. 인사청문/국감 | 6 | 6 | 0 | `query_assembly` (코드 발굴 완료) |
-| 12. 역대 국회 | 11 | 11 | 0 | `query_assembly` (코드 발굴 완료) |
-| 13. 보도자료/뉴스 | 22 | 22 | 0 | `query_assembly` (코드 발굴 완료) |
+| 7. 회의록 | 21 | 21 | 13 | `assembly_session` (소위/예결위/특위/국조/시정연설/토론회 등) |
+| 8. 일정 | 13 | 13 | 2 | `assembly_session` (+ 영문) |
+| 9. 위원회 | 5 | 5 | 4 | `assembly_org` + `committee_detail` (위원명단+개정법률+자료실) |
+| 10. 청원 | 7 | 7 | 6 | `assembly_org` + `petition_detail` (심사+소개의원+통계) |
+| 11. 인사청문/국감 | 6 | 6 | 4 | `assembly_session` (인사청문+국감+국조 결과보고서) |
+| 12. 역대 국회 | 11 | 11 | 11 | `assembly_member(scope=history)` — 전부 통합 |
+| 13. 보도자료/뉴스 | 22 | 22 | 2 | `assembly_org(type=press)` + 영문 |
 | 14. 의회외교 | 8 | 7 | 0 | `query_assembly` (코드 발굴 완료) |
-| 15. 영문 API | 7 | 7 | 0 | `query_assembly` (코드 발굴 완료) |
-| 16. 예산정책처 | 25 | 25 | 1 | `research_data` + `query_assembly` |
-| 17. 입법조사처 | 16 | 16 | 1 | `research_data` + `query_assembly` |
-| 18~23. 기타 | 70 | 69 | 1 | `query_assembly` (코드 발굴 완료) |
-| **합계** | **276** | **271 (98.2%)** | **39** | **100% 접근** |
+| 15. 영문 API | 7 | 7 | 5 | 4개 도구 `lang=en` + 영문 보도자료 |
+| 16. 예산정책처 | 25 | 25 | 4 | `research_data` + `bill_detail(budget)` |
+| 17. 입법조사처 | 16 | 16 | 1 | `research_data` |
+| 18~23. 기타 | 70 | 69 | 3 | `research_data(source=future/publications)` + `query_assembly` |
+| **합계** | **276** | **271 (98.2%)** | **107** | **100% 접근** |
 
 > **핵심**: 271개 API의 코드가 `codes.ts`에 등록되어 `query_assembly`로 **즉시 호출 가능**합니다. 107개는 전용 도구에서 최적화된 인터페이스로 제공됩니다.
 
@@ -337,22 +339,50 @@ Full 프로필은 Lite 6개를 모두 포함하며, 심층 분석용 4개 도구
 | 법률안 제안이유 및 주요내용 | 열린국회정보에서 API 코드 미제공 |
 | 의원연맹별 보조금 예산 | 열린국회정보에서 API 코드 미제공 |
 
-### 발굴된 주요 신규 코드 (기존 도구 확장에 활용 가능)
+### 통합 완료된 주요 API (Tier 1~3, v0.5.0)
 
-| API | 코드 | 기대 효과 | 통합 대상 |
-|-----|------|----------|----------|
-| 의원이력 | `nexgtxtmaamffofof` | 학력/경력 상세 | `assembly_member` |
-| 본회의 표결정보 (의원별) | `nojepdqqaweusdfbi` | 의원별 투표 성향 | `assembly_member` |
-| 상임위 활동 | `nuvypcdgahexhvrjt` | 위원회 활동 분석 | `assembly_member` |
-| 의안별 회의록 목록 | `VCONFBILLCONFLIST` | 법안 논의 추적 | `assembly_bill` |
-| 제안설명서 목록 | `VCONFATTEXPLANLIST` | 의안 원문 보완 | `assembly_bill` |
-| 예결산 심사정보 | `BUDGETJUDGE` | 예산 심사 과정 | `bill_detail` |
-| 국감 결과보고서 | `AUDITREPORTRESULT` | 국정감사 결과 | `assembly_session` |
-| 청원 심사정보 | `PTTJUDGE` | 청원 심사 경과 | `petition_detail` |
-| 청원 소개의원 | `PTTINFOPPSR` | 청원 소개의원 상세 | `petition_detail` |
-| 청원 통계 | `PTTCNTMAIN` | 청원 통계 | `assembly_org` |
-| 역대 의안 통계 | `nzivskufaliivfhpb` | 역대 데이터 | `assembly_bill` |
-| 계류의안 통계 | `BILLCNTRSVT` | 계류 통계 | `assembly_bill` |
+| API | 코드 | 통합 도구 | Tier |
+|-----|------|----------|------|
+| 의원이력 | `nexgtxtmaamffofof` | `assembly_member` (analyze) | 1 |
+| 본회의 표결정보 (의원별) | `nojepdqqaweusdfbi` | `assembly_member` (analyze) | 1 |
+| 상임위 활동 | `nuvypcdgahexhvrjt` | `assembly_member` (analyze) | 1 |
+| 위원회 경력 | `nyzrglyvagmrypezq` | `assembly_member` (analyze) | 1 |
+| 의정보고서 | `nmfcjtvmajsbhhckf` | `assembly_member` (analyze) | 2 |
+| SNS정보 | `negnlnyvatsjwocar` | `assembly_member` (analyze) | 2 |
+| 발언영상 | `npeslxqbanwkimebr` | `assembly_member` (analyze) | 2 |
+| 청원현황 | `NAMEMBERLEGIPTT` | `assembly_member` (analyze) | 2 |
+| 의안별 회의록 | `VCONFBILLCONFLIST` | `assembly_bill` (track) | 1 |
+| 계류의안 통계 | `BILLCNTRSVT` | `assembly_bill` (stats) | 1 |
+| 역대 의안 통계 | `nzivskufaliivfhpb` | `assembly_bill` (stats) | 1 |
+| 위원회 계류법률안 | `ndiwuqmpambgvnfsj` | `assembly_bill` (search) | 2 |
+| 위원회안/대안 | `nxtkyptyaolzcbfwl` | `assembly_bill` (search) | 2 |
+| ALLBILL 심사경과 | `ALLBILL` | `assembly_bill` + `bill_detail` | — |
+| 예결산 심사 | `BUDGETJUDGE` | `bill_detail` | 1 |
+| 예결산 예비심사 | `BUDGETADJUDGE` | `bill_detail` | 1 |
+| 소위원회 회의록 | `VCONFSUBCCONFLIST` | `assembly_session` | 2 |
+| 예결위 회의록 | `VCONFBUDGETCONFLIST` | `assembly_session` | 2 |
+| 특별위 회의록 | `VCONFSPCCONFLIST` | `assembly_session` | 2 |
+| 회의록 상세 | `VCONFDETAIL` | `assembly_session` | 2 |
+| 제안설명서 | `VCONFATTEXPLANLIST` | `assembly_session` | 2 |
+| 국감 결과보고서 | `AUDITREPORTRESULT` | `assembly_session` | 2 |
+| 국정조사 회의록 | `VCONFPIPCONFLIST` | `assembly_session` | 3A |
+| 국정조사 결과보고서 | `INVESTREPORTRESULT` | `assembly_session` | 3A |
+| 시정연설 회의록 | `VCONFSNACONFLIST` | `assembly_session` | 3A |
+| 인사청문회 | `nrvsawtaauyihadij` | `assembly_session` | 3A |
+| 토론회 | `nyioaasianxlkcqxs` | `assembly_session` | 3A |
+| 토론회 결과보고서 | `NABOPBLMDCSNREPORT` | `assembly_session` | 3A |
+| 시정조치 결과보고서 | `VCONFATTATBLIST` | `assembly_session` | 3A |
+| 처리요구 결과보고서 | `AUDITREPORTVISIBILIT` | `assembly_session` | 3A |
+| 역대 의원 인적사항 외 13건 | (13개 코드) | `assembly_member(scope=history)` | 3B |
+| 정당 의석수 | `nepjpxkkabqiqpbvk` | `assembly_member(mode=party_stats)` | 3C |
+| 영문 의원/일정/의안/위원회/보도자료 | 5개 EN* 코드 | 4개 도구 `lang=en` | 3D |
+| 통합API 5건+미래연구원 | 5개 ALL* + 4개 코드 | `research_data` source 확장 | 3E |
+| 보도자료 | `ninnagrlaelvtzfnt` | `assembly_org(type=press)` | 3F |
+| 청원 심사 | `PTTJUDGE` | `petition_detail` | 1 |
+| 청원 소개의원 | `PTTINFOPPSR` | `petition_detail` | 1 |
+| 청원 통계 | `PTTCNTMAIN` | `petition_detail` | 1 |
+| 개정대상 법률 | `CLAWSTATE` | `committee_detail` | 2 |
+| 위원회 자료실 | `nbiwfpqbaipwgkhfr` | `committee_detail` | 2 |
 
 > 발굴 스크립트: `ASSEMBLY_API_KEY=your-key npx tsx scripts/discover-all-codes.ts`
 > 전체 결과: `docs/discovered-all-codes.json`
