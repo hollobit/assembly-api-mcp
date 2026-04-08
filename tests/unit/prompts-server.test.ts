@@ -159,8 +159,8 @@ describe("registerResources", () => {
     const resources = (server as any)._registeredResources;
     const result = await resources["assembly://tools-guide"].readCallback();
     const text = result.contents[0].text;
-    expect(text).toContain("search_members");
-    expect(text).toContain("analyze_legislator");
-    expect(text).toContain("track_legislation");
+    expect(text).toContain("assembly_member");
+    expect(text).toContain("assembly_bill");
+    expect(text).toContain("assembly_session");
   });
 });

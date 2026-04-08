@@ -1434,14 +1434,18 @@ describe("Lite track_legislation", () => {
         { BILL_NO: "2200001", BILL_NAME: "교육법", PROPOSER: "A", PROPOSE_DT: "2024-01" },
         { BILL_NO: "2200002", BILL_NAME: "보건법", PROPOSER: "B", PROPOSE_DT: "2024-02" },
       ], 2),
-      // 교육법 심사이력
+      // 교육법 심사이력 (BILL_REVIEW)
       buildAssemblyResponse("BILLJUDGE", [
         { CMIT_NM: "교육위", PROC_RESULT_CD: "심사중", PROC_DT: "2024-05-01" },
       ], 1),
-      // 보건법 심사이력
+      // 보건법 심사이력 (BILL_REVIEW)
       buildAssemblyResponse("BILLJUDGE", [
         { COMMITTEE: "보건위", PROC_RESULT: "가결", PPSR_DT: "2024-06-01" },
       ], 1),
+      // 교육법 위원회심사 회의정보 (BILL_COMMITTEE_CONF)
+      buildAssemblyResponse("BILLJUDGECONF", [], 0),
+      // 보건법 위원회심사 회의정보 (BILL_COMMITTEE_CONF)
+      buildAssemblyResponse("BILLJUDGECONF", [], 0),
     );
 
     const tools = getRegisteredTools(server);
@@ -1461,8 +1465,8 @@ describe("Lite track_legislation", () => {
     expect(histories["2200002"][0]["PROC_RESULT"]).toBe("가결");
 
     const fetchSpy = globalThis.fetch as ReturnType<typeof vi.fn>;
-    // 1 keyword search + 2 history fetches = 3
-    expect(fetchSpy).toHaveBeenCalledTimes(3);
+    // 1 keyword search + 2 history fetches + 2 committee conf fetches = 5
+    expect(fetchSpy).toHaveBeenCalledTimes(5);
   });
 
   it("빈 키워드 → 키워드를 입력해 주세요", async () => {

@@ -45,7 +45,7 @@ function getRegisteredPrompts(
 // ---------------------------------------------------------------------------
 
 describe("buildMcpServer (프로필 분기)", () => {
-  it("Lite 프로필: 9개 도구를 등록한다", async () => {
+  it("Lite 프로필: 6개 도구를 등록한다", async () => {
     const { createServer } = await import("../../src/server.js");
 
     // createServer는 transport를 시작하므로 직접 호출 대신
@@ -184,15 +184,12 @@ describe("createServer (HTTP 통합)", () => {
     // mcpServer 자체에서 HTTP 서버 접근은 어려우므로
     // 등록된 도구 수로 buildMcpServer 동작을 검증
     const tools = getRegisteredTools(mcpServer);
-    // Lite 프로필: 9개 도구
-    expect(Object.keys(tools)).toHaveLength(9);
-    expect(tools["search_members"]).toBeDefined();
-    expect(tools["search_bills"]).toBeDefined();
-    expect(tools["get_schedule"]).toBeDefined();
-    expect(tools["search_meetings"]).toBeDefined();
-    expect(tools["get_votes"]).toBeDefined();
-    expect(tools["analyze_legislator"]).toBeDefined();
-    expect(tools["track_legislation"]).toBeDefined();
+    // Lite 프로필: 6개 도구
+    expect(Object.keys(tools)).toHaveLength(6);
+    expect(tools["assembly_member"]).toBeDefined();
+    expect(tools["assembly_bill"]).toBeDefined();
+    expect(tools["assembly_session"]).toBeDefined();
+    expect(tools["assembly_org"]).toBeDefined();
     expect(tools["discover_apis"]).toBeDefined();
     expect(tools["query_assembly"]).toBeDefined();
 
@@ -205,7 +202,7 @@ describe("createServer (HTTP 통합)", () => {
     expect(Object.keys(prompts)).toHaveLength(3);
   });
 
-  it("Full 프로필로 28개 도구를 등록한다", async () => {
+  it("Full 프로필로 10개 도구를 등록한다", async () => {
     const { createServer } = await import("../../src/server.js");
     const config = createTestConfig({
       server: { transport: "http", port: 0, logLevel: "info" },
@@ -215,21 +212,19 @@ describe("createServer (HTTP 통합)", () => {
     const mcpServer = await createServer(config);
     const tools = getRegisteredTools(mcpServer);
 
-    // Full 프로필: Lite 9개 + Full 전용 8개 = 17개 도구
-    // Lite: search_members, search_bills, get_schedule, search_meetings, get_votes,
-    //        analyze_legislator, track_legislation, discover_apis, query_assembly
-    // Full: get_bill_detail, get_bill_review, get_bill_history, get_committees,
-    //       search_petitions, get_legislation_notices, search_library,
-    //       get_budget_analysis, search_research_reports
-    expect(Object.keys(tools)).toHaveLength(18);
+    // Full 프로필: Lite 6개 + Full 전용 4개 = 10개 도구
+    // Lite: assembly_member, assembly_bill, assembly_session, assembly_org,
+    //        discover_apis, query_assembly
+    // Full: bill_detail, committee_detail, petition_detail, research_data
+    expect(Object.keys(tools)).toHaveLength(10);
     // Lite 도구 확인
-    expect(tools["search_members"]).toBeDefined();
-    expect(tools["search_bills"]).toBeDefined();
-    expect(tools["analyze_legislator"]).toBeDefined();
+    expect(tools["assembly_member"]).toBeDefined();
+    expect(tools["assembly_bill"]).toBeDefined();
+    expect(tools["assembly_org"]).toBeDefined();
     // Full 전용 도구 확인
-    expect(tools["get_bill_detail"]).toBeDefined();
-    expect(tools["get_committees"]).toBeDefined();
-    expect(tools["search_petitions"]).toBeDefined();
+    expect(tools["bill_detail"]).toBeDefined();
+    expect(tools["committee_detail"]).toBeDefined();
+    expect(tools["petition_detail"]).toBeDefined();
   });
 });
 

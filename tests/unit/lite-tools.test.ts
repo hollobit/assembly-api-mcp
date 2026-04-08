@@ -71,7 +71,7 @@ describe("Lite 도구 모듈 import", () => {
 });
 
 describe("Lite 도구 등록 검증", () => {
-  it("registerLiteTools는 server.tool을 9번 호출한다", async () => {
+  it("registerLiteTools는 server.tool을 6번 호출한다", async () => {
     const { registerLiteTools } = await import("../../src/tools/lite/index.js");
 
     const toolCalls: string[] = [];
@@ -91,14 +91,11 @@ describe("Lite 도구 등록 검증", () => {
 
     registerLiteTools(mockServer as any, mockConfig);
 
-    expect(toolCalls).toHaveLength(9);
-    expect(toolCalls).toContain("search_members");
-    expect(toolCalls).toContain("search_bills");
-    expect(toolCalls).toContain("get_schedule");
-    expect(toolCalls).toContain("search_meetings");
-    expect(toolCalls).toContain("get_votes");
-    expect(toolCalls).toContain("analyze_legislator");
-    expect(toolCalls).toContain("track_legislation");
+    expect(toolCalls).toHaveLength(6);
+    expect(toolCalls).toContain("assembly_member");
+    expect(toolCalls).toContain("assembly_bill");
+    expect(toolCalls).toContain("assembly_session");
+    expect(toolCalls).toContain("assembly_org");
     expect(toolCalls).toContain("discover_apis");
     expect(toolCalls).toContain("query_assembly");
   });
