@@ -237,9 +237,9 @@ async function handleDetail(
     );
     if (proposerResult.rows.length > 0) {
       const proposers = proposerResult.rows.map((r) => ({
-        이름: r.HG_NM ?? r.RST_PROPOSER,
-        정당: r.POLY_NM,
-        선거구: r.ORIG_NM,
+        이름: r.PPSR_NM ?? r.HG_NM ?? "",
+        정당: r.PPSR_POLY_NM ?? r.POLY_NM ?? "",
+        대표구분: r.REP_DIV ?? "",
       }));
       (detail as Record<string, unknown>)["공동발의자"] = proposers.slice(0, MAX_CO_PROPOSERS);
       (detail as Record<string, unknown>)["공동발의자_총수"] = proposerResult.totalCount;

@@ -69,25 +69,34 @@ async function handleCommittee(
     );
     const grouped = new Map<string, Record<string, unknown>[]>();
     for (const m of membersResult.rows) {
-      const name = String(m.HR_DEPT_NM ?? "");
+      const name = String(m.DEPT_NM ?? m.HR_DEPT_NM ?? "");
       const existing = grouped.get(name) ?? [];
-      grouped.set(name, [...existing, { 이름: m.HG_NM, 정당: m.POLY_NM, 직책: m.JOB_RES_NM }]);
+      grouped.set(name, [...existing, {
+        이름: m.HG_NM, 정당: m.POLY_NM, 선거구: m.ORIG_NM,
+        직위: m.JOB_RES_NM, 의원코드: m.MONA_CD,
+      }]);
     }
     membersMap = grouped;
   }
 
   const formatted = rows.map((row) => {
+    const cmtName = String(row.COMMITTEE_NAME ?? "");
+    const members = membersMap.get(cmtName) ?? [];
+    // 위원장 정당 정보: 위원 명단에서 위원장 이름 매칭
+    const chairName = String(row.HG_NM ?? "");
+    const chairMember = members.find((m) => m["이름"] === chairName);
+    const chairDisplay = chairMember
+      ? `${chairName} (${chairMember["정당"] ?? ""})`
+      : chairName;
     const base: Record<string, unknown> = {
-      위원회명: row.COMMITTEE_NAME,
+      위원회명: cmtName,
       위원회구분: row.CMT_DIV_NM,
-      위원장: row.HG_NM,
+      위원장: chairDisplay,
       간사: row.HG_NM_LIST,
       현원: row.CURR_CNT,
       정원: row.LIMIT_CNT,
     };
-    const cmtName = String(row.COMMITTEE_NAME ?? "");
-    const members = membersMap.get(cmtName);
-    if (members && members.length > 0) {
+    if (members.length > 0) {
       return { ...base, 위원목록: members };
     }
     return base;

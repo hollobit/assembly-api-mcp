@@ -175,10 +175,11 @@ async function fetchProposers(
   });
 
   return result.rows.map((row) => ({
-    이름: row.HG_NM ?? row.RST_PROPOSER,
-    정당: row.POLY_NM,
-    선거구: row.ORIG_NM,
-    의원코드: row.MONA_CD,
+    이름: row.PPSR_NM ?? row.HG_NM ?? "",
+    정당: row.PPSR_POLY_NM ?? row.POLY_NM ?? "",
+    대표구분: row.REP_DIV ?? "",
+    역할: row.PPSR_ROLE ?? "",
+    의원코드: row.NASS_CD ?? row.MONA_CD ?? "",
   }));
 }
 
