@@ -212,6 +212,17 @@ BILL_NO 1회 호출로 의안 전체 심사경과(소관위→법사위→본회
 | 19.1 | assembly_bill 상세 모드에 ALLBILL 통합 | bill_id 조회 시 ALLBILL로 심사경과 자동 포함 | - | cc:完了 |
 | 19.2 | bill_detail(Full)에 ALLBILL 통합 | fields에 lifecycle 추가, 소관위→법사위→본회의→공포 타임라인 | 19.1 | cc:完了 |
 
+### Phase 20: API 커버율 확장 Tier 3A~3F (36건, 도구 수 변경 없음)
+
+| Task | 내용 | DoD | Depends | Status |
+|------|------|-----|---------|--------|
+| 20.1 | 3A 국정감시 8건 → assembly_session에 meeting_type 확장 | 국정조사/시정연설/인사청문/토론회 + 보고서 자동 포함 | - | cc:完了 |
+| 20.2 | 3B 역대국회 13건 → assembly_member에 scope=history 추가 | 역대 의원/선거/의장 데이터 13개 API 조회 | - | cc:完了 |
+| 20.3 | 3C 정당 1건 → assembly_member에 mode=party_stats 추가 | 정당별 의석수 반환 | - | cc:完了 |
+| 20.4 | 3D 영문 6건 → 4개 도구에 lang=en 추가 | 영문 의원/일정/의안/위원회 API 라우팅 | - | cc:完了 |
+| 20.5 | 3E 통합API 5건+미래연구원 → research_data source 확장 | publications/future/all_integrated 추가 | - | cc:完了 |
+| 20.6 | 3F 보도자료 2건 → assembly_org type=press 추가 | 보도자료 검색 + 영문 보도자료 | - | cc:完了 |
+
 ---
 
 ## 현재 프로젝트 수치

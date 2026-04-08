@@ -114,6 +114,42 @@ function buildQueryParams(
 }
 
 // ---------------------------------------------------------------------------
+// Historical API codes (역대국회)
+// ---------------------------------------------------------------------------
+
+const HISTORY_API_CODES = {
+  /** 역대 의원 인적사항 (main search) */
+  MEMBER_PROFILE: "npffdutiapkzbfyvr",
+  /** 역대 의원 현황 */
+  MEMBER_STATUS: "nprlapfmaufmqytet",
+  /** 역대 의원 이력 */
+  MEMBER_CAREER: "nfzegpkvaclgtscxt",
+  /** 역대 위원회 경력 */
+  COMMITTEE_CAREER: "nqbeopthavwwfbekw",
+  /** 역대 재선 현황 */
+  REELECTION_STATUS: "ngdeoqgoablceakpp",
+  /** 역대 여성 의원 현황 */
+  WOMEN_MEMBERS: "nmkjkjpwaxfhwdnjl",
+  /** 역대 선거일/정수/임기 */
+  ELECTION_INFO: "nokivirranikoinnk",
+  /** 역대 정당별 지역분포 */
+  PARTY_REGION: "nvarpwrqaklzxcmmp",
+  /** 역대 정당별 선거결과 */
+  PARTY_ELECTION_RESULT: "nedjqrnlavrvcycue",
+  /** 역대 의장단 정보 */
+  SPEAKER_INFO: "nubbgpxmawmzkclkc",
+  /** 국회의장 주요일정 */
+  SPEAKER_SCHEDULE: "nhedurlwawoquyxwn",
+  /** 의장단 주요일정 */
+  SPEAKER_GROUP_SCHEDULE: "SPGRPSCHEDULE",
+  /** 의장단 보도자료 */
+  SPEAKER_GROUP_PRESS: "SPGRPPRESS",
+} as const;
+
+/** 정당 및 교섭단체 의석수 현황 */
+const PARTY_STATS_API = "nepjpxkkabqiqpbvk";
+
+// ---------------------------------------------------------------------------
 // Registration
 // ---------------------------------------------------------------------------
 
@@ -124,24 +160,44 @@ export function registerAssemblyMemberTool(
 
   server.tool(
     "assembly_member",
-    "국회의원을 검색하고 의정활동을 분석합니다. 이름·정당·선거구·위원회로 검색, 1명이면 자동 상세 반환. analyze=true면 발의법안+표결 종합분석.",
+    "국회의원을 검색하고 의정활동을 분석합니다. 이름·정당·선거구·위원회로 검색, 1명이면 자동 상세 반환. analyze=true면 발의법안+표결 종합분석. scope='history'면 역대국회 데이터 조회. mode='party_stats'면 정당별 의석수 현황.",
     {
       name: z.string().optional().describe("의원 이름 (부분 일치 검색)"),
       party: z.string().optional().describe("정당명"),
       district: z.string().optional().describe("선거구명"),
       committee: z.string().optional().describe("소속위원회명 (부분 일치)"),
       analyze: z.boolean().optional().describe("true면 발의법안+표결 종합분석 포함 (기본: false)"),
+      lang: z.enum(["en"]).optional().describe("언어: en이면 영문 API 사용 (검색 모드만 지원)"),
       age: z.number().optional().describe(`대수 (기본: ${CURRENT_AGE} = 제${CURRENT_AGE}대 국회)`),
       page: z.number().optional().describe("페이지 번호 (기본: 1)"),
       page_size: z.number().optional().describe("페이지 크기 (기본: 20, 최대: 100)"),
+      scope: z.enum(["current", "history"]).optional().describe("current=현재 국회(기본), history=역대국회 데이터 조회"),
+      mode: z.enum(["party_stats"]).optional().describe("party_stats=정당 및 교섭단체 의석수 현황 조회"),
     },
     async (params, extra) => {
       try {
+        // ----- mode: party_stats → 정당별 의석수 현황 조회 후 즉시 반환 -----
+        if (params.mode === "party_stats") {
+          const partyResult = await api.fetchOpenAssembly(PARTY_STATS_API, {
+            ...(params.age ? { AGE: params.age } : {}),
+          });
+          return { content: [{ type: "text" as const, text: JSON.stringify({
+            mode: "party_stats", items: partyResult.rows,
+          }) }] };
+        }
+
         const age = params.age ?? CURRENT_AGE;
         const shouldAnalyze = params.analyze ?? false;
+        const isHistory = params.scope === "history";
         const queryParams = buildQueryParams(params, config.apiResponse.maxPageSize);
 
-        const memberResult = await api.fetchOpenAssembly(API_CODES.MEMBER_INFO, queryParams);
+        // scope/lang에 따라 다른 API 사용
+        const searchApiCode = params.lang === "en"
+          ? "ENNAMEMBER"
+          : isHistory
+            ? HISTORY_API_CODES.MEMBER_PROFILE
+            : API_CODES.MEMBER_INFO;
+        const memberResult = await api.fetchOpenAssembly(searchApiCode, queryParams);
         let rows = memberResult.rows;
 
         // 소속위원회 클라이언트 측 필터링 (API가 서버 측 필터 미지원)
@@ -203,6 +259,52 @@ export function registerAssemblyMemberTool(
             }).catch(() => ({ rows: [] as readonly Record<string, unknown>[], totalCount: 0 })),
           ]);
 
+          // ----- 역대국회 추가 API 호출 (scope=history) -----
+          let historyData: Record<string, readonly Record<string, unknown>[]> | undefined;
+          if (isHistory) {
+            const hq: Record<string, string | number> = {};
+            if (memberName) hq.HG_NM = memberName;
+            if (age) hq.AGE = age;
+
+            const emptyResult = { rows: [] as readonly Record<string, unknown>[], totalCount: 0 };
+            const [
+              hStatusResult, hCareerResult, hCommCareerResult, hReelectionResult,
+              hWomenResult, hElectionResult, hPartyRegionResult, hPartyElectionResult,
+              hSpeakerResult, hSpeakerScheduleResult, hGroupScheduleResult, hGroupPressResult,
+            ] = await Promise.allSettled([
+              api.fetchOpenAssembly(HISTORY_API_CODES.MEMBER_STATUS, hq).catch(() => emptyResult),
+              api.fetchOpenAssembly(HISTORY_API_CODES.MEMBER_CAREER, hq).catch(() => emptyResult),
+              api.fetchOpenAssembly(HISTORY_API_CODES.COMMITTEE_CAREER, hq).catch(() => emptyResult),
+              api.fetchOpenAssembly(HISTORY_API_CODES.REELECTION_STATUS, hq).catch(() => emptyResult),
+              api.fetchOpenAssembly(HISTORY_API_CODES.WOMEN_MEMBERS, hq).catch(() => emptyResult),
+              api.fetchOpenAssembly(HISTORY_API_CODES.ELECTION_INFO, hq).catch(() => emptyResult),
+              api.fetchOpenAssembly(HISTORY_API_CODES.PARTY_REGION, hq).catch(() => emptyResult),
+              api.fetchOpenAssembly(HISTORY_API_CODES.PARTY_ELECTION_RESULT, hq).catch(() => emptyResult),
+              api.fetchOpenAssembly(HISTORY_API_CODES.SPEAKER_INFO, hq).catch(() => emptyResult),
+              api.fetchOpenAssembly(HISTORY_API_CODES.SPEAKER_SCHEDULE, hq).catch(() => emptyResult),
+              api.fetchOpenAssembly(HISTORY_API_CODES.SPEAKER_GROUP_SCHEDULE, hq).catch(() => emptyResult),
+              api.fetchOpenAssembly(HISTORY_API_CODES.SPEAKER_GROUP_PRESS, hq).catch(() => emptyResult),
+            ]);
+
+            const extractRows = (r: PromiseSettledResult<{ rows: readonly Record<string, unknown>[] }>) =>
+              r.status === "fulfilled" ? r.value.rows : [];
+
+            historyData = {
+              member_status: extractRows(hStatusResult),
+              member_career: extractRows(hCareerResult),
+              committee_career: extractRows(hCommCareerResult),
+              reelection_status: extractRows(hReelectionResult),
+              women_members: extractRows(hWomenResult),
+              election_info: extractRows(hElectionResult),
+              party_region: extractRows(hPartyRegionResult),
+              party_election_result: extractRows(hPartyElectionResult),
+              speaker_info: extractRows(hSpeakerResult),
+              speaker_schedule: extractRows(hSpeakerScheduleResult),
+              speaker_group_schedule: extractRows(hGroupScheduleResult),
+              speaker_group_press: extractRows(hGroupPressResult),
+            };
+          }
+
           await sendProgress(extra, 3, 3, "종합 분석 완료");
 
           const billsData = billsResult.status === "fulfilled" ? billsResult.value : { rows: [], totalCount: 0 };
@@ -246,6 +348,9 @@ export function registerAssemblyMemberTool(
           }
           if (petitionsData.rows.length > 0) {
             response.petitions = petitionsData.rows;
+          }
+          if (historyData) {
+            response.history = historyData;
           }
 
           return { content: [{ type: "text" as const, text: JSON.stringify(response) }] };

@@ -67,7 +67,7 @@ function detectType(params: {
 
 async function handleSchedule(
   api: ApiClient,
-  params: { date_from?: string; date_to?: string; keyword?: string; committee?: string; page?: number; page_size?: number },
+  params: { date_from?: string; date_to?: string; keyword?: string; committee?: string; lang?: string; page?: number; page_size?: number },
   config: AppConfig,
 ): Promise<Record<string, unknown>[]> {
   const q: Record<string, string | number> = {};
@@ -82,7 +82,8 @@ async function handleSchedule(
     ? Math.min(params.page_size ?? 100, config.apiResponse.maxPageSize)
     : Math.min(defaultSize, config.apiResponse.maxPageSize);
 
-  const result = await api.fetchOpenAssembly(API_CODES.SCHEDULE_ALL, q);
+  const scheduleApiCode = params.lang === "en" ? "ENSCHEDULENOTICE" : API_CODES.SCHEDULE_ALL;
+  const result = await api.fetchOpenAssembly(scheduleApiCode, q);
   let rows = result.rows;
   if (hasRange) {
     rows = rows.filter((r) => {
@@ -130,7 +131,7 @@ async function handleMeeting(
 
   const confDateYear = params.date_from?.slice(0, 4);
   const currentYear = String(new Date().getFullYear());
-  const usesConfDate = !["국정감사", "인사청문회", "공청회", "소위원회", "예결위", "특별위"].includes(params.meeting_type ?? "");
+  const usesConfDate = !["국정감사", "인사청문회", "공청회", "소위원회", "예결위", "특별위", "국정조사", "시정연설", "인사청문", "토론회"].includes(params.meeting_type ?? "");
   const q: Record<string, string | number> = {};
   if (params.page) q.pIndex = params.page;
   q.pSize = Math.min(params.page_size ?? config.apiResponse.defaultPageSize, config.apiResponse.maxPageSize);
@@ -167,6 +168,22 @@ async function handleMeeting(
     case "특별위":
       apiCode = "VCONFSPCCONFLIST";
       q.ERACO = `제${age}대`;
+      break;
+    case "국정조사":
+      apiCode = "VCONFPIPCONFLIST";
+      q.ERACO = `제${age}대`;
+      break;
+    case "시정연설":
+      apiCode = "VCONFSNACONFLIST";
+      q.ERACO = `제${age}대`;
+      break;
+    case "인사청문":
+      apiCode = "nrvsawtaauyihadij";
+      q.pSize = Math.min(params.page_size ?? config.apiResponse.defaultPageSize, config.apiResponse.maxPageSize);
+      break;
+    case "토론회":
+      apiCode = "nyioaasianxlkcqxs";
+      q.pSize = Math.min(params.page_size ?? config.apiResponse.defaultPageSize, config.apiResponse.maxPageSize);
       break;
     default: // 위원회
       apiCode = API_CODES.MEETING_COMMITTEE;
@@ -218,6 +235,32 @@ async function handleMeeting(
       api.fetchOpenAssembly("AUDITREPORTRESULT", { ERACO: `제${age}대` })
         .then((r) => { if (r.rows.length > 0) extras.audit_reports = r.rows; })
         .catch(() => { /* 국감 결과보고서 조회 실패 무시 */ }),
+    );
+    extraFetches.push(
+      api.fetchOpenAssembly("VCONFATTATBLIST", { ERACO: `제${age}대` })
+        .then((r) => { if (r.rows.length > 0) extras.correction_reports = r.rows; })
+        .catch(() => { /* 시정조치 결과보고서 조회 실패 무시 */ }),
+    );
+    extraFetches.push(
+      api.fetchOpenAssembly("AUDITREPORTVISIBILIT", { ERACO: `제${age}대` })
+        .then((r) => { if (r.rows.length > 0) extras.requirement_reports = r.rows; })
+        .catch(() => { /* 시정/처리 요구 결과보고서 조회 실패 무시 */ }),
+    );
+  }
+
+  if (params.meeting_type === "국정조사") {
+    extraFetches.push(
+      api.fetchOpenAssembly("INVESTREPORTRESULT", { ERACO: `제${age}대` })
+        .then((r) => { if (r.rows.length > 0) extras.investigation_reports = r.rows; })
+        .catch(() => { /* 국정조사 결과보고서 조회 실패 무시 */ }),
+    );
+  }
+
+  if (params.meeting_type === "토론회") {
+    extraFetches.push(
+      api.fetchOpenAssembly("NABOPBLMDCSNREPORT", { pSize: q.pSize })
+        .then((r) => { if (r.rows.length > 0) extras.discussion_reports = r.rows; })
+        .catch(() => { /* 토론회 결과보고서 조회 실패 무시 */ }),
     );
   }
 
@@ -280,7 +323,7 @@ export function registerAssemblySessionTool(server: McpServer, config: AppConfig
         .describe("시작 날짜 (YYYY-MM-DD) 또는 연도 (YYYY). schedule: 날짜 필터, meeting: 연도 필터"),
       date_to: z.string().optional()
         .describe("종료 날짜 (YYYY-MM-DD). schedule 모드에서 범위 검색 시 사용"),
-      meeting_type: z.enum(["본회의", "위원회", "소위원회", "국정감사", "인사청문회", "공청회", "예결위", "특별위"]).optional()
+      meeting_type: z.enum(["본회의", "위원회", "소위원회", "국정감사", "인사청문회", "공청회", "예결위", "특별위", "국정조사", "시정연설", "인사청문", "토론회"]).optional()
         .describe("회의 종류 (meeting 모드)"),
       conf_id: z.string().optional().describe("회의록 ID (meeting 모드: 상세 조회)"),
       include_explanations: z.boolean().optional().describe("제안설명서 목록 포함 여부 (meeting 모드, 기본: false)"),
@@ -290,6 +333,7 @@ export function registerAssemblySessionTool(server: McpServer, config: AppConfig
       bill_id: z.string().optional().describe("의안 ID (vote 모드: 의원별 표결 상세)"),
       vote_type: z.enum(["법률안", "예산안", "결산", "기타"]).optional()
         .describe("본회의 처리안건 유형 (vote 모드)"),
+      lang: z.enum(["en"]).optional().describe("언어: en이면 영문 API 사용 (schedule 모드만 지원)"),
       age: z.number().optional().describe(`대수 (기본: ${CURRENT_AGE} = 제${CURRENT_AGE}대 국회)`),
       page: z.number().optional().describe("페이지 번호 (기본: 1)"),
       page_size: z.number().optional().describe("페이지 크기 (기본: 20, 최대: 100)"),

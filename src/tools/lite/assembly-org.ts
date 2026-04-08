@@ -15,7 +15,7 @@ import { formatToolError } from "../helpers.js";
 // Type detection
 // ---------------------------------------------------------------------------
 
-type OrgType = "committee" | "petition" | "legislation_notice";
+type OrgType = "committee" | "petition" | "legislation_notice" | "press";
 
 interface OrgParams {
   readonly type?: OrgType;
@@ -24,6 +24,7 @@ interface OrgParams {
   readonly petition_id?: string;
   readonly petition_status?: "pending" | "processed" | "all";
   readonly bill_name?: string;
+  readonly lang?: string;
   readonly age?: number;
   readonly page?: number;
   readonly page_size?: number;
@@ -31,6 +32,7 @@ interface OrgParams {
 
 function detectType(params: OrgParams): OrgType {
   if (params.type) return params.type;
+  if (params.lang === "en") return "press";
   if (params.committee_name) return "committee";
   if (params.petition_id) return "petition";
   if (params.bill_name && !params.committee_name) return "legislation_notice";
@@ -50,7 +52,8 @@ async function handleCommittee(
   if (params.page) queryParams.pIndex = params.page;
   if (params.page_size) queryParams.pSize = Math.min(params.page_size, maxPageSize);
 
-  const result = await api.fetchOpenAssembly(API_CODES.COMMITTEE_INFO, queryParams);
+  const committeeApiCode = params.lang === "en" ? "ENCMITINFO" : API_CODES.COMMITTEE_INFO;
+  const result = await api.fetchOpenAssembly(committeeApiCode, queryParams);
   let rows = result.rows;
 
   if (params.committee_name) {
@@ -194,6 +197,33 @@ async function handleLegislation(
 }
 
 // ---------------------------------------------------------------------------
+// Press handler
+// ---------------------------------------------------------------------------
+
+async function handlePress(
+  params: OrgParams,
+  api: ReturnType<typeof createApiClient>,
+  maxPageSize: number,
+) {
+  const queryParams: Record<string, string | number> = {};
+  if (params.page) queryParams.pIndex = params.page;
+  queryParams.pSize = Math.min(params.page_size ?? 20, maxPageSize);
+
+  const apiCode = params.lang === "en" ? "ENPRESS" : "ninnagrlaelvtzfnt";
+
+  const result = await api.fetchOpenAssembly(apiCode, queryParams);
+
+  const formatted = result.rows.map((row) => ({
+    제목: row.TITLE ?? row.SUBJECT,
+    등록일: row.REG_DATE ?? row.WRITE_DATE,
+    내용미리보기: row.CONTENT ? String(row.CONTENT).slice(0, 200) : undefined,
+    링크: row.LINK_URL ?? row.URL,
+  }));
+
+  return { total: formatted.length, items: formatted };
+}
+
+// ---------------------------------------------------------------------------
 // Registration
 // ---------------------------------------------------------------------------
 
@@ -205,9 +235,9 @@ export function registerAssemblyOrgTool(
 
   server.tool(
     "assembly_org",
-    "위원회·청원·입법예고를 조회합니다. type=committee로 위원회, petition으로 청원, legislation_notice로 입법예고.",
+    "위원회·청원·입법예고·보도자료를 조회합니다. type=committee로 위원회, petition으로 청원, legislation_notice로 입법예고, press로 보도자료.",
     {
-      type: z.enum(["committee", "petition", "legislation_notice"]).optional()
+      type: z.enum(["committee", "petition", "legislation_notice", "press"]).optional()
         .describe("조회 유형. 미지정 시 파라미터로 자동 감지"),
       committee_name: z.string().optional()
         .describe("위원회명 (부분 일치). 지정 시 type=committee 자동 설정"),
@@ -219,6 +249,8 @@ export function registerAssemblyOrgTool(
         .describe("청원 상태 필터 (기본: pending)"),
       bill_name: z.string().optional()
         .describe("입법예고 법안명 검색 (부분 일치)"),
+      lang: z.enum(["en"]).optional()
+        .describe("언어: en이면 영문 API 사용 (committee/press 모드 지원)"),
       age: z.number().optional().describe("대수 (예: 22)"),
       page: z.number().optional().describe("페이지 번호 (기본: 1)"),
       page_size: z.number().optional().describe("페이지 크기 (기본: 20, 최대: 100)"),
@@ -239,6 +271,9 @@ export function registerAssemblyOrgTool(
             break;
           case "legislation_notice":
             data = await handleLegislation(params, api, maxPageSize);
+            break;
+          case "press":
+            data = await handlePress(params, api, maxPageSize);
             break;
         }
 

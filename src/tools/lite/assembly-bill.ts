@@ -293,6 +293,7 @@ async function handleSearch(
     readonly page?: number;
     readonly page_size?: number;
     readonly bill_type?: string;
+    readonly lang?: string;
   },
   maxPageSize: number,
 ): Promise<{ content: { type: "text"; text: string }[] }> {
@@ -334,7 +335,11 @@ async function handleSearch(
     };
   }
 
-  const { apiCode, queryParams } = buildSearchQuery(params, maxPageSize);
+  const { apiCode: baseApiCode, queryParams } = buildSearchQuery(params, maxPageSize);
+  // lang="en" + status="recent" → 영문 최신 처리 의안 API
+  const apiCode = (params.lang === "en" && (params.status ?? "all") === "recent")
+    ? "ENBCONFBILL"
+    : baseApiCode;
   const result = await api.fetchOpenAssembly(apiCode, queryParams);
   const formatted = result.rows.map(formatSearchRow);
 
@@ -626,6 +631,10 @@ export function registerAssemblyBillTool(
         .boolean()
         .optional()
         .describe("심사 이력 포함 여부 (track 모드, 기본: false)"),
+      lang: z
+        .enum(["en"])
+        .optional()
+        .describe("언어: en이면 영문 API 사용 (status=recent 검색 모드만 지원)"),
       age: z
         .number()
         .optional()
@@ -682,6 +691,7 @@ export function registerAssemblyBillTool(
                 page: params.page,
                 page_size: params.page_size,
                 bill_type: params.bill_type,
+                lang: params.lang,
               },
               config.apiResponse.maxPageSize,
             );
