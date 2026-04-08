@@ -75,9 +75,12 @@ async function handleSchedule(
   if (params.date_from && !hasRange) q.SCH_DT = params.date_from;
   if (params.committee) q.CMIT_NM = params.committee;
   if (params.page) q.pIndex = params.page;
+  // 클라이언트 필터(committee/keyword) 적용 시 충분한 건수 확보
+  const needsClientFilter = !!(params.committee || params.keyword);
+  const defaultSize = needsClientFilter ? 100 : (params.page_size ?? config.apiResponse.defaultPageSize);
   q.pSize = hasRange
     ? Math.min(params.page_size ?? 100, config.apiResponse.maxPageSize)
-    : Math.min(params.page_size ?? config.apiResponse.defaultPageSize, config.apiResponse.maxPageSize);
+    : Math.min(defaultSize, config.apiResponse.maxPageSize);
 
   const result = await api.fetchOpenAssembly(API_CODES.SCHEDULE_ALL, q);
   let rows = result.rows;
@@ -87,9 +90,23 @@ async function handleSchedule(
       return dt >= params.date_from! && dt <= params.date_to!;
     });
   }
+  // 위원회 클라이언트 필터 (API가 CMIT_NM 파라미터를 무시하므로)
+  if (params.committee) {
+    const cmtKw = params.committee.toLowerCase();
+    rows = rows.filter((r) => {
+      const cmit = String(r.CMIT_NM ?? "").toLowerCase();
+      const content = String(r.SCH_CN ?? "").toLowerCase();
+      return cmit.includes(cmtKw) || content.includes(cmtKw);
+    });
+  }
   if (params.keyword) {
     const kw = params.keyword.toLowerCase();
-    rows = rows.filter((r) => String(r.SCH_CN ?? "").toLowerCase().includes(kw));
+    rows = rows.filter((r) => {
+      const cn = String(r.SCH_CN ?? "").toLowerCase();
+      const kind = String(r.SCH_KIND ?? "").toLowerCase();
+      const cmit = String(r.CMIT_NM ?? "").toLowerCase();
+      return cn.includes(kw) || kind.includes(kw) || cmit.includes(kw);
+    });
   }
   return rows.map(formatScheduleRow);
 }
