@@ -6,12 +6,25 @@ Claude, Gemini, ChatGPT 등 AI 도구에서 국회의원, 의안, 일정, 회의
 
 ***국가 AI 전환(AX)은 AI 챗봇쓴다고 되지 않죠. 국민들의 일상이 AI로 편리해져야 그것이 진정한 네이티브 AI 시대겠죠***
 
-## v0.4.0 업데이트 안내
+## v0.5.0 업데이트 안내
 
-> **Breaking Change**: Lite/Full 도구명이 변경되었습니다.
+### v0.5.0 — API 커버율 대폭 확장 (2026-04-09)
 
-| v0.3 (이전) | v0.4 (현재) |
-|------------|------------|
+- **271개 API 코드 일괄 발굴** (98.2%) — 자동 발굴 스크립트로 276개 중 271개 코드 확인
+- **107개 API 전용 도구 통합** (39% 커버율) — Tier 1~3 단계적 통합 완료
+- **ALLBILL 의안정보 통합 API** — 의안 심사경과(소관위→법사위→본회의→공포) 자동 포함
+- **역대 국회 데이터** — `assembly_member(scope="history")`로 역대 의원/선거/의장 13개 API 접근
+- **국정감시 확장** — 국정조사/시정연설/인사청문/토론회 회의록 + 결과보고서
+- **영문 API 지원** — 4개 도구에 `lang="en"` 파라미터로 영문 데이터 접근
+- **보도자료/연구자료 확장** — `assembly_org(type="press")`, `research_data(source="future")`
+- **정당 의석수 통계** — `assembly_member(mode="party_stats")`
+
+> 도구 수 변경 없음 (Lite 6개 / Full 10개). 기존 사용자 영향 없음.
+
+### v0.4.0 — 도구 구조 대규모 통합 (Breaking Change)
+
+| v0.3 (이전) | v0.4+ (현재) |
+|------------|-------------|
 | `search_members` + `analyze_legislator` | **`assembly_member`** |
 | `search_bills` + `track_legislation` | **`assembly_bill`** |
 | `get_schedule` + `search_meetings` + `get_votes` | **`assembly_session`** |
@@ -19,20 +32,20 @@ Claude, Gemini, ChatGPT 등 AI 도구에서 국회의원, 의안, 일정, 회의
 | `get_bill_detail` + `get_bill_review` + `get_bill_history` + `get_bill_proposers` | **`bill_detail`** (Full) |
 | `search_library` + `search_research_reports` + `get_budget_analysis` | **`research_data`** (Full) |
 
-**영향**: 원격 서버(fly.dev) 사용자는 Claude Desktop 재시작만으로 자동 반영됩니다. REST API(`/api/*`)와 ChatGPT GPTs는 변경 없음.
-
 자세한 도구 매핑은 [docs/tool-mapping.md](docs/tool-mapping.md)를 참조하세요.
 
 ## 주요 기능
 
 - **6개 Lite / 10개 Full 프로필 도구** — 도메인 엔티티 기반 통합 ([활용 사례 100선](USECASE.md))
 - **276개 국회 API 100% 접근** — `discover_apis` + `query_assembly` 범용 도구
-- **271개 API 코드 발굴 (98.2%)** — 276개 중 271개 코드 확인, `query_assembly`로 즉시 호출
+- **271개 API 코드 발굴 (98.2%)** — 107개 전용 도구 통합, 나머지 `query_assembly`로 즉시 호출
+- **영문 API 지원** — `lang="en"` 파라미터로 의원/일정/의안/위원회 영문 데이터
+- **역대 국회 데이터** — `scope="history"`로 역대 의원/선거/의장 접근
+- **ALLBILL 심사경과** — 의안 조회 시 소관위→법사위→본회의→공포 타임라인 자동 포함
 - **CLI 지원** — 터미널에서 직접 국회 데이터 조회
 - **이중 Transport** — stdio (Claude Desktop) + HTTP (원격 서버)
 - **REST API + OpenAPI 스펙** — ChatGPT GPTs Actions 지원 (`/openapi.json`)
-- **인메모리 캐싱** — TTL 기반, 정적/동적 데이터 구분
-- **API 모니터링** — 응답 시간 추적, Rate Limit 관리
+- **성능 최적화** — SWR 캐시, DNS 프리워밍, gzip 압축, 예측 프리패치, MCP Progress/Logging
 
 ## 빠른 시작
 

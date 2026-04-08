@@ -1,6 +1,6 @@
 {
   "name": "assembly-api-mcp",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "대한민국 국회 Open API MCP 서버 — 국회의원, 의안, 일정, 회의록 등 국회 데이터 접근",
   "type": "module",
   "main": "dist/index.js",
