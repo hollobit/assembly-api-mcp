@@ -85,6 +85,7 @@ interface BillSummary {
   readonly status: string;
   readonly proposer: string;
   readonly proposeDate: string;
+  readonly coProposers?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -106,6 +107,8 @@ function formatSearchRow(
     처리상태: row.PROC_RESULT ?? null,
     처리일: row.PROC_DT ?? null,
     상세링크: row.DETAIL_LINK ?? null,
+    대표발의자: row.RST_PROPOSER ?? null,
+    공동발의자: row.PUBL_PROPOSER ?? null,
   };
 }
 
@@ -138,6 +141,7 @@ function extractBillSummary(
     status: String(row.PROC_RESULT_CD ?? row.PROC_RESULT ?? row.RESULT ?? ""),
     proposer: String(row.PROPOSER ?? row.RST_PROPOSER ?? ""),
     proposeDate: String(row.PROPOSE_DT ?? row.PPSR_DT ?? ""),
+    coProposers: String(row.PUBL_PROPOSER ?? ""),
   };
 }
 
