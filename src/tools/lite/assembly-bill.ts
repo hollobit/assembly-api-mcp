@@ -234,23 +234,44 @@ async function handleDetail(
 
   const detail = formatDetailRow(result.rows[0]);
 
-  // 공동발의자 자동 포함 (상위 5명)
-  try {
-    const proposerResult = await api.fetchOpenAssembly(
-      API_CODES.BILL_PROPOSERS,
-      { BILL_ID: params.bill_id, pSize: 20 },
-    );
-    if (proposerResult.rows.length > 0) {
-      const proposers = proposerResult.rows.map((r) => ({
-        이름: r.PPSR_NM ?? r.HG_NM ?? "",
-        정당: r.PPSR_POLY_NM ?? r.POLY_NM ?? "",
-        대표구분: r.REP_DIV ?? "",
-      }));
-      (detail as Record<string, unknown>)["공동발의자"] = proposers.slice(0, MAX_CO_PROPOSERS);
-      (detail as Record<string, unknown>)["공동발의자_총수"] = proposerResult.totalCount;
-    }
-  } catch {
-    // 제안자 조회 실패는 무시
+  // 공동발의자 + ALLBILL 심사경과를 병렬 호출
+  const billNo = String(result.rows[0].BILL_NO ?? "");
+  const [proposerSettled, lifecycleSettled] = await Promise.allSettled([
+    // 공동발의자 (상위 5명)
+    api.fetchOpenAssembly(API_CODES.BILL_PROPOSERS, { BILL_ID: params.bill_id, pSize: 20 }),
+    // ALLBILL 심사경과 (BILL_NO 필수)
+    billNo ? api.fetchOpenAssembly("ALLBILL", { BILL_NO: billNo, pSize: 1 }) : Promise.reject("no BILL_NO"),
+  ]);
+
+  if (proposerSettled.status === "fulfilled" && proposerSettled.value.rows.length > 0) {
+    const proposers = proposerSettled.value.rows.map((r) => ({
+      이름: r.PPSR_NM ?? r.HG_NM ?? "",
+      정당: r.PPSR_POLY_NM ?? r.POLY_NM ?? "",
+      대표구분: r.REP_DIV ?? "",
+    }));
+    (detail as Record<string, unknown>)["공동발의자"] = proposers.slice(0, MAX_CO_PROPOSERS);
+    (detail as Record<string, unknown>)["공동발의자_총수"] = proposerSettled.value.totalCount;
+  }
+
+  if (lifecycleSettled.status === "fulfilled" && lifecycleSettled.value.rows.length > 0) {
+    const lc = lifecycleSettled.value.rows[0];
+    (detail as Record<string, unknown>)["심사경과"] = {
+      소관위원회: lc.JRCMIT_NM ?? null,
+      소관위_회부일: lc.JRCMIT_CMMT_DT ?? null,
+      소관위_상정일: lc.JRCMIT_PRSNT_DT ?? null,
+      소관위_처리일: lc.JRCMIT_PROC_DT ?? null,
+      소관위_처리결과: lc.JRCMIT_PROC_RSLT ?? null,
+      법사위_회부일: lc.LAW_CMMT_DT ?? null,
+      법사위_상정일: lc.LAW_PRSNT_DT ?? null,
+      법사위_처리일: lc.LAW_PROC_DT ?? null,
+      법사위_처리결과: lc.LAW_PROC_RSLT ?? null,
+      본회의_상정일: lc.RGS_PRSNT_DT ?? null,
+      본회의_의결일: lc.RGS_RSLN_DT ?? null,
+      본회의_결과: lc.RGS_CONF_RSLT ?? null,
+      정부이송일: lc.GVRN_TRSF_DT ?? null,
+      공포일: lc.PROM_DT ?? null,
+      공포번호: lc.PROM_NO ?? null,
+    };
   }
 
   return {

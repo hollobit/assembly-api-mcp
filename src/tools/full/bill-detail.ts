@@ -11,7 +11,7 @@ import { createApiClient } from "../../api/client.js";
 import { API_CODES, CURRENT_AGE } from "../../api/codes.js";
 import { formatToolError } from "../helpers.js";
 
-const ALL_FIELDS = ["detail", "review", "history", "proposers", "meetings"] as const;
+const ALL_FIELDS = ["detail", "review", "history", "proposers", "meetings", "lifecycle"] as const;
 type BillField = (typeof ALL_FIELDS)[number];
 
 export function registerBillDetailTool(
@@ -28,7 +28,7 @@ export function registerBillDetailTool(
       fields: z
         .array(z.enum(ALL_FIELDS))
         .optional()
-        .describe("조회 항목 (기본: 전체). detail, review, history, proposers, meetings"),
+        .describe("조회 항목 (기본: 전체). detail, review, history, proposers, meetings, lifecycle"),
       age: z.number().optional().describe("대수 (예: 22)"),
       page_size: z.number().optional().describe("페이지 크기 (기본: 100, 최대: 100)"),
     },
@@ -55,6 +55,9 @@ export function registerBillDetailTool(
             : Promise.resolve(undefined),
           meetings: selected.has("meetings")
             ? fetchMeetings(api, params.bill_id)
+            : Promise.resolve(undefined),
+          lifecycle: selected.has("lifecycle")
+            ? fetchLifecycle(api, params.bill_id)
             : Promise.resolve(undefined),
         };
 
@@ -235,5 +238,52 @@ async function fetchMeetings(
   return {
     committee_meetings: committeeConf,
     law_committee_meetings: lawCommitteeConf,
+  };
+}
+
+async function fetchLifecycle(
+  api: Api,
+  billId: string,
+): Promise<Record<string, unknown> | undefined> {
+  // ALLBILL은 BILL_NO가 필수 → 먼저 BILL_NO를 확보
+  // BILL_ID에서 직접 BILL_NO를 알 수 없으므로 BILLINFODETAIL에서 추출
+  const detailResult = await api.fetchOpenAssembly(API_CODES.BILL_DETAIL, {
+    BILL_ID: billId,
+  });
+  const billNo = detailResult.rows[0]?.BILL_NO;
+  if (!billNo) return undefined;
+
+  const result = await api.fetchOpenAssembly("ALLBILL", {
+    BILL_NO: String(billNo),
+    pSize: 1,
+  });
+  if (result.rows.length === 0) return undefined;
+
+  const lc = result.rows[0];
+  return {
+    의안번호: lc.BILL_NO,
+    의안명: lc.BILL_NM,
+    의안종류: lc.BILL_KND,
+    제안자구분: lc.PPSR_KND,
+    제안자: lc.PPSR_NM,
+    제안일: lc.PPSL_DT,
+    소관위원회: lc.JRCMIT_NM,
+    소관위_회부일: lc.JRCMIT_CMMT_DT,
+    소관위_상정일: lc.JRCMIT_PRSNT_DT,
+    소관위_처리일: lc.JRCMIT_PROC_DT,
+    소관위_처리결과: lc.JRCMIT_PROC_RSLT,
+    법사위_회부일: lc.LAW_CMMT_DT,
+    법사위_상정일: lc.LAW_PRSNT_DT,
+    법사위_처리일: lc.LAW_PROC_DT,
+    법사위_처리결과: lc.LAW_PROC_RSLT,
+    본회의_상정일: lc.RGS_PRSNT_DT,
+    본회의_의결일: lc.RGS_RSLN_DT,
+    본회의_회의명: lc.RGS_CONF_NM,
+    본회의_결과: lc.RGS_CONF_RSLT,
+    정부이송일: lc.GVRN_TRSF_DT,
+    공포법률명: lc.PROM_LAW_NM,
+    공포일: lc.PROM_DT,
+    공포번호: lc.PROM_NO,
+    링크: lc.LINK_URL,
   };
 }

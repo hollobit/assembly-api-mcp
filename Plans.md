@@ -202,6 +202,16 @@ FastMCP(TS) 마이그레이션보다 현재 SDK에서 3가지 핵심 개선이 R
 | 18.5 | assembly_session에 소위/예결위/특위 회의록+상세+제안설명서+국감결과 6개 API 통합 | 회의록 유형 확장, 상세/설명서/국감결과 | - | cc:完了 |
 | 18.6 | committee_detail에 개정대상법률+자료실 2개 API 통합 | 위원회 상세에 개정법률/자료실 포함 | - | cc:完了 |
 
+### Phase 19: ALLBILL 통합 — 의안정보 통합 API
+
+BILL_NO 1회 호출로 의안 전체 심사경과(소관위→법사위→본회의→공포)를 반환.
+기존 도구에서 ALLBILL을 추가 데이터 소스로 활용하여 응답 품질 향상.
+
+| Task | 내용 | DoD | Depends | Status |
+|------|------|-----|---------|--------|
+| 19.1 | assembly_bill 상세 모드에 ALLBILL 통합 | bill_id 조회 시 ALLBILL로 심사경과 자동 포함 | - | cc:完了 |
+| 19.2 | bill_detail(Full)에 ALLBILL 통합 | fields에 lifecycle 추가, 소관위→법사위→본회의→공포 타임라인 | 19.1 | cc:完了 |
+
 ---
 
 ## 현재 프로젝트 수치
