@@ -94,7 +94,7 @@ bill_detail(bill_id="...") 호출 시:
 | 파라미터 | 동작 | 사용 API |
 |----------|------|---------|
 | `bill_name`, `proposer` | 의안 검색 | MEMBER_BILLS |
-| `bill_id` | 의안 상세 + 공동발의자 | BILL_DETAIL + BILL_PROPOSERS |
+| `bill_id` | 의안 상세 + 공동발의자 + 심사경과 | BILL_DETAIL + BILL_PROPOSERS + ALLBILL |
 | `status="pending"` | 계류의안 | BILL_PENDING |
 | `status="processed"` | 처리의안 | BILL_PROCESSED |
 | `status="recent"` | 최근 본회의 처리 | RECENT_PLENARY_BILLS |
@@ -156,7 +156,7 @@ Full 프로필은 Lite 6개를 모두 포함하며, 심층 분석용 4개 도구
 | 파라미터 | 설명 |
 |----------|------|
 | `bill_id` (필수) | 의안 ID |
-| `fields` | 조회 항목 선택: `detail`, `review`, `history`, `proposers`, `meetings`, `budget` |
+| `fields` | 조회 항목 선택: `detail`, `review`, `history`, `proposers`, `meetings`, `lifecycle`, `budget` |
 
 1회 호출로 의안의 모든 것을 반환합니다:
 
@@ -168,6 +168,7 @@ Full 프로필은 Lite 6개를 모두 포함하며, 심층 분석용 4개 도구
 | proposers | BILL_PROPOSERS | 공동발의 의원 전체 목록 |
 | meetings | BILL_COMMITTEE_CONF + BILL_LAW_COMMITTEE_CONF | 위원회+법사위 회의 |
 | budget | BUDGETJUDGE + BUDGETADJUDGE | 예결산 심사+예비심사 (Tier 1) |
+| lifecycle | ALLBILL | 소관위→법사위→본회의→공포 전체 타임라인 (Phase 19) |
 
 **흡수한 기존 도구**: `get_bill_detail`, `get_bill_review`, `get_bill_history`, `get_bill_proposers`
 
@@ -349,6 +350,6 @@ Full 프로필은 Lite 6개를 모두 포함하며, 심층 분석용 4개 도구
 | Full 도구 수 | 19 | 10 | **10** |
 | 토큰 소비 (Lite) | ~3,800 | ~2,800 | **~2,800** |
 | API 코드 등록 | 39 | 44 | **271** (98.2%) |
-| 전용 도구에서 사용 | 39 | 44 | **70** |
+| 전용 도구에서 사용 | 39 | 44 | **71** |
 | 전용 도구 커버율 | 14% | 16% | **26%** |
 | 276개 API 접근 | 100% | 100% | **100%** |
