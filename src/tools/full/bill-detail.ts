@@ -147,9 +147,13 @@ async function fetchDetail(
     ...row,
   };
 
-  // 의안 웹 열람 링크 (LINK_URL이 없으면 BILL_ID로 생성)
-  if (!detail.LINK_URL && (row.BILL_ID ?? billId)) {
-    detail.LINK_URL = `https://likms.assembly.go.kr/bill/billDetail.do?billId=${String(row.BILL_ID ?? billId)}`;
+  // 의안 웹 열람 + 문서 다운로드 링크
+  const effectiveBillId = String(row.BILL_ID ?? billId);
+  if (!detail.LINK_URL && effectiveBillId) {
+    detail.LINK_URL = `https://likms.assembly.go.kr/bill/billDetail.do?billId=${effectiveBillId}`;
+  }
+  if (effectiveBillId) {
+    detail["의안문서_ZIP"] = `https://likms.assembly.go.kr/bill/bi/bill/detail/downloadDtlZip.do?billId=${effectiveBillId}&billKindCd=${encodeURIComponent("법률안")}`;
   }
 
   return detail;
