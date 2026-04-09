@@ -30,6 +30,41 @@
 
 ---
 
+## Phase 22: 의안 생애주기 완성 — 발의→심사→표결→공포 전체 정보 제공
+
+목표: 의안 1건의 생애주기 전체를 MCP 도구로 완전히 추적할 수 있도록 확장.
+현재 부족한 영역: 원문 파일 링크, 회의별 의안/안건, 부록/첨부, 서면질의, 영상회의록.
+
+### 의안 생애주기 맵
+
+```
+발의 → 위원회 심사 → 법사위 → 본회의 표결 → 정부이송 → 공포
+ │        │            │          │             │         │
+ │        │            │          │             │         └─ ALLBILL 공포일/번호
+ │        │            │          │             └─ ALLBILL 정부이송일
+ │        │            │          └─ VOTE_BY_BILL 표결 상세
+ │        │            └─ BILLLWJUDGECONF 법사위 회의
+ │        └─ BILLJUDGE + BILLJUDGECONF 심사경과/회의
+ └─ BILLINFODETAIL 제안이유 + BILLINFOPPSR 발의자
+
+ [현재 빠진 것]
+ └─ LIKMS 원문 HWP/PDF 링크 생성
+ └─ VCONFBILLLIST 회의별 의안목록
+ └─ VCONFATTAPPENDIXLIST 회의록 부록
+ └─ VCONFATTQNALIST 서면질의답변서
+ └─ WEBCASTVCONF 영상회의록
+```
+
+| Task | 내용 | DoD | Depends | Status |
+|------|------|-----|---------|--------|
+| 22.1 | LIKMS 원문 링크 생성 — bill_detail에 HWP/PDF 다운로드 URL 자동 포함 | BILLINFODETAIL 응답의 BOOK_ID로 LIKMS FileGate URL 생성, 응답에 `원문_HWP`/`원문_PDF` 포함 | - | cc:完了 |
+| 22.2 | 회의별 의안/안건 통합 — assembly_session에 VCONFBILLLIST + VCONFBLLLIST 추가 | conf_id 지정 시 해당 회의의 의안/안건 목록 자동 포함 | - | cc:完了 |
+| 22.3 | 회의록 부록/첨부 — assembly_session에 VCONFATTAPPENDIXLIST + VCONFATTQNALIST 추가 | conf_id 지정 시 부록+서면질의 자동 포함 | 22.2 | cc:完了 |
+| 22.4 | 영상회의록 링크 — assembly_session에 WEBCASTVCONF 연동 | 회의록 결과에 영상 링크(VOD_LINK_URL) 포함 | - | cc:完了 |
+| 22.5 | bill_detail lifecycle 강화 — 전체 생애주기를 1회 호출로 반환 | bill_detail(fields=["lifecycle"])에 원문링크+회의록+부록 모두 포함 | 22.1~22.4 | cc:完了 |
+
+---
+
 ## 현재 프로젝트 수치 (v0.5.0)
 
 | 항목 | 수치 |

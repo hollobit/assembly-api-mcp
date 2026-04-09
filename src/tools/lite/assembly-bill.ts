@@ -234,6 +234,13 @@ async function handleDetail(
 
   const detail = formatDetailRow(result.rows[0]);
 
+  // LIKMS 원문 다운로드 링크 생성
+  const bookId = String(result.rows[0].BOOK_ID ?? result.rows[0].BILL_ID ?? "");
+  if (bookId) {
+    (detail as Record<string, unknown>)["원문_HWP"] = `https://likms.assembly.go.kr/filegate/servlet/FileGate?type=0&bookId=${bookId}`;
+    (detail as Record<string, unknown>)["원문_PDF"] = `https://likms.assembly.go.kr/filegate/servlet/FileGate?type=1&bookId=${bookId}`;
+  }
+
   // 공동발의자 + ALLBILL 심사경과를 병렬 호출
   const billNo = String(result.rows[0].BILL_NO ?? "");
   const [proposerSettled, lifecycleSettled] = await Promise.allSettled([

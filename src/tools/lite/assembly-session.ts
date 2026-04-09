@@ -123,10 +123,39 @@ async function handleMeeting(
 
   // 회의록 상세 조회 (conf_id 제공 시)
   if (params.conf_id) {
-    const detailResult = await api.fetchOpenAssembly("VCONFDETAIL", {
-      CONF_ID: params.conf_id,
-    });
-    return { detail: detailResult.rows.length > 0 ? detailResult.rows[0] : null, total: detailResult.rows.length };
+    const [detailSettled, billListSettled, agendaListSettled, appendixSettled, writtenQaSettled, videoSettled] =
+      await Promise.allSettled([
+        api.fetchOpenAssembly("VCONFDETAIL", { CONF_ID: params.conf_id }),
+        api.fetchOpenAssembly("VCONFBILLLIST", { CONF_ID: params.conf_id }),
+        api.fetchOpenAssembly("VCONFBLLLIST", { CONF_ID: params.conf_id }),
+        api.fetchOpenAssembly("VCONFATTAPPENDIXLIST", { CONF_ID: params.conf_id }),
+        api.fetchOpenAssembly("VCONFATTQNALIST", { CONF_ID: params.conf_id }),
+        api.fetchOpenAssembly("WEBCASTVCONF", { CONF_ID: params.conf_id }),
+      ]);
+
+    const detailRows = detailSettled.status === "fulfilled" ? detailSettled.value.rows : [];
+    const response: Record<string, unknown> = {
+      detail: detailRows.length > 0 ? detailRows[0] : null,
+      total: detailRows.length,
+    };
+
+    if (billListSettled.status === "fulfilled" && billListSettled.value.rows.length > 0) {
+      response.bill_list = billListSettled.value.rows;
+    }
+    if (agendaListSettled.status === "fulfilled" && agendaListSettled.value.rows.length > 0) {
+      response.agenda_list = agendaListSettled.value.rows;
+    }
+    if (appendixSettled.status === "fulfilled" && appendixSettled.value.rows.length > 0) {
+      response.appendix = appendixSettled.value.rows;
+    }
+    if (writtenQaSettled.status === "fulfilled" && writtenQaSettled.value.rows.length > 0) {
+      response.written_qa = writtenQaSettled.value.rows;
+    }
+    if (videoSettled.status === "fulfilled" && videoSettled.value.rows.length > 0) {
+      response.video = videoSettled.value.rows;
+    }
+
+    return response;
   }
 
   const confDateYear = params.date_from?.slice(0, 4);
