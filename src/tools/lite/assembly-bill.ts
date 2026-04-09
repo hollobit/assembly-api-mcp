@@ -234,11 +234,10 @@ async function handleDetail(
 
   const detail = formatDetailRow(result.rows[0]);
 
-  // LIKMS 원문 다운로드 링크 생성
-  const bookId = String(result.rows[0].BOOK_ID ?? result.rows[0].BILL_ID ?? "");
-  if (bookId) {
-    (detail as Record<string, unknown>)["원문_HWP"] = `https://likms.assembly.go.kr/filegate/servlet/FileGate?type=0&bookId=${bookId}`;
-    (detail as Record<string, unknown>)["원문_PDF"] = `https://likms.assembly.go.kr/filegate/servlet/FileGate?type=1&bookId=${bookId}`;
+  // 의안 웹 열람 링크 (BILLINFODETAIL에 없으면 BILL_ID로 생성)
+  const billId = String(result.rows[0].BILL_ID ?? params.bill_id);
+  if (!(detail as Record<string, unknown>)["LINK_URL"] && billId) {
+    (detail as Record<string, unknown>)["LINK_URL"] = `https://likms.assembly.go.kr/bill/billDetail.do?billId=${billId}`;
   }
 
   // 공동발의자 + ALLBILL 심사경과를 병렬 호출

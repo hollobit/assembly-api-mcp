@@ -147,11 +147,9 @@ async function fetchDetail(
     ...row,
   };
 
-  // LIKMS 원문 다운로드 링크 생성
-  const bookId = String(row.BOOK_ID ?? row.BILL_ID ?? "");
-  if (bookId) {
-    detail["원문_HWP"] = `https://likms.assembly.go.kr/filegate/servlet/FileGate?type=0&bookId=${bookId}`;
-    detail["원문_PDF"] = `https://likms.assembly.go.kr/filegate/servlet/FileGate?type=1&bookId=${bookId}`;
+  // 의안 웹 열람 링크 (LINK_URL이 없으면 BILL_ID로 생성)
+  if (!detail.LINK_URL && (row.BILL_ID ?? billId)) {
+    detail.LINK_URL = `https://likms.assembly.go.kr/bill/billDetail.do?billId=${String(row.BILL_ID ?? billId)}`;
   }
 
   return detail;
