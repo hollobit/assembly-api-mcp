@@ -17,7 +17,7 @@
 | 단계 | 설명 | 핵심 질문 |
 |------|------|---------|
 | **발의** | 정부 atau議員이 법안을 제출 | "누가 발의했나?" |
-| **의안접수** |国会가 의안을 접수 | "의안이正式 접수되었나?" |
+| **의안접수** |국회가 의안을 접수 | "의안이 정식으로 접수되었나?" |
 | **소관위원회** | 해당 위원会上程·심사 | "위원회에서 어떻게 처리되었나?" |
 | **법사위** | 법제사務위원회 재적용 심사 | "법적으로 문제가 없나?" |
 | **본회의** | 全院quetsung 상정·표결 | "본회의에서可決되었나?" |
@@ -56,7 +56,7 @@ assembly-api-mcp는 이 **전 과정**을 데이터로 제공합니다:
 
 ## 3. Pre-Legislative (입법 전)
 
-입법 전 단계는 법안이国会에正式 제출되기 **전**에 해당합니다. 이 단계에서 정부는 입법계획을 수립하고, 예고를 통해 국민의 의견을 수렴합니다.
+입법 전 단계는 법안이 국회에 정식 제출되기 **전**에 해당합니다. 이 단계에서 정부는 입법계획을 수립하고, 예고를 통해 국민의 의견을 수렴합니다.
 
 ### 3.1 입법계획 (Legislative Plan)
 
@@ -94,7 +94,7 @@ npx tsx src/cli.ts lawmaking --type notice --keyword 인공지능
 
 **API**: `GET /rest/ogLmPp`
 
-**의미**: 법안이正式 발의되기 전에 공개되어 **60일** 동안 국민 의견을 수렴합니다. 이 단계에서 시민참여가 가능합니다.
+**의미**: 법안이 정식 발의되기 전에 공개되어 **60일** 동안 국민 의견을 수렴합니다. 이 단계에서 시민참여가 가능합니다.
 
 ### 3.3 행정예고 (Administrative Notice)
 
@@ -140,17 +140,17 @@ npx tsx src/cli.ts nabo --type periodical --key 경제동향
 // 연구 자료 통합 검색
 research_data({
   keyword: "인공지능 규제",
-  source: "all_integrated"  // 도서관 + 입법조사처 + 예산정책처 + 미래研究院
+  source: "all_integrated"  // 도서관 + 입법조사처 + 예산정책처 + 미래연구원
 })
 ```
 
-**의미**: 입법조사처의 법안 분석, 도서관의 학문적 참고자료, 미래研究院의 장기 전망 등을 통합检索합니다.
+**의미**: 입법조사처의 법안 분석, 도서관의 학문적 참고자료, 미래연구원의 장기 전망 등을 통합 검색합니다.
 
 ---
 
 ## 4. Legislative Process (입법 과정)
 
-입법 과정은 의안이正式国会에 접수되어 심사받는 단계입니다.
+입법 과정은 의안이 정식으로 국회에 접수되어 심사받는 단계입니다.
 
 ### 4.1 의안 접수 (Bill Receipt)
 
@@ -169,7 +169,7 @@ npx tsx src/cli.ts bills --proposer 홍길동
 
 **API**: `BILLRCP`
 
-**의미**:国会에 접수된 모든 법안이 추적 가능합니다.
+**의미**:국회에 접수된 모든 법안이 추적 가능합니다.
 
 ### 4.2 소관위원회 심사 (Committee Review)
 
@@ -289,7 +289,7 @@ research_data({
 })
 ```
 
-**의미**: 국회미래研究院의 장기 정책 전망 연구로 입법의 **장기적 영향**을 분석합니다.
+**의미**: 국회미래연구원의 장기 정책 전망 연구로 입법의 **장기적 영향**을 분석합니다.
 
 ---
 
@@ -300,13 +300,13 @@ research_data({
 ```
 [1단계] 입법 전
 ─────────────────────────────────────────────────
-# 政府의 年度立法계획에 AI 규제 관련 법안이 있나?
+# 政府의 年度입법계획에 AI 규제 관련 법안이 있나?
 npx tsx src/cli.ts lawmaking --type plan --key AI
 → 결과: "AI 국가전략법 제정계획" 있음
 
 # 입법예고 단계인지 확인
 npx tsx src/cli.ts lawmaking --type notice --keyword 인공지능
-→ 결과: "人工智能(AI)規制法案" 예고 중 (意见수렴 기간)
+→ 결과: "인공지능(AI) 규제법안" 예고 중 (의견수렴 기간)
 
 # NABO에서 AI 재정 영향 분석 자료 확인
 npx tsx src/cli.ts nabo --type report --key 인공지능
@@ -316,14 +316,14 @@ npx tsx src/cli.ts nabo --type report --key 인공지능
 
 [2단계] 입법 과정
 ─────────────────────────────────────────────────
-# 国会에 접수된 AI 규제 관련 의안 검색
+# 국회에 접수된 AI 규제 관련 의안 검색
 npx tsx src/cli.ts bills --name AI --size 20
 
 # 특정 의안의 심사 경과 추적
 npx tsx src/cli.ts bill-detail <BILL_ID>
 → 결과:
   - 소관위: 과학기술정보위원회 (2024-03-15 상정)
-  - 법사위: 2024-04-20，处理中
+  - 법사위: 2024-04-20，처리중
   - 본회의: 표결 대기
 
 # 본회의 표결 결과
@@ -336,13 +336,13 @@ npx tsx src/cli.ts votes --bill-no 2201567
 ─────────────────────────────────────────────────
 # 공포 후 NABO 효과 분석
 npx tsx src/cli.ts nabo --type report --key AI규제법
-→ 결과: "AI規制法案 시행에 따른 재정영향 분석" (2025)
+→ 결과: "AI규제법안 시행에 따른 재정영향 분석" (2025)
 
 # 예산 집행 분석
 # research_data(source="budget", keyword="AI")
 → 결과: "디지털 전환 예산 투자 계획" (2025)
 
-# 미래研究院 장기 전망
+# 미래연구원 장기 전망
 # research_data(source="future", keyword="AI")
 → 결과: "AI 기술 발전 전망과 정책적 대응" (2030)
 ```
@@ -359,15 +359,15 @@ npx tsx src/cli.ts nabo --type report --key AI규제법
 | `assembly_org` | Lite | 위원회/청원/입법예고 (lawmaking type 포함) |
 | `assembly_session` | Lite | 일정/회의록/표결 |
 | `bill_detail` | **Full** | 의안 심층 (심사/이력/회의/생애주기) |
-| `research_data` | **Full** | 도서관/입법조사처/예산정책처/미래研究院 통합 |
+| `research_data` | **Full** | 도서관/입법조사처/예산정책처/미래연구원 통합 |
 | `get_nabo` | **Full** | NABO 보고서/정기간행물/채용 |
 
 ### Key 파라미터
 
 | 도구 | 파라미터 | 설명 |
 |------|---------|------|
-| `assembly_org` | `type="lawmaking"` | 국민참여立法센터 API切替 |
-| `assembly_org` | `category="plan\|notice\|admin\|interpretation\|opinion"` |立法단계 구분 |
+| `assembly_org` | `type="lawmaking"` | 국민참여입법센터 API전환 |
+| `assembly_org` | `category="plan\|notice\|admin\|interpretation\|opinion"` |입법단계 구분 |
 | `assembly_bill` | `status="pending\|processed\|recent"` | 의안 상태 필터 |
 | `assembly_bill` | `keywords` | 의안명 키워드 추적 |
 | `assembly_session` | `type="vote"` | 표결 조회 |
@@ -382,12 +382,12 @@ npx tsx src/cli.ts nabo --type report --key AI규제법
 | 소스 | URL | 주요 데이터 |
 |------|-----|-----------|
 | **국회** (open.assembly.go.kr) | 열린국회정보 | 의안/국회의원/일정/회의록/표결/청원 |
-| **국민참여立法센터** (lawmaking.go.kr) | opinion.lawmaking.go.kr | 입법계획/예고/행정예고/법령해석/의견제시 |
+| **국민참여입법센터** (lawmaking.go.kr) | opinion.lawmaking.go.kr | 입법계획/예고/행정예고/법령해석/의견제시 |
 | **국회예산정책처** (nabo.go.kr) | nabo.go.kr | 재정분석/경제전망/예산보고서 |
 | **국회도서관** (nanet.go.kr) | nanet.go.kr | 학술 자료/Government 문서 |
-| **입법조사처** | open.assembly.go.kr |立法調査 보고서 |
+| **입법조사처** | open.assembly.go.kr |입법조사 보고서 |
 | **예산정책처** | open.assembly.go.kr | 예산 분석 자료 |
-| **미래研究院** | open.assembly.go.kr | 장기 정책 전망 |
+| **미래연구원** | open.assembly.go.kr | 장기 정책 전망 |
 
 ---
 
@@ -398,5 +398,5 @@ npx tsx src/cli.ts nabo --type report --key AI규제법
 **관련 문서**:
 - [README.md](../README.md) — 프로젝트 전체 개요
 - [docs/tool-mapping.md](tool-mapping.md) — MCP 도구 ↔ API 매핑
-- [docs/api-catalog.md](api-catalog.md) —国会 API 276개 전체 목록
+- [docs/api-catalog.md](api-catalog.md) —국회 API 276개 전체 목록
 - [USECASE.md](../USECASE.md) — 활용 사례 100선
