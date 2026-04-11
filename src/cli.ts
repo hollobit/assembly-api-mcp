@@ -16,11 +16,13 @@
  *   npx tsx src/cli.ts plenary                     # 본회의부의안건
  *   npx tsx src/cli.ts meta                        # 전체 API 목록
  *   npx tsx src/cli.ts test                        # 전체 API 작동 테스트
+ *   npx tsx src/cli.ts lawmaking --type notice    # 국민참여입법센터 API
  */
 
 import "dotenv/config";
 import { loadConfig, type AppConfig } from "./config.js";
 import { createApiClient } from "./api/client.js";
+import { createLawmakingClient } from "./api/lawmaking.js";
 import { API_CODES, CURRENT_AGE } from "./api/codes.js";
 
 // config와 api는 실제 명령 실행 시에만 초기화 (--help 시 불필요)
@@ -35,6 +37,10 @@ function getConfig(): AppConfig {
 function getApi(): ReturnType<typeof createApiClient> {
   if (!_api) _api = createApiClient(getConfig());
   return _api;
+}
+
+function getLawmaking(): ReturnType<typeof createLawmakingClient> {
+  return createLawmakingClient(getConfig());
 }
 
 // ---------------------------------------------------------------------------
@@ -213,6 +219,78 @@ async function cmdMeta(): Promise<void> {
   printTable(result.rows, ["INF_ID", "INF_NM", "CATE_NM", "ORG_NM"]);
 }
 
+// lawmaking API 타입 (CLI에서 직접 지정)
+type LawmakingApiType = "status" | "plan" | "notice" | "noticeByUpd" | "admin" | "interpretation" | "opinion";
+
+async function cmdLawmaking(flags: Record<string, string>): Promise<void> {
+  const type = (flags.type ?? "notice") as LawmakingApiType;
+  const key = flags.key ?? undefined;
+  const pageSize = Number(flags.size ?? 20);
+
+  let result: Record<string, unknown>;
+
+  switch (type) {
+    case "status":
+      result = await getLawmaking().getLegislations({});
+      break;
+    case "plan":
+      result = await getLawmaking().getLegislationPlan({ srchTxt: key });
+      break;
+    case "notice":
+      result = await getLawmaking().getLegislationNotices({
+        diff: key ?? "0",
+        lsNm: flags.keyword,
+        lsClsCd: flags.ls,
+        pntcNo: undefined,
+        stYdFmt: flags.st,
+        edYdFmt: flags.ed,
+        cptOfiOrgCd: undefined,
+      });
+      break;
+    case "noticeByUpd":
+      result = await getLawmaking().getLegislationNoticesByUpd({
+        updYdFmt: key ?? "2024.01.01",
+        diff: flags.diff,
+        lsClsCd: flags.ls,
+        lsNm: flags.keyword,
+      });
+      break;
+    case "admin":
+      result = await getLawmaking().getAdminNotices({
+        lsClsCd: flags.ls,
+        closing: flags.closing,
+        asndOfiNm: undefined,
+        stYdFmt: flags.st,
+        edYdFmt: flags.ed,
+        admRulNm: key,
+      });
+      break;
+    case "interpretation":
+      result = await getLawmaking().getInterpretations({
+        schKeyword: key,
+        prdFrDay: flags.fr,
+        prdToDay: flags.to,
+        lsCptOrg: flags.org,
+      });
+      break;
+    case "opinion":
+      result = await getLawmaking().getOpinionCases({
+        scFmDt: flags.fr,
+        scToDt: flags.to,
+        scTextType: flags.searchType as "caseNm" | "caseNo" | "reqOrgNm" | undefined,
+        scText: key,
+      });
+      break;
+    default:
+      console.error(`알 수 없는 타입: ${type}`);
+      process.exit(1);
+  }
+
+  const rows = (result as Record<string, unknown>).result as Record<string, unknown>[] ?? [];
+  console.log(`\n국민참여입법센터 API: ${type} (총 ${rows.length}건)\n`);
+  printTable(rows.slice(0, pageSize), Object.keys(rows[0] ?? {}));
+}
+
 async function cmdTest(): Promise<void> {
   console.log("\n=== 전체 API 작동 테스트 ===\n");
 
@@ -275,6 +353,19 @@ function printHelp(): void {
   plenary              본회의 부의안건
   meta                 전체 API 목록 (276개)
   test                 전체 API 작동 테스트
+  lawmaking            국민참여입법센터 API
+    --type <type>      notice(기본)|status|plan|noticeByUpd|admin|interpretation|opinion
+    --key <값>         검색어 또는 차수 (diff)
+    --keyword <단어>    법령명 검색어
+    --ls <코드>         법령분류코드
+    --st <날짜>        시작일자 (YYYY.MM.DD)
+    --ed <날짜>        종료일자 (YYYY.MM.DD)
+    --fr <날짜>        검색기간 시작
+    --to <날짜>        검색기간 종료
+    --org <코드>        소관기관 코드
+    --closing <Y|N>     마감여부 (admin)
+    --diff <차수>       예고 차수
+    --searchType <유형>  검색구분 (opinion: caseNm|caseNo|reqOrgNm)
 
 공통 옵션:
   --size <N>           결과 수 (기본: 20)
@@ -311,6 +402,8 @@ async function main(): Promise<void> {
         return cmdPlenary(flags);
       case "meta":
         return cmdMeta();
+      case "lawmaking":
+        return cmdLawmaking(flags);
       case "test":
         return cmdTest();
       case "help":
