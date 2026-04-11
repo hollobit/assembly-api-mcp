@@ -408,6 +408,29 @@ npx tsx src/cli.ts test
 npx tsx src/cli.ts help
 ```
 
+### 국민참여입법센터 API (lawmaking.go.kr)
+
+> `.env`에 `LAWMKING_OC=<발급받은OC>` 설정 필요. MCP 도구로만 호출 가능 (CLI 미지원)
+
+```bash
+# AI 클라이언트에서 assembly_org 도구로 호출 예시:
+
+# 입법예고 목록 (진행중)
+assembly_org({type: "lawmaking", category: "legislation", diff: "0"})
+
+# 입법예고 목록 (수정일 기준)
+assembly_org({type: "lawmaking", category: "legislation", upd_yd_fmt: "2024.01.01"})
+
+# 행정예고 목록
+assembly_org({type: "lawmaking", category: "admin"})
+
+# 법령해석례 검색
+assembly_org({type: "lawmaking", category: "interpretation", keyword: "자동차"})
+
+# 의견제시사례 목록
+assembly_org({type: "lawmaking", category: "opinion"})
+```
+
 ## 문서
 
 | 문서 | 설명 |
