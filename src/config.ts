@@ -223,7 +223,7 @@ export const API_BASE_URLS = {
   /** 국회예산정책처 */
   nabo: "https://www.nabo.go.kr",
   /** 국민참여입법센터 */
-  lawmaking: "https://www.lawmaking.go.kr/rest",
+  lawmaking: "https://opinion.lawmaking.go.kr/rest",
 } as const;
 
 // ---------------------------------------------------------------------------
