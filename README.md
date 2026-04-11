@@ -1,20 +1,20 @@
 # assembly-api-mcp
 
-대한민국 국회 Open API를 [Model Context Protocol (MCP)](https://modelcontextprotocol.io) 서버로 제공합니다.
+대한민국 국회 관련 Open API를 [Model Context Protocol (MCP)](https://modelcontextprotocol.io) 서버로 제공합니다.
 
-Claude, Gemini, ChatGPT 등 AI 도구에서 국회의원, 의안, 일정, 회의록, 위원회, 표결, 청원 등 국회 데이터에 실시간으로 접근할 수 있습니다.
+Claude, Gemini, ChatGPT 등 AI 도구에서 국회의원, 의안, 일정, 회의록, 위원회, 표결, 청원 등 국회 관련 데이터에 실시간으로 접근할 수 있습니다.
 
 ***국가 AI 전환(AX)은 AI 챗봇쓴다고 되지 않죠. 국민들의 일상이 AI로 편리해져야 그것이 진정한 네이티브 AI 시대겠죠***
 
 ## 업데이트 내역
 
-### v0.7.0 — NABO Open API 통합 (2026-04-12)
+### v0.7.0 — 국회예산정책처(NABO) Open API 통합 (2026-04-12)
 
 - **nabo.go.kr 3개 API 통합** — 보고서 자료 검색, 정기간행물, 채용정보
 - **get_nabo MCP 도구 추가** (Full 프로필) — `type=report|periodical|recruitments`
 - **REST API `/api/nabo` 추가** — Full 프로필에서 HTTP로 NABO 데이터 접근
 - **도구 수 변경** — Lite 유지 (6개), Full 10개 → **11개** (+get_nabo)
-- **API 소스 3개** —国会 + lawmaking + NABO
+- **API 소스 3개** —국회 + lawmaking + NABO
 - **API 커버 287개** (276개국회 + 8 국민참여입법센터 + 3개 NABO)
 - **NABO API Key 발급** — https://www.nabo.go.kr/ko/api/apply.do?key=2509230004
 
