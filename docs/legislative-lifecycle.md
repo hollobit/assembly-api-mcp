@@ -6,6 +6,8 @@
 
 ## 1. Legislative Lifecycle 개요
 
+![입법 과정 및 MCP 연관도](lifecycle.jpeg)
+
 한국의 입법 절차는 크게 **6단계**로 구성됩니다:
 
 ```
