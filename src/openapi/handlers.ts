@@ -614,3 +614,55 @@ export const searchResearchReports: RouteHandler = async (ctx, params) => {
     return error(500, e instanceof Error ? e.message : String(e));
   }
 };
+
+// ---------------------------------------------------------------------------
+// NABO handlers (nabo.go.kr)
+// ---------------------------------------------------------------------------
+
+import { createNaboClient, type NaboApiType, type NaboItem } from "../api/nabo.js";
+
+export const getNabo: RouteHandler = async (ctx, params) => {
+  try {
+    const type = (params.type ?? "report") as NaboApiType;
+    if (!["report", "periodical", "recruitments"].includes(type)) {
+      return error(400, "type은 report, periodical, recruitments 중 하나여야 합니다.");
+    }
+
+    const nabo = createNaboClient(ctx.config);
+
+    const searchParams = {
+      page: intParam(params.page, 1),
+      size: clampPageSize(params.page_size, ctx.config.apiResponse.maxPageSize),
+      scSort: params.sc_sort as "pubDt" | "subj" | undefined,
+      scOrder: params.sc_order as "asc" | "desc" | undefined,
+      scSw: params.sc_sw,
+    };
+
+    let result: { page: number; size: number; total: number; items: NaboItem[] };
+    if (type === "report") {
+      const res = await nabo.searchReports(searchParams);
+      result = { page: res.page, size: res.size, total: res.total, items: [...res.items] };
+    } else if (type === "periodical") {
+      const res = await nabo.searchPeriodicals(searchParams);
+      result = { page: res.page, size: res.size, total: res.total, items: [...res.items] };
+    } else {
+      const res = await nabo.searchRecruitments(searchParams);
+      result = { page: res.page, size: res.size, total: res.total, items: [...res.items] };
+    }
+
+    const formatted = result.items.map((item) => ({
+      제목: item.subj,
+      작성부서: item.cdNm,
+      게시일: item.pubDt,
+      조회수: item.count,
+      내용요약: item.text,
+      상세URL: item.detailUrl,
+      첨부파일명: item.name,
+      첨부파일URL: item.url,
+    }));
+
+    return ok(formatted, { total: result.total, page: result.page, size: result.size, type });
+  } catch (e) {
+    return error(500, e instanceof Error ? e.message : String(e));
+  }
+};

@@ -163,7 +163,7 @@ export function createLawmakingClient(config: AppConfig) {
     try {
       response = await fetch(url, {
         headers: {
-          "User-Agent": "assembly-api-mcp/0.6.0",
+          "User-Agent": "assembly-api-mcp/0.7.0",
         },
       });
     } catch (err: unknown) {

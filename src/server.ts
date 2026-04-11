@@ -24,6 +24,7 @@ import { registerBillDetailTool } from "./tools/full/bill-detail.js";
 import { registerCommitteeDetailTool } from "./tools/full/committee-detail.js";
 import { registerPetitionDetailTool } from "./tools/full/petition-detail.js";
 import { registerResearchDataTool } from "./tools/full/research-data.js";
+import { registerNaboTools } from "./tools/nabo.js";
 import { registerResources } from "./resources/static-data.js";
 import { registerPrompts } from "./prompts/templates.js";
 
@@ -34,7 +35,7 @@ import { registerPrompts } from "./prompts/templates.js";
 function buildMcpServer(config: AppConfig): McpServer {
   const server = new McpServer({
     name: "assembly-api-mcp",
-    version: "0.6.0",
+    version: "0.7.0",
   });
 
   // 도구 등록 — 프로필에 따라 분기
@@ -42,11 +43,12 @@ function buildMcpServer(config: AppConfig): McpServer {
     // Lite 도구 6개 먼저 등록
     registerLiteTools(server, config);
 
-    // Full 전용 심층 도구 4개 추가 (총 10개)
+    // Full 전용 심층 도구 5개 추가 (총 11개)
     registerBillDetailTool(server, config);      // bill_detail (상세+심사+이력+제안자+회의)
     registerCommitteeDetailTool(server, config);  // committee_detail (위원회+위원명단)
     registerPetitionDetailTool(server, config);   // petition_detail (청원 상세)
     registerResearchDataTool(server, config);     // research_data (도서관+조사처+예산처)
+    registerNaboTools(server, config);          // get_nabo (nabo.go.kr 보고서/정기간행물/채용)
   } else {
     // Lite 프로필 (기본): 6개 도구
     registerLiteTools(server, config);

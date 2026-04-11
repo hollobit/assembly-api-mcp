@@ -32,7 +32,7 @@ https://assembly-api-mcp.fly.dev/mcp?key=YOUR_API_KEY&profile=lite
 | 파라미터 | 필수 | 기본값 | 설명 |
 |---------|------|--------|------|
 | `key` | O | `sample` | 열린국회정보 API 키 |
-| `profile` | X | `lite` | `lite` (6개 도구) 또는 `full` (10개 도구) |
+| `profile` | X | `lite` | `lite` (6개 도구) 또는 `full` (11개 도구) |
 
 > `sample` 키로 최대 10건까지 테스트할 수 있습니다. 설정 후 Claude Desktop을 완전 종료(Cmd+Q) 후 재시작하세요.
 
@@ -479,7 +479,7 @@ MCP_PORT=3001 npm start
 
 ## 다음 단계
 
-- [README.md](README.md) — 전체 프로젝트 설명, Lite(6개)/Full(10개) 도구 목록
+- [README.md](README.md) — 전체 프로젝트 설명, Lite(6개)/Full(11개) 도구 목록
 - [docs/api-catalog.md](docs/api-catalog.md) — 국회 API 276개 전체 목록
 - [docs/mcp-api.md](docs/mcp-api.md) — MCP 도구 ↔ API 매핑 상세
 - [docs/discovered-codes.md](docs/discovered-codes.md) — 발굴된 API 코드 및 파라미터

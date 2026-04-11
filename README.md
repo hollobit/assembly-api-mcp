@@ -8,6 +8,16 @@ Claude, Gemini, ChatGPT 등 AI 도구에서 국회의원, 의안, 일정, 회의
 
 ## 업데이트 내역
 
+### v0.7.0 — NABO Open API 통합 (2026-04-12)
+
+- **nabo.go.kr 3개 API 통합** — 보고서 자료 검색, 정기간행물, 채용정보
+- **get_nabo MCP 도구 추가** (Full 프로필) — `type=report|periodical|recruitments`
+- **REST API `/api/nabo` 추가** — Full 프로필에서 HTTP로 NABO 데이터 접근
+- **도구 수 변경** — Lite 유지 (6개), Full 10개 → **11개** (+get_nabo)
+- **API 소스 3개** —国会 + lawmaking + NABO
+- **API 커버 287개** (276개국회 + 8 국민참여입법센터 + 3개 NABO)
+- **NABO API Key 발급** — https://www.nabo.go.kr/ko/api/apply.do?key=2509230004
+
 ### v0.6.0 — 국민참여입법센터 API 통합 (2026-04-11)
 
 - **279개 API 코드 등록** (271국회 + 8 국민참여입법센터)
@@ -44,8 +54,8 @@ Claude, Gemini, ChatGPT 등 AI 도구에서 국회의원, 의안, 일정, 회의
 
 ## 주요 기능
 
-- **6개 Lite / 10개 Full 프로필 도구** — 도메인 엔티티 기반 통합 ([활용 사례 100선](USECASE.md))
-- **284개 API 접근 (276개국회 + 8 국민참여입법센터)** — `discover_apis` + `query_assembly` 범용 도구
+- **6개 Lite / 11개 Full 프로필 도구** — 도메인 엔티티 기반 통합 ([활용 사례 100선](USECASE.md))
+- **287개 API 접근 (276개국회 + 8 국민참여입법센터 + 3개 NABO)** — `discover_apis` + `query_assembly` 범용 도구
 - **279개 API 코드 등록 (271개국회 + 8 국민참여입법센터)** — 107개 전용 도구 통합, 나머지 `query_assembly`로 즉시 호출
 - **영문 API 지원** — `lang="en"` 파라미터로 의원/일정/의안/위원회 영문 데이터
 - **역대 국회 데이터** — `scope="history"`로 역대 의원/선거/의장 접근
@@ -87,7 +97,7 @@ https://assembly-api-mcp.fly.dev/mcp?key=YOUR_API_KEY&profile=lite
 | 파라미터 | 필수 | 기본값 | 설명 |
 |---------|------|--------|------|
 | `key` | O | `sample` | 열린국회정보 API 키 |
-| `profile` | X | `lite` | `lite` (6개 도구) 또는 `full` (10개 도구) |
+| `profile` | X | `lite` | `lite` (6개 도구) 또는 `full` (11개 도구) |
 
 > `sample` 키로 최대 10건까지 테스트할 수 있습니다.
 
@@ -297,13 +307,13 @@ ngrok http 3000
 
 > 활용 예시는 [활용 사례 100선](USECASE.md)을 참조하세요. 도구 매핑 상세는 [docs/tool-mapping.md](docs/tool-mapping.md)를 참조하세요.
 
-### Full 프로필 (10개)
+### Full 프로필 (11개)
 
-`MCP_PROFILE=full`로 전환하면 Lite 6개 + Full 전용 4개를 사용할 수 있습니다.
+`MCP_PROFILE=full`로 전환하면 Lite 6개 + Full 전용 5개를 사용할 수 있습니다.
 
 #### Lite 도구 (6개) — 위와 동일
 
-#### Full 전용 (4개)
+#### Full 전용 (5개)
 
 | 도구 | 설명 |
 |------|------|
@@ -311,6 +321,7 @@ ngrok http 3000
 | `committee_detail` | 위원회 심층 (현황+위원명단) |
 | `petition_detail` | 청원 심층 (목록+상세) |
 | `research_data` | 연구자료 통합 (도서관+입법조사처+예산정책처) |
+| `get_nabo` | NABO 보고서/정기간행물/채용정보 (nabo.go.kr) |
 
 ## CLI 사용법
 
@@ -432,6 +443,28 @@ npx tsx src/cli.ts lawmaking --type interpretation --key 자동차
 npx tsx src/cli.ts lawmaking --type opinion
 ```
 
+### 국회예산정책처 NABO API (nabo.go.kr)
+
+> `.env`에 `NABO_API_KEY=<발급받은키>` 설정 필요
+
+```bash
+# 보고서 자료 검색 (기본)
+npx tsx src/cli.ts nabo --type report
+
+# 키워드 검색
+npx tsx src/cli.ts nabo --type report --key 예산
+
+# 정기간행물 조회
+npx tsx src/cli.ts nabo --type periodical
+npx tsx src/cli.ts nabo --type periodical --key 경제
+
+# 채용정보 조회
+npx tsx src/cli.ts nabo --type recruitments
+
+# 페이지네이션
+npx tsx src/cli.ts nabo --type report --page 2 --size 20
+```
+
 ## 문서
 
 | 문서 | 설명 |
@@ -538,7 +571,7 @@ assembly-api/
 │   │   ├── codes.ts          # 검증된 API 코드 매핑
 │   │   ├── monitor.ts        # API 응답 시간 모니터링
 │   │   └── rate-limiter.ts   # Rate Limit 추적
-│   ├── tools/                # MCP 도구 (Lite 6개 / Full 10개)
+│   ├── tools/                # MCP 도구 (Lite 6개 / Full 11개)
 │   │   ├── lite/             # Lite 프로필 도구 (6개)
 │   ├── openapi/              # OpenAPI REST 브릿지
 │   │   ├── router.ts         # REST 라우터 (/api/*)

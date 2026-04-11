@@ -71,6 +71,7 @@ import {
   searchLibrary,
   getBudgetAnalysis,
   searchResearchReports,
+  getNabo,
 } from "./handlers.js";
 
 // ---------------------------------------------------------------------------
@@ -118,6 +119,7 @@ const ROUTES: readonly RouteEntry[] = [
   { pattern: /^\/api\/library$/, handler: searchLibrary, pathParamNames: [], profile: "full", cacheMaxAge: CACHE_DYNAMIC },
   { pattern: /^\/api\/budget$/, handler: getBudgetAnalysis, pathParamNames: [], profile: "full", cacheMaxAge: CACHE_DYNAMIC },
   { pattern: /^\/api\/research$/, handler: searchResearchReports, pathParamNames: [], profile: "full", cacheMaxAge: CACHE_DYNAMIC },
+  { pattern: /^\/api\/nabo$/, handler: getNabo, pathParamNames: [], profile: "full", cacheMaxAge: CACHE_DYNAMIC },
 ];
 
 // ---------------------------------------------------------------------------

@@ -23,6 +23,7 @@ import "dotenv/config";
 import { loadConfig, type AppConfig } from "./config.js";
 import { createApiClient } from "./api/client.js";
 import { createLawmakingClient } from "./api/lawmaking.js";
+import { createNaboClient } from "./api/nabo.js";
 import { API_CODES, CURRENT_AGE } from "./api/codes.js";
 
 // config와 api는 실제 명령 실행 시에만 초기화 (--help 시 불필요)
@@ -41,6 +42,10 @@ function getApi(): ReturnType<typeof createApiClient> {
 
 function getLawmaking(): ReturnType<typeof createLawmakingClient> {
   return createLawmakingClient(getConfig());
+}
+
+function getNabo(): ReturnType<typeof createNaboClient> {
+  return createNaboClient(getConfig());
 }
 
 // ---------------------------------------------------------------------------
@@ -295,6 +300,39 @@ async function cmdLawmaking(flags: Record<string, string>): Promise<void> {
   printTable(rows.slice(0, pageSize), Object.keys(rows[0] ?? {}));
 }
 
+// ---------------------------------------------------------------------------
+// NABO CLI
+// ---------------------------------------------------------------------------
+
+type NaboCliType = "report" | "periodical" | "recruitments";
+
+async function cmdNabo(flags: Record<string, string>): Promise<void> {
+  const type = (flags.type ?? "report") as NaboCliType;
+  const key = flags.key ?? undefined;
+  const page = Number(flags.page ?? 1);
+  const pageSize = Number(flags.size ?? 20);
+
+  let result: import("./api/nabo.js").NaboApiResult;
+
+  switch (type) {
+    case "report":
+      result = await getNabo().searchReports({ page, size: pageSize, scSw: key });
+      break;
+    case "periodical":
+      result = await getNabo().searchPeriodicals({ page, size: pageSize, scSw: key });
+      break;
+    case "recruitments":
+      result = await getNabo().searchRecruitments({ page, size: pageSize, scSw: key });
+      break;
+    default:
+      console.error(`알 수 없는 타입: ${type}`);
+      process.exit(1);
+  }
+
+  console.log(`\nNABO API: ${type} (총 ${result.total}건, ${result.page}/${Math.ceil(result.total / result.size)}페이지)\n`);
+  printTable(result.items as unknown as Record<string, unknown>[], ["subj", "cdNm", "pubDt", "count"]);
+}
+
 async function cmdTest(): Promise<void> {
   console.log("\n=== 전체 API 작동 테스트 ===\n");
 
@@ -371,6 +409,12 @@ function printHelp(): void {
     --diff <차수>       예고 차수
     --searchType <유형>  검색구분 (opinion: caseNm|caseNo|reqOrgNm)
 
+  nabo                국회예산정책처 NABO API
+    --type <type>      report(기본)|periodical|recruitments
+    --key <검색어>      검색어
+    --page <숫자>       페이지 번호 (기본: 1)
+    --size <숫자>       결과 수 (기본: 20)
+
 공통 옵션:
   --size <N>           결과 수 (기본: 20)
   --age <N>            대수 (기본: 22)
@@ -408,6 +452,8 @@ async function main(): Promise<void> {
         return cmdMeta();
       case "lawmaking":
         return cmdLawmaking(flags);
+      case "nabo":
+        return cmdNabo(flags);
       case "test":
         return cmdTest();
       case "help":

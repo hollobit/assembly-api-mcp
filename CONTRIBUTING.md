@@ -26,7 +26,7 @@ npm run lint       # 타입 체크
 이 프로젝트는 **Lite/Full 프로필**로 MCP 도구를 제공합니다.
 
 - **Lite** (기본, 6개 도구): `src/tools/lite/` — 도메인 엔티티 기반 통합
-- **Full** (10개 도구): Lite 6개 + `src/tools/full/` 심층 4개
+- **Full** (11개 도구): Lite 6개 + `src/tools/full/` 심층 5개 (bill_detail, committee_detail, petition_detail, research_data, get_nabo)
 
 새 도구를 추가할 때:
 1. Full 모드 도구: `src/tools/` 아래에 파일 생성, `server.ts`의 Full 분기에 등록

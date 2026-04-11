@@ -155,7 +155,7 @@ export function registerResources(
               ],
             },
             full: {
-              description: "Full 프로필 (10개 도구) — Lite 6개 + 심층 4개",
+              description: "Full 프로필 (11개 도구) — Lite 6개 + 심층 5개",
               toolCount: 10,
               additionalTools: [
                 "bill_detail — 의안 1건의 모든 정보 (상세+심사+이력+제안자+회의)",

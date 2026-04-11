@@ -54,7 +54,7 @@ export interface AppConfig {
   readonly server: ServerConfig;
   readonly cache: CacheConfig;
   readonly apiResponse: ApiResponseConfig;
-  /** MCP 도구 프로필: lite(6개 도구) 또는 full(10개 도구) */
+  /** MCP 도구 프로필: lite(6개 도구) 또는 full(11개 도구) */
   readonly profile: "lite" | "full";
 }
 
