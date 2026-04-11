@@ -392,29 +392,27 @@ Full 프로필은 Lite 6개를 모두 포함하며, 심층 분석용 4개 도구
 > Base URL: `https://www.lawmaking.go.kr/rest`
 > 인증: OC (정보공개 서비스 신청 ID, `.env`에 `LAWMKING_OC`로 설정)
 
-### 목록 API (7개)
+### 목록 API (6개)
 
 | # | API 코드 | API명 | 매핑 도구 | 비고 |
 |---|----------|-------|----------|------|
 | 1 | `govLmSts` | 입법현황 목록 | `assembly_org(type=lawmaking, category=legislation)` | OC 필요 |
 | 2 | `lmPln` | 입법계획 목록 | `assembly_org(type=lawmaking, category=legislation, keyword=...)` | OC 필요 |
 | 3 | `ogLmPp` | 입법예고 목록 | `assembly_org(type=lawmaking, category=legislation, diff=0)` | OC 필요 |
-| 4 | `ogLmPpByUpd` | 입법예고 목록(수정일) | `assembly_org(type=lawmaking, category=legislation, upd_yd_fmt=...)` | OC 필요 |
-| 5 | `ptcpAdmPp` | 행정예고 목록 | `assembly_org(type=lawmaking, category=admin)` | OC 필요 |
+| 4 | `ptcpAdmPp` | 행정예고 목록 | `assembly_org(type=lawmaking, category=admin)` | OC 필요 |
 | 6 | `lsItptEmp` | 법령해석례 검색 | `assembly_org(type=lawmaking, category=interpretation)` | OC 필요 |
 | 7 | `loLsExample` | 의견제시사례 목록 | `assembly_org(type=lawmaking, category=opinion)` | OC 필요 |
 
-### 상세 API (7개) — `detail_seq` 파라미터로 조회
+### 상세 API (6개) — `detail_seq` 파라미터로 조회
 
 | # | API 코드 | API명 | 매핑 도구 |
 |---|----------|-------|----------|
 | 8 | `govLmSts/{seq}` | 입법현황 상세 | `assembly_org(type=lawmaking, category=legislation, detail_seq=...)` |
 | 9 | `lmPln/{seq}` | 입법계획 상세 | `assembly_org(type=lawmaking, category=legislation, keyword=..., detail_seq=...)` |
 | 10 | `ogLmPp/{seq}/...` | 입법예고 상세 | `assembly_org(type=lawmaking, category=legislation, diff=..., detail_seq=...)` |
-| 11 | `ogLmPpByUpd/{seq}` | 입법예고 상세(수정일) | `assembly_org(type=lawmaking, category=legislation, upd_yd_fmt=..., detail_seq=...)` |
-| 12 | `ptcpAdmPp/{seq}` | 행정예고 상세 | `assembly_org(type=lawmaking, category=admin, detail_seq=...)` |
-| 13 | `lsItptEmp/{seq}` | 법령해석례 상세 | `assembly_org(type=lawmaking, category=interpretation, detail_seq=...)` |
-| 14 | `loLsExample/{seq}` | 의견제시사례 상세 | `assembly_org(type=lawmaking, category=opinion, detail_seq=...)` |
+| 11 | `ptcpAdmPp/{seq}` | 행정예고 상세 | `assembly_org(type=lawmaking, category=admin, detail_seq=...)` |
+| 12 | `lsItptEmp/{seq}` | 법령해석례 상세 | `assembly_org(type=lawmaking, category=interpretation, detail_seq=...)` |
+| 13 | `loLsExample/{seq}` | 의견제시사례 상세 | `assembly_org(type=lawmaking, category=opinion, detail_seq=...)` |
 
 ### assembly_org lawmaking 파라미터
 

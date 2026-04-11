@@ -422,9 +422,6 @@ npx tsx src/cli.ts lawmaking --type plan --key 교육
 # 입법예고 목록 (진행중)
 npx tsx src/cli.ts lawmaking --type notice
 
-# 입법예고 목록 (수정일 기준)
-npx tsx src/cli.ts lawmaking --type noticeByUpd --key 2024.01.01
-
 # 행정예고 목록
 npx tsx src/cli.ts lawmaking --type admin
 

@@ -220,7 +220,7 @@ async function cmdMeta(): Promise<void> {
 }
 
 // lawmaking API 타입 (CLI에서 직접 지정)
-type LawmakingApiType = "status" | "plan" | "notice" | "noticeByUpd" | "admin" | "interpretation" | "opinion";
+type LawmakingApiType = "status" | "plan" | "notice" | "admin" | "interpretation" | "opinion";
 
 // lawmaking API 응답에서 리스트 추출 헬퍼
 function extractLawmakingRows(result: Record<string, unknown>): Record<string, unknown>[] {
@@ -257,14 +257,6 @@ async function cmdLawmaking(flags: Record<string, string>): Promise<void> {
         stYdFmt: flags.st,
         edYdFmt: flags.ed,
         cptOfiOrgCd: undefined,
-      });
-      break;
-    case "noticeByUpd":
-      result = await getLawmaking().getLegislationNoticesByUpd({
-        updYdFmt: key ?? "2024.01.01",
-        diff: flags.diff,
-        lsClsCd: flags.ls,
-        lsNm: flags.keyword,
       });
       break;
     case "admin":
@@ -366,7 +358,7 @@ function printHelp(): void {
   meta                 전체 API 목록 (276개)
   test                 전체 API 작동 테스트
   lawmaking            국민참여입법센터 API
-    --type <type>      notice(기본)|status|plan|noticeByUpd|admin|interpretation|opinion
+    --type <type>      notice(기본)|status|plan|admin|interpretation|opinion
     --key <값>         검색어 또는 차수 (diff)
     --keyword <단어>    법령명 검색어
     --ls <코드>         법령분류코드
