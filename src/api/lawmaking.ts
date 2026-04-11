@@ -143,14 +143,15 @@ export function createLawmakingClient(config: AppConfig) {
    */
   async function fetchLawmaking<T>(
     endpoint: string,
-    params: Record<string, string | number> = {},
+    params: Record<string, string | number | undefined> = {},
   ): Promise<T> {
-    const queryParams: Record<string, string | number> = {
-      OC: ocKey as string,
-      ...params,
-    };
+    const filtered = Object.fromEntries(
+      Object.entries({ OC: ocKey as string, ...params }).filter(
+        ([, v]) => v !== undefined && v !== null && v !== "",
+      ),
+    );
 
-    const entries = Object.entries(queryParams)
+    const entries = Object.entries(filtered)
       .map(
         ([k, v]) =>
           `${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`,

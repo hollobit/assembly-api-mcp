@@ -18,6 +18,18 @@ import { createLawmakingClient, type Interpretation, type OpinionCase } from "..
 import { API_CODES } from "../../api/codes.js";
 import { formatToolError } from "../helpers.js";
 
+// lawmaking API 응답에서 리스트 추출 헬퍼
+function extractLawmakingRows(result: Record<string, unknown>): Record<string, unknown>[] {
+  const res = (result as Record<string, unknown>).result as Record<string, unknown> | undefined;
+  if (!res) return [];
+  const list = res.list as Record<string, unknown> | undefined;
+  if (!list) return [];
+  const firstKey = Object.keys(list)[0];
+  if (!firstKey) return [];
+  const arr = list[firstKey];
+  return Array.isArray(arr) ? (arr as Record<string, unknown>[]) : [];
+}
+
 // ---------------------------------------------------------------------------
 // Type detection
 // ---------------------------------------------------------------------------
@@ -311,8 +323,8 @@ async function handleLawmaking(
   // 목록 조회 모드
   switch (category) {
     case "legislation": {
-      // mode: keyword 있음 → plan / diff 있음 → notice / 없음 → status (govLmSts)
-      const mode = params.keyword ? "plan" : (params.diff !== undefined ? "notice" : "status");
+      // mode: keyword 있음 → plan / upd_yd_fmt나 diff 있음 → notice / 없음 → status (govLmSts)
+      const mode = params.keyword ? "plan" : ((params.diff !== undefined || params.upd_yd_fmt !== undefined) ? "notice" : "status");
 
       if (mode === "plan") {
         // 입법계획
@@ -323,7 +335,7 @@ async function handleLawmaking(
           searchKnd: params.search_knd,
           srchTxt: params.srch_txt ?? params.keyword,
         });
-        const rows = (result as Record<string, unknown>).result as Record<string, unknown>[] ?? [];
+        const rows = extractLawmakingRows(result);
         return {
           total: rows.length,
           items: rows.map((row) => ({
@@ -354,7 +366,7 @@ async function handleLawmaking(
               edYdFmt: params.ed_dt_fmt,
               lsNm: params.keyword,
             });
-        const rows = (result as Record<string, unknown>).result as Record<string, unknown>[] ?? [];
+        const rows = extractLawmakingRows(result);
         return {
           total: rows.length,
           items: rows.map((row) => ({
@@ -379,7 +391,7 @@ async function handleLawmaking(
           edDtFmt: params.ed_dt_fmt,
           lsNmKo: params.keyword,
         });
-        const rows = (result as Record<string, unknown>).result as Record<string, unknown>[] ?? [];
+        const rows = extractLawmakingRows(result);
         return {
           total: rows.length,
           items: rows.map((row) => ({
@@ -404,7 +416,7 @@ async function handleLawmaking(
         stYdFmt: params.st_dt_fmt,
         edYdFmt: params.ed_dt_fmt,
       });
-      const rows = (result as Record<string, unknown>).result as Record<string, unknown>[] ?? [];
+      const rows = extractLawmakingRows(result);
       return {
         total: rows.length,
         items: rows.map((row) => ({
@@ -429,7 +441,7 @@ async function handleLawmaking(
         lsCptOrg: params.ls_cpt_org,
         schKeyword: params.keyword,
       });
-      const rows = (result as Record<string, unknown>).result as Record<string, unknown>[] ?? [];
+      const rows = extractLawmakingRows(result);
       return {
         total: rows.length,
         items: rows.map((row) => ({
@@ -451,7 +463,7 @@ async function handleLawmaking(
         scTextType: params.sc_text_type,
         scText: params.sc_text ?? params.keyword,
       });
-      const rows = (result as Record<string, unknown>).result as Record<string, unknown>[] ?? [];
+      const rows = extractLawmakingRows(result);
       return {
         total: rows.length,
         items: rows.map((row) => ({

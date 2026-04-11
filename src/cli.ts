@@ -222,6 +222,18 @@ async function cmdMeta(): Promise<void> {
 // lawmaking API 타입 (CLI에서 직접 지정)
 type LawmakingApiType = "status" | "plan" | "notice" | "noticeByUpd" | "admin" | "interpretation" | "opinion";
 
+// lawmaking API 응답에서 리스트 추출 헬퍼
+function extractLawmakingRows(result: Record<string, unknown>): Record<string, unknown>[] {
+  const res = (result as Record<string, unknown>).result as Record<string, unknown> | undefined;
+  if (!res) return [];
+  const list = res.list as Record<string, unknown> | undefined;
+  if (!list) return [];
+  const firstKey = Object.keys(list)[0];
+  if (!firstKey) return [];
+  const arr = list[firstKey];
+  return Array.isArray(arr) ? arr as Record<string, unknown>[] : [];
+}
+
 async function cmdLawmaking(flags: Record<string, string>): Promise<void> {
   const type = (flags.type ?? "notice") as LawmakingApiType;
   const key = flags.key ?? undefined;
@@ -286,7 +298,7 @@ async function cmdLawmaking(flags: Record<string, string>): Promise<void> {
       process.exit(1);
   }
 
-  const rows = (result as Record<string, unknown>).result as Record<string, unknown>[] ?? [];
+  const rows = extractLawmakingRows(result);
   console.log(`\n국민참여입법센터 API: ${type} (총 ${rows.length}건)\n`);
   printTable(rows.slice(0, pageSize), Object.keys(rows[0] ?? {}));
 }
