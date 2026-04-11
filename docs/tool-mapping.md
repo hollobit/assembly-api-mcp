@@ -428,7 +428,6 @@ assembly_org(
   diff="0",                  // 0=진행중, 1=종료 (notice 모드)
   ls_cls_cd="AA0101",       // 법령분류코드 (AA0101=법률)
   cpt_ofi_org_cd="1741000", // 소관부처 코드
-  upd_yd_fmt="2024.01.01",  // 수정일자 (수정일 기준 예고 조회 시)
 
   // admin 전용
   closing="N",               // N=진행, Y=종료
