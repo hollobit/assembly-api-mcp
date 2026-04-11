@@ -10,8 +10,8 @@ Claude, Gemini, ChatGPT 등 AI 도구에서 국회의원, 의안, 일정, 회의
 
 ### v0.6.0 — 국민참여입법센터 API 통합 (2026-04-11)
 
-- **277개 API 코드 등록** (271국회 + 6 국민참여입법센터)
-- **assembly_org 확장** — `type=lawmaking`으로 입법현황/계획/예고, 행정예고, 법령해석례, 의견제시사례 접근
+- **279개 API 코드 등록** (271국회 + 8 국민참여입법센터)
+- **assembly_org 확장** — `type=lawmaking`으로 입법현황/계획/예고, 행정예고, 법령해석례, 의견제시사례 접근 (14개 엔드포인트)
 - **Lite/Full 도구 수 변경 없음** (6/10개 유지, 파라미터 확장만)
 - **fast-xml-parser 의존성 추가** — lawmaking API XML 응답 파싱
 - **국민참여입법센터 API 사용 시** — [opinion.lawmaking.go.kr](https://opinion.lawmaking.go.kr)에서 OC(정보공개 서비스 신청 ID) 발급 필요
@@ -45,8 +45,8 @@ Claude, Gemini, ChatGPT 등 AI 도구에서 국회의원, 의안, 일정, 회의
 ## 주요 기능
 
 - **6개 Lite / 10개 Full 프로필 도구** — 도메인 엔티티 기반 통합 ([활용 사례 100선](USECASE.md))
-- **282개 API 접근 (277개국회 + 6 국민참여입법센터)** — `discover_apis` + `query_assembly` 범용 도구
-- **277개 API 코드 등록 (271개국회 + 6 국민참여입법센터)** — 107개 전용 도구 통합, 나머지 `query_assembly`로 즉시 호출
+- **284개 API 접근 (276개국회 + 8 국민참여입법센터)** — `discover_apis` + `query_assembly` 범용 도구
+- **279개 API 코드 등록 (271개국회 + 8 국민참여입법센터)** — 107개 전용 도구 통합, 나머지 `query_assembly`로 즉시 호출
 - **영문 API 지원** — `lang="en"` 파라미터로 의원/일정/의안/위원회 영문 데이터
 - **역대 국회 데이터** — `scope="history"`로 역대 의원/선거/의장 접근
 - **ALLBILL 심사경과** — 의안 조회 시 소관위→법사위→본회의→공포 타임라인 자동 포함

@@ -263,6 +263,36 @@ export function createLawmakingClient(config: AppConfig) {
   }
 
   /**
+   * 입법예고 조회 (수정일 기준)
+   *
+   * @param params updYdFmt(수정일자, YYYY.MM.DD 형식), diff(차수),
+   *               lsClsCd(법령분류코드), lsNm(법령명)
+   */
+  async function getLegislationNoticesByUpd(
+    params: {
+      updYdFmt?: string;
+      diff?: string;
+      lsClsCd?: string;
+      lsNm?: string;
+    } = {},
+  ): Promise<LawmakingLegislationNoticeResponse> {
+    mcpLogger.log("debug", "lawmaking", `입법예고 조회(수정일): ${JSON.stringify(params)}`);
+    return fetchLawmaking<LawmakingLegislationNoticeResponse>("/ogLmPpByUpd", params);
+  }
+
+  /**
+   * 입법예고 상세 조회 (수정일 기준)
+   *
+   * @param seq 입법예고 일련번호
+   */
+  async function getLegislationNoticeDetailByUpd(
+    seq: string,
+  ): Promise<Record<string, unknown>> {
+    mcpLogger.log("debug", "lawmaking", `입법예고 상세(수정일): ${seq}`);
+    return fetchLawmaking<Record<string, unknown>>(`/ogLmPpByUpd/${seq}`, {});
+  }
+
+  /**
    * 행정예고 조회
    *
    * @param params lsClsCd(법령분류코드), closing(마감여부), asndOfiNm(소관부처명),
@@ -384,6 +414,8 @@ export function createLawmakingClient(config: AppConfig) {
     getLegislationPlanDetail,
     getLegislationNotices,
     getLegislationNoticeDetail,
+    getLegislationNoticesByUpd,
+    getLegislationNoticeDetailByUpd,
     getAdminNotices,
     getAdminNoticeDetail,
     getInterpretations,

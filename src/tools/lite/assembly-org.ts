@@ -42,6 +42,7 @@ interface OrgParams {
   readonly diff?: string;
   readonly closing?: string;
   readonly ls_cls_cd?: string;
+  readonly upd_yd_fmt?: string;
   readonly cpt_ofi_org_cd?: string;
   readonly st_dt_fmt?: string;
   readonly ed_dt_fmt?: string;
@@ -277,12 +278,15 @@ async function handleLawmaking(
     switch (category) {
       case "legislation": {
         // mode 파라미터로 세 분기: status(기본) / plan / notice
-        const mode = params.keyword ? "plan" : (params.diff ? "notice" : "status");
+        const mode = params.keyword ? "plan" : (params.diff || params.upd_yd_fmt ? "notice" : "status");
         if (mode === "plan") {
           const result = await lawmaking.getLegislationPlanDetail(detailSeq);
           return { total: 1, items: [(result as Record<string, unknown>).result ?? result] };
         } else if (mode === "notice") {
-          const result = await lawmaking.getLegislationNoticeDetail(detailSeq);
+          // upd_yd_fmt 있으면 수정일 기준 상세 API 사용
+          const result = params.upd_yd_fmt
+            ? await lawmaking.getLegislationNoticeDetailByUpd(detailSeq)
+            : await lawmaking.getLegislationNoticeDetail(detailSeq);
           return { total: 1, items: [(result as Record<string, unknown>).result ?? result] };
         } else {
           const result = await lawmaking.getLegislationDetail(detailSeq);
@@ -332,16 +336,24 @@ async function handleLawmaking(
           })),
         };
       } else if (mode === "notice") {
-        // 입법예고 (ogLmPp)
-        const result = await lawmaking.getLegislationNotices({
-          lsClsCd: params.ls_cls_cd,
-          cptOfiOrgCd: params.cpt_ofi_org_cd,
-          diff: params.diff,
-          pntcNo: undefined,
-          stYdFmt: params.st_dt_fmt,
-          edYdFmt: params.ed_dt_fmt,
-          lsNm: params.keyword,
-        });
+        // 입법예고 (ogLmPp) — upd_yd_fmt 있으면 수정일 기준 API 사용
+        const isByUpd = !!params.upd_yd_fmt;
+        const result = isByUpd
+          ? await lawmaking.getLegislationNoticesByUpd({
+              updYdFmt: params.upd_yd_fmt,
+              diff: params.diff,
+              lsClsCd: params.ls_cls_cd,
+              lsNm: params.keyword,
+            })
+          : await lawmaking.getLegislationNotices({
+              lsClsCd: params.ls_cls_cd,
+              cptOfiOrgCd: params.cpt_ofi_org_cd,
+              diff: params.diff,
+              pntcNo: undefined,
+              stYdFmt: params.st_dt_fmt,
+              edYdFmt: params.ed_dt_fmt,
+              lsNm: params.keyword,
+            });
         const rows = (result as Record<string, unknown>).result as Record<string, unknown>[] ?? [];
         return {
           total: rows.length,
@@ -498,6 +510,8 @@ export function registerAssemblyOrgTool(
         .describe("예고상태 (lawmaking legislation): 0=진행중, 1=종료"),
       ls_cls_cd: z.string().optional()
         .describe("법령분류코드: AA0101(법률), AA0102(대통령령), AA0103~AA0106(시행령/규칙 등)"),
+      upd_yd_fmt: z.string().optional()
+        .describe("수정일자 (YYYY.MM.DD, lawmaking legislation 예고 조회 시 수정일 기준"),
       cpt_ofi_org_cd: z.string().optional()
         .describe("소관부처 코드 (예: 1741000=행안부)"),
       st_dt_fmt: z.string().optional()

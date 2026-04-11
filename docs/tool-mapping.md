@@ -392,27 +392,29 @@ Full 프로필은 Lite 6개를 모두 포함하며, 심층 분석용 4개 도구
 > Base URL: `https://www.lawmaking.go.kr/rest`
 > 인증: OC (정보공개 서비스 신청 ID, `.env`에 `LAWMKING_OC`로 설정)
 
-### 목록 API (6개)
+### 목록 API (7개)
 
 | # | API 코드 | API명 | 매핑 도구 | 비고 |
 |---|----------|-------|----------|------|
 | 1 | `govLmSts` | 입법현황 목록 | `assembly_org(type=lawmaking, category=legislation)` | OC 필요 |
 | 2 | `lmPln` | 입법계획 목록 | `assembly_org(type=lawmaking, category=legislation, keyword=...)` | OC 필요 |
 | 3 | `ogLmPp` | 입법예고 목록 | `assembly_org(type=lawmaking, category=legislation, diff=0)` | OC 필요 |
-| 4 | `ptcpAdmPp` | 행정예고 목록 | `assembly_org(type=lawmaking, category=admin)` | OC 필요 |
-| 5 | `lsItptEmp` | 법령해석례 검색 | `assembly_org(type=lawmaking, category=interpretation)` | OC 필요 |
-| 6 | `loLsExample` | 의견제시사례 목록 | `assembly_org(type=lawmaking, category=opinion)` | OC 필요 |
+| 4 | `ogLmPpByUpd` | 입법예고 목록(수정일) | `assembly_org(type=lawmaking, category=legislation, upd_yd_fmt=...)` | OC 필요 |
+| 5 | `ptcpAdmPp` | 행정예고 목록 | `assembly_org(type=lawmaking, category=admin)` | OC 필요 |
+| 6 | `lsItptEmp` | 법령해석례 검색 | `assembly_org(type=lawmaking, category=interpretation)` | OC 필요 |
+| 7 | `loLsExample` | 의견제시사례 목록 | `assembly_org(type=lawmaking, category=opinion)` | OC 필요 |
 
-### 상세 API (6개) — `detail_seq` 파라미터로 조회
+### 상세 API (7개) — `detail_seq` 파라미터로 조회
 
 | # | API 코드 | API명 | 매핑 도구 |
 |---|----------|-------|----------|
-| 7 | `govLmSts/{seq}` | 입법현황 상세 | `assembly_org(type=lawmaking, category=legislation, detail_seq=...)` |
-| 8 | `lmPln/{seq}` | 입법계획 상세 | `assembly_org(type=lawmaking, category=legislation, keyword=..., detail_seq=...)` |
-| 9 | `ogLmPp/{seq}/...` | 입법예고 상세 | `assembly_org(type=lawmaking, category=legislation, diff=..., detail_seq=...)` |
-| 10 | `ptcpAdmPp/{seq}` | 행정예고 상세 | `assembly_org(type=lawmaking, category=admin, detail_seq=...)` |
-| 11 | `lsItptEmp/{seq}` | 법령해석례 상세 | `assembly_org(type=lawmaking, category=interpretation, detail_seq=...)` |
-| 12 | `loLsExample/{seq}` | 의견제시사례 상세 | `assembly_org(type=lawmaking, category=opinion, detail_seq=...)` |
+| 8 | `govLmSts/{seq}` | 입법현황 상세 | `assembly_org(type=lawmaking, category=legislation, detail_seq=...)` |
+| 9 | `lmPln/{seq}` | 입법계획 상세 | `assembly_org(type=lawmaking, category=legislation, keyword=..., detail_seq=...)` |
+| 10 | `ogLmPp/{seq}/...` | 입법예고 상세 | `assembly_org(type=lawmaking, category=legislation, diff=..., detail_seq=...)` |
+| 11 | `ogLmPpByUpd/{seq}` | 입법예고 상세(수정일) | `assembly_org(type=lawmaking, category=legislation, upd_yd_fmt=..., detail_seq=...)` |
+| 12 | `ptcpAdmPp/{seq}` | 행정예고 상세 | `assembly_org(type=lawmaking, category=admin, detail_seq=...)` |
+| 13 | `lsItptEmp/{seq}` | 법령해석례 상세 | `assembly_org(type=lawmaking, category=interpretation, detail_seq=...)` |
+| 14 | `loLsExample/{seq}` | 의견제시사례 상세 | `assembly_org(type=lawmaking, category=opinion, detail_seq=...)` |
 
 ### assembly_org lawmaking 파라미터
 
@@ -428,6 +430,7 @@ assembly_org(
   diff="0",                  // 0=진행중, 1=종료 (notice 모드)
   ls_cls_cd="AA0101",       // 법령분류코드 (AA0101=법률)
   cpt_ofi_org_cd="1741000", // 소관부처 코드
+  upd_yd_fmt="2024.01.01",  // 수정일자 (수정일 기준 예고 조회 시)
 
   // admin 전용
   closing="N",               // N=진행, Y=종료
@@ -466,4 +469,4 @@ assembly_org(
 | API 코드 등록 | 44 | 271 (98.2%) | **277** (+6 lawmaking) |
 | 전용 도구에서 사용 | 44 | 107 | **107** |
 | 전용 도구 커버율 | 16% | 39% | **43%** |
-| API 접근 |国会 276개 |国会 276개 | **282개** (+lawmaking 6개) |
+| API 접근 |国会 276개 |国会 276개 | **284개** (+lawmaking 8개) |

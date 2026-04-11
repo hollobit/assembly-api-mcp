@@ -162,6 +162,6 @@ get_lawmaking_detail({ id, type })       // lawmaking 상세
 | 항목 | v0.5.0 | v0.6.0 | 변화 |
 |------|--------|--------|------|
 | MCP 도구 | 6개 (Lite) / 10개 (Full) | 6개 (Lite) / 10개 (Full) | 유지 |
-| API 코드 등록 | 271개 | **277개** (+6 lawmaking) | +6 |
+| API 코드 등록 | 271개 | **279개** (+8 lawmaking) | +8 |
 | API 소스 |国会 1개 | **国会+lawmaking 2개** | +1 |
-| 커버 범위 |国会 276개 | **282개** (+6 lawmaking) | +6 |
+| 커버 범위 |国会 276개 | **284개** (+8 lawmaking) | +8 |
