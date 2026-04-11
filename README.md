@@ -10,6 +10,7 @@ Claude, Gemini, ChatGPT 등 AI 도구에서 국회의원, 의안, 일정, 회의
 
 ### v0.7.0 — 국회예산정책처(NABO) Open API 통합 (2026-04-12)
 
+- [docs/legislative-lifecycle.md](docs/legislative-lifecycle.md) 입법 라이프사이클 완전 가이드 — 입법 전/중/후 데이터 추적 
 - **nabo.go.kr 3개 API 통합** — 보고서 자료 검색, 정기간행물, 채용정보
 - **get_nabo MCP 도구 추가** (Full 프로필) — `type=report|periodical|recruitments`
 - **REST API `/api/nabo` 추가** — Full 프로필에서 HTTP로 NABO 데이터 접근
