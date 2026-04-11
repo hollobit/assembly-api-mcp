@@ -136,6 +136,13 @@ export function getLandingPageHtml(baseUrl: string): string {
   </div>
   <input type="text" id="apiKey" placeholder="발급받은 API 키 또는 sample" autocomplete="off" spellcheck="false">
 
+  <div class="hint" style="margin-top:0.75rem">
+    <strong>국민참여입법센터 API (선택)</strong> —
+    <a href="https://opinion.lawmaking.go.kr" target="_blank">opinion.lawmaking.go.kr</a>에서 OC 발급 시 입력 ·
+    없으면 입법현황/예고 등 lawmaking API 사용 불가
+  </div>
+  <input type="text" id="lawmakingOc" placeholder="OC (정보공개 서비스 신청 ID, 선택)" autocomplete="off" spellcheck="false">
+
   <div style="margin-top:1rem">
     <label>프로필</label>
     <div class="radio-group">
@@ -182,11 +189,16 @@ const CLIENTS = [
 function getValues() {
   const key = document.getElementById("apiKey").value.trim() || "sample";
   const profile = document.querySelector('input[name="profile"]:checked').value;
-  return { key, profile };
+  const lawmakingOc = document.getElementById("lawmakingOc").value.trim() || undefined;
+  return { key, profile, lawmakingOc };
 }
 
-function mcpUrl(key, profile) {
-  return BASE + "/mcp?key=" + encodeURIComponent(key) + "&profile=" + profile;
+function mcpUrl(key, profile, lawmakingOc) {
+  let url = BASE + "/mcp?key=" + encodeURIComponent(key) + "&profile=" + profile;
+  if (lawmakingOc) {
+    url += "&lawmakingOc=" + encodeURIComponent(lawmakingOc);
+  }
+  return url;
 }
 
 function openapiUrl(profile) {
@@ -197,8 +209,8 @@ function jsonBlock(obj) {
   return JSON.stringify(obj, null, 2);
 }
 
-function buildContent(id, key, profile) {
-  const url = mcpUrl(key, profile);
+function buildContent(id, key, profile, lawmakingOc) {
+  const url = mcpUrl(key, profile, lawmakingOc);
 
   switch (id) {
     case "claude-web":
@@ -274,8 +286,8 @@ function buildContent(id, key, profile) {
   }
 }
 
-function renderPanel(id, key, profile) {
-  const { steps } = buildContent(id, key, profile);
+function renderPanel(id, key, profile, lawmakingOc) {
+  const { steps } = buildContent(id, key, profile, lawmakingOc);
   let html = "";
   for (const step of steps) {
     if (step.type === "text") {
@@ -304,7 +316,7 @@ function generate() {
   CLIENTS.forEach(function(c, i) {
     const active = i === 0 ? " active" : "";
     tabsHtml += '<button class="tab-btn' + active + '" data-tab="' + c.id + '" onclick="switchTab(this)">' + escHtml(c.name) + "</button>";
-    panelsHtml += '<div class="tab-panel' + active + '" id="panel-' + c.id + '">' + renderPanel(c.id, key, profile) + "</div>";
+    panelsHtml += '<div class="tab-panel' + active + '" id="panel-' + c.id + '">' + renderPanel(c.id, key, profile, lawmakingOc) + "</div>";
   });
 
   tabsEl.innerHTML = tabsHtml;
