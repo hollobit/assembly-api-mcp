@@ -6,8 +6,6 @@
 
 ## 1. Legislative Lifecycle 개요
 
-![입법 과정 및 MCP 연관도](lifecycle.jpeg)
-
 한국의 입법 절차는 크게 **6단계**로 구성됩니다:
 
 ```
@@ -36,6 +34,8 @@ assembly-api-mcp는 이 **전 과정**을 데이터로 제공합니다:
 ---
 
 ## 2. 데이터 커버리지 매트릭스
+
+![입법 과정 및 MCP 연관도](lifecycle.jpeg)
 
 ### 입법 단계별 활용 도구
 
