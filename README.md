@@ -14,6 +14,7 @@ Claude, Gemini, ChatGPT 등 AI 도구에서 국회의원, 의안, 일정, 회의
 - **assembly_org 확장** — `type=lawmaking`으로 입법현황/계획/예고, 행정예고, 법령해석례, 의견제시사례 접근
 - **Lite/Full 도구 수 변경 없음** (6/10개 유지, 파라미터 확장만)
 - **fast-xml-parser 의존성 추가** — lawmaking API XML 응답 파싱
+- **국민참여입법센터 API 사용 시** — [opinion.lawmaking.go.kr](https://opinion.lawmaking.go.kr)에서 OC(정보공개 서비스 신청 ID) 발급 필요
 
 ### v0.5.0 — API 커버율 대폭 확장 (2026-04-09)
 
@@ -59,6 +60,7 @@ Claude, Gemini, ChatGPT 등 AI 도구에서 국회의원, 의안, 일정, 회의
 ### 사전 조건
 
 - **국회 API 키** — [open.assembly.go.kr](https://open.assembly.go.kr)에서 무료 발급 (`sample` 키로 테스트 가능)
+- **국민참여입법센터 API 키(선택)** — [opinion.lawmaking.go.kr](https://opinion.lawmaking.go.kr)에서 정보공개 서비스 신청 후 OC 발급 필요. 미설정 시 해당 API 호출 불가.
 
 ### 방법 1: 자동 설치 (로컬, 권장)
 
