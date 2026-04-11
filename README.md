@@ -539,7 +539,7 @@ docker compose up -d
 
 ## 참고 프로젝트
 
-- [korean-law-mcp](https://github.com/SeoNaRu/korean-law-mcp) — 한국 법률 MCP 서버
+- [korean-law-mcp](https://github.com/chrisryugj/korean-law-mcp) — 한국 법률 MCP 서버
 - [data-go-mcp-servers](https://github.com/Koomook/data-go-mcp-servers) — 공공데이터 MCP 서버
 
 ## Star history
