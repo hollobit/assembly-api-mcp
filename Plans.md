@@ -86,7 +86,7 @@ nabostats.go.kr의 통계표 API(`SttsApiTblData.do`)는 **별도 API Key + 명�
 | 25.5 | 단위 테스트 — NABO API 테스트 작성 |nabo.ts 테스트 5개 이상 | 25.4 | cc:완료 |
 | 25.6 | 문서 갱신 — tool-mapping.md + docs/nabo-api.md | NABO API 카테고리 추가, 사용법記載 | 25.5 | cc:완료 |
 | 25.7 | 버전 업데이트 — v0.6.0 → v0.7.0 | package.json + README + server.ts + User-Agent v0.7.0 | 25.6 | cc:완료 |
-| 25.8 | NABO CLI 명령어 추가 — nabo.go.kr 3개 타입 CLI 지원 | npx tsx src/cli.ts nabo --type report\|periodical\|recruitments 동작 확인 | 25.1 | cc:TODO |
+| 25.8 | NABO CLI 명령어 추가 — nabo.go.kr 3개 타입 CLI 지원 | npx tsx src/cli.ts nabo --type report\|periodical\|recruitments 동작 확인 | 25.1 | cc:완료 |
 
 ---
 
@@ -127,7 +127,7 @@ nabostats.go.kr의 통계표 API(`SttsApiTblData.do`)는 **별도 API Key + 명�
 
 | 항목 | v0.6.0 | v0.7.0 | 변화 |
 |------|--------|--------|------|
-| MCP 도구 | 6개 (Lite) / 10개 (Full) | 7개 (Lite) / 12개 (Full) | +1~+3 |
+| MCP 도구 | 6개 (Lite) / 10개 (Full) | **6개 (Lite) / 11개 (Full)** | +1 |
 | NABO API | 0개 | **3개** (report/periodical/recruitments) | +3 |
 | API 소스 |国会+lawmaking | **国会+lawmaking+NABO 3개** | +1 |
 
