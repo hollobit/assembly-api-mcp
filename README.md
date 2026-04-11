@@ -60,6 +60,7 @@ Claude, Gemini, ChatGPT 등 AI 도구에서 국회의원, 의안, 일정, 회의
 - **영문 API 지원** — `lang="en"` 파라미터로 의원/일정/의안/위원회 영문 데이터
 - **역대 국회 데이터** — `scope="history"`로 역대 의원/선거/의장 접근
 - **ALLBILL 심사경과** — 의안 조회 시 소관위→법사위→본회의→공포 타임라인 자동 포함
+- **입법 라이프사이클 완전 추적** — 입법계획/예고(입법 전)→심사/표결(입법 중)→NABO 분석(입법 후) 통합 ([legislative-lifecycle](docs/legislative-lifecycle.md))
 - **CLI 지원** — 터미널에서 직접 국회 데이터 조회
 - **이중 Transport** — stdio (Claude Desktop) + HTTP (원격 서버)
 - **REST API + OpenAPI 스펙** — ChatGPT GPTs Actions 지원 (`/openapi.json`)
@@ -474,6 +475,7 @@ npx tsx src/cli.ts nabo --type report --page 2 --size 20
 | [docs/mcp-api.md](docs/mcp-api.md) | MCP 도구 ↔ 국회 API 코드 매핑 (271개 발굴, 107개 통합) |
 | [docs/discovered-codes.md](docs/discovered-codes.md) | API 코드 발굴 과정 및 검증된 엔드포인트 파라미터 |
 | [docs/mcp-design-analysis.md](docs/mcp-design-analysis.md) | MCP 도구 설계 분석 — Lite/Full 프로필 결정 근거 |
+| [docs/legislative-lifecycle.md](docs/legislative-lifecycle.md) | 입법 라이프사이클 완전 가이드 — 입법 전/중/후 데이터 추적 |
 
 ## 문제 해결
 
