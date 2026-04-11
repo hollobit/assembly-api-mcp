@@ -86,15 +86,19 @@ async function writeJsonFile(path: string, data: Record<string, unknown>): Promi
   await writeFile(path, JSON.stringify(data, null, 2) + "\n", "utf-8");
 }
 
-function buildServerEntry(apiKey: string, profile: string): Record<string, unknown> {
+function buildServerEntry(apiKey: string, profile: string, lawmakingOc?: string): Record<string, unknown> {
+  const env: Record<string, string> = {
+    ASSEMBLY_API_KEY: apiKey,
+    MCP_TRANSPORT: "stdio",
+    MCP_PROFILE: profile,
+  };
+  if (lawmakingOc) {
+    env.LAWMKING_OC = lawmakingOc;
+  }
   return {
     command: "npx",
     args: ["-y", "assembly-api-mcp"],
-    env: {
-      ASSEMBLY_API_KEY: apiKey,
-      MCP_TRANSPORT: "stdio",
-      MCP_PROFILE: profile,
-    },
+    env,
   };
 }
 
@@ -125,6 +129,17 @@ export async function runSetup(): Promise<void> {
       console.log("\n   ⚠️  API 키가 입력되지 않았습니다. 'sample'을 사용합니다.");
     }
     const finalKey = apiKey.trim() || "sample";
+
+    // Step 1.5: 국민참여입법센터 OC 키 (선택)
+    console.log("");
+    console.log("📋 Step 1.5: 국민참여입법센터 API 키 (선택)");
+    console.log("   입법현황/예고, 행정예고, 법령해석례, 의견제시사례 API 사용 시 필요.");
+    console.log("   발급: https://opinion.lawmaking.go.kr → 정보공개 서비스 신청 → OC 발급");
+    console.log("   (미입력 시 해당 API는 사용할 수 없습니다)");
+    console.log("");
+
+    const lawmakingOc = await rl.question("   OC를 입력하세요 (Enter: 건너뛰기): ");
+    const lawmakingOcValue = lawmakingOc.trim() || undefined;
 
     // Step 2: 프로필 선택
     console.log("");
@@ -166,7 +181,7 @@ export async function runSetup(): Promise<void> {
     console.log("📋 Step 4: 설정 적용 중...");
     console.log("");
 
-    const serverEntry = buildServerEntry(finalKey, profile);
+    const serverEntry = buildServerEntry(finalKey, profile, lawmakingOcValue);
 
     for (const idx of selectedIndices) {
       const client = clients[idx]!;
