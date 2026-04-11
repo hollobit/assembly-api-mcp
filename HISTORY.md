@@ -1,4 +1,53 @@
-# HISTORY.md — 국회 API MCP 서버 (assembly-api-mcp)
+# HISTORY.md —国会 API MCP 서버 (assembly-api-mcp)
+
+---
+
+## 2026-04-11: Phase 23-24 — 국민참여입법센터 Open API 통합 (v0.6.0)
+
+### 배경
+
+lawmaking.go.kr의 Open API를 assembly-api-mcp에 통합하여 입법예고/행정예고/법령해석례/의견제시까지 100% 커버.
+
+### 구현 내용
+
+| 카테고리 | 변경 |
+|----------|------|
+| 신규 파일 | `src/api/lawmaking.ts` (lawmaking.go.kr REST API 클라이언트) |
+| API 추가 | 6개 엔드포인트: govLmSts, lmPln, ogLmPp, ptcpAdmPp, lsItptEmp, loLsExample |
+| 도구 확장 | `assembly_org`에 `type="lawmaking"` + `category` 파라미터 추가 |
+| codes.ts | lawmaking API 코드 6개 등록 |
+| config 변경 | `lawmakingOc` 필드 추가, `API_BASE_URLS.lawmaking` 추가 |
+| 의존성 | `fast-xml-parser` 추가 (XML → JSON 변환) |
+| 설정 | `LAWMKING_OC` 환경 변수 추가 |
+
+### assembly_org lawmaking 확장
+
+```
+assembly_org(type="lawmaking", category="legislation") // 입법현황/계획/예고
+assembly_org(type="lawmaking", category="admin")       // 행정예고
+assembly_org(type="lawmaking", category="interpretation") // 법령해석례
+assembly_org(type="lawmaking", category="opinion")     // 의견제시사례
+```
+
+### lawmaking API 6개 엔드포인트
+
+| API | endpoint | 용도 |
+|-----|----------|------|
+| 입법현황 | `govLmSts` | 입법현황 목록/상세 |
+| 입법계획 | `lmPln` | 입법계획 목록/상세 |
+| 입법예고 | `ogLmPp` | 입법예고 목록/상세 (진행/종료) |
+| 행정예고 | `ptcpAdmPp` | 행정예고 목록/상세 (자치법규) |
+| 법령해석례 | `lsItptEmp` | 법령해석례 검색/상세 |
+| 의견제시사례 | `loLsExample` | 의견제시사례 목록/상세 |
+
+### 수치 변화
+
+| 항목 | v0.5.0 | v0.6.0 | 변화 |
+|------|--------|--------|------|
+| API 코드 등록 | 271 | **277** | +6 |
+| API 소스 |国会 1개 | **国会+lawmaking 2개** | +1 |
+| 커버 범위 |国会 276개 | **282개** | +6 |
+| 토큰 소비 (Lite) | ~2,800 | **~2,880** | +80 |
 
 ---
 
@@ -130,7 +179,7 @@ MCP 생태계 리서치 + AI 에이전트/사용자 관점 토론을 통해 최�
 
 ### 진행 경과
 
-1. **프로젝트 기획** — 국회 API 276개 조사, MCP 서버 설계, Plans.md 생성
+1. **프로젝트 기획** —国会 API 276개 조사, MCP 서버 설계, Plans.md 생성
 2. **Phase 1** (Lead 직접) — 스캐폴딩, API 클라이언트, 인증키 관리, 에러 처리, vitest
 3. **Phase 2~5** (4 Worker 병렬) — 핵심 도구 14개, Resource, Prompt, 캐싱, HTTP Transport
 4. **Phase 6** — 276개 API 메타 조사, 17개 작동 코드 식별, CLI 11커맨드, HTML 테스터
@@ -138,7 +187,7 @@ MCP 생태계 리서치 + AI 에이전트/사용자 관점 토론을 통해 최�
 
 ### 주요 발견
 
-1. **AGE 파라미터 필수**: 대부분 국회 API는 `AGE`(대수) 없이 호출 시 0건 반환
+1. **AGE 파라미터 필수**: 대부분国会 API는 `AGE`(대수) 없이 호출 시 0건 반환
 2. **INF_ID ≠ API 코드**: 메타 API의 `INF_ID`는 레지스트리 식별자이며 실제 엔드포인트 코드와 다름
 3. **코드 발견 방법**: OPENSRVAPI → `downloadOpenApiSpec.do`로 Excel 다운로드 → "요청주소" 필드에서 추출
 

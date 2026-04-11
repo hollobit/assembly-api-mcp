@@ -1,7 +1,7 @@
-# MCP 도구 - 국회 API 매핑
+# MCP 도구 - 국회 API + 국민참여입법센터 매핑
 
-> 최종 검증일: 2026-04-09 (v0.5.0)
-> 271개 API 코드 발굴 (98.2%), 107개 전용 도구 통합
+> 최종 검증일: 2026-04-11 (v0.6.0)
+> 277개 API 코드 등록 (271国会 + 6 국민참여입법센터)
 > 도구 매핑 상세는 [tool-mapping.md](tool-mapping.md) 참조
 
 ---
@@ -104,6 +104,22 @@ Full 프로필은 Lite 6개 도구에 아래 4개 심층 도구를 추가로 제
 | 7 | search_library | 국회도서관 자료 검색 | `nywrpgoaatcpoqbiy` |
 | 8 | get_budget_analysis | 예산정책처 분석 자료 | `OZN379001174FW17905` |
 | 9 | search_research_reports | 입법조사처 보고서 | `naaborihbkorknasp` |
+
+---
+
+## 국민참여입법센터 API (lawmaking.go.kr)
+
+> v0.6.0에서 추가 — `.env`에 `LAWMKING_OC` 설정 필요
+
+| API 코드 | API명 | 용도 | 비고 |
+|----------|-------|------|------|
+| `govLmSts` | 입법현황 | type=lawmaking, category=legislation | OC 필요 |
+| `lmPln` | 입법계획 | type=lawmaking, category=legislation | OC 필요 |
+| `ogLmPp` | 입법예고 | type=lawmaking, category=legislation, diff=0 | OC 필요 |
+| `ptcpAdmPp` | 행정예고 | type=lawmaking, category=admin | OC 필요 |
+| `lsItptEmp` | 법령해석례 | type=lawmaking, category=interpretation | OC 필요 |
+| `loLsExample` | 의견제시사례 | type=lawmaking, category=opinion | OC 필요 |
+
 
 ---
 

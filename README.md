@@ -6,7 +6,14 @@ Claude, Gemini, ChatGPT 등 AI 도구에서 국회의원, 의안, 일정, 회의
 
 ***국가 AI 전환(AX)은 AI 챗봇쓴다고 되지 않죠. 국민들의 일상이 AI로 편리해져야 그것이 진정한 네이티브 AI 시대겠죠***
 
-## v0.5.0 업데이트 안내
+## 업데이트 내역
+
+### v0.6.0 — 국민참여입법센터 API 통합 (2026-04-11)
+
+- **277개 API 코드 등록** (271국회 + 6 국민참여입법센터)
+- **assembly_org 확장** — `type=lawmaking`으로 입법현황/계획/예고, 행정예고, 법령해석례, 의견제시사례 접근
+- **Lite/Full 도구 수 변경 없음** (6/10개 유지, 파라미터 확장만)
+- **fast-xml-parser 의존성 추가** — lawmaking API XML 응답 파싱
 
 ### v0.5.0 — API 커버율 대폭 확장 (2026-04-09)
 
@@ -37,8 +44,8 @@ Claude, Gemini, ChatGPT 등 AI 도구에서 국회의원, 의안, 일정, 회의
 ## 주요 기능
 
 - **6개 Lite / 10개 Full 프로필 도구** — 도메인 엔티티 기반 통합 ([활용 사례 100선](USECASE.md))
-- **276개 국회 API 100% 접근** — `discover_apis` + `query_assembly` 범용 도구
-- **271개 API 코드 발굴 (98.2%)** — 107개 전용 도구 통합, 나머지 `query_assembly`로 즉시 호출
+- **282개 API 접근 (277개국회 + 6 국민참여입법센터)** — `discover_apis` + `query_assembly` 범용 도구
+- **277개 API 코드 등록 (271개국회 + 6 국민참여입법센터)** — 107개 전용 도구 통합, 나머지 `query_assembly`로 즉시 호출
 - **영문 API 지원** — `lang="en"` 파라미터로 의원/일정/의안/위원회 영문 데이터
 - **역대 국회 데이터** — `scope="history"`로 역대 의원/선거/의장 접근
 - **ALLBILL 심사경과** — 의안 조회 시 소관위→법사위→본회의→공포 타임라인 자동 포함
@@ -467,6 +474,7 @@ MCP_PORT=3001 npm start
 | `DATA_GO_KR_SERVICE_KEY` | X | - | 공공데이터포털 ServiceKey |
 | `NANET_API_KEY` | X | - | 국회도서관 API 키 |
 | `NABO_API_KEY` | X | - | 국회예산정책처 API 키 |
+| `LAWMKING_OC` | X | - | 국민참여입법센터 OC (정보공개 서비스 신청 ID) |
 | `MCP_PROFILE` | X | `lite` | `lite` 또는 `full` |
 | `MCP_TRANSPORT` | X | `stdio` | `stdio` 또는 `http` |
 | `MCP_PORT` | X | `3000` | HTTP 모드 포트 |
@@ -481,6 +489,13 @@ MCP_PORT=3001 npm start
 4. 발급받은 키를 `.env` 파일의 `ASSEMBLY_API_KEY`에 입력
 
 > `sample` 키로 최대 10건까지 테스트할 수 있습니다.
+
+### 국민참여입법센터 API 키 발급
+
+1. [opinion.lawmaking.go.kr](https://opinion.lawmaking.go.kr) 접속
+2. 정보공개 서비스 신청 (무료)
+3. 신청 승인 후 OC(Organization Code) 확인 — `@` 앞부분이 OC입니다
+4. `.env` 파일에 `LAWMKING_OC=<OC값>`으로 입력
 
 ## 프로젝트 구조
 

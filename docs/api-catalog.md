@@ -1,8 +1,10 @@
 # 대한민국 국회 Open API 전체 목록
 
-> 작성일: 2026-04-04  
-> 총 API 수: ~276개 오퍼레이션 (열린국회정보 기준)  
+> 작성일: 2026-04-04
+> 총 API 수: ~276개 오퍼레이션 (열린국회정보 기준)
 > 데이터 소스: open.assembly.go.kr, data.go.kr
+>
+> **참고**: 국민참여입법센터 API (lawmaking.go.kr) 6개는 [tool-mapping.md](tool-mapping.md)에서 별도 관리
 
 ---
 

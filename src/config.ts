@@ -18,6 +18,8 @@ export interface ApiKeyConfig {
   readonly nanetApiKey: string | undefined;
   /** 국회예산정책처 API 키 (선택) */
   readonly naboApiKey: string | undefined;
+  /** 국민참여입법센터 OC (선택, 정보공개 서비스 신청 ID) */
+  readonly lawmakingOc: string | undefined;
 }
 
 export interface ServerConfig {
@@ -120,6 +122,7 @@ export function loadConfig(): AppConfig {
       dataGoKrServiceKey: optionalEnv("DATA_GO_KR_SERVICE_KEY"),
       nanetApiKey: optionalEnv("NANET_API_KEY"),
       naboApiKey: optionalEnv("NABO_API_KEY"),
+      lawmakingOc: optionalEnv("LAWMKING_OC"),
     },
     server: {
       transport: envOrDefault("MCP_TRANSPORT", "stdio") as "stdio" | "http",
@@ -159,6 +162,7 @@ export function loadRemoteConfig(): AppConfig {
       dataGoKrServiceKey: optionalEnv("DATA_GO_KR_SERVICE_KEY"),
       nanetApiKey: optionalEnv("NANET_API_KEY"),
       naboApiKey: optionalEnv("NABO_API_KEY"),
+      lawmakingOc: optionalEnv("LAWMKING_OC"),
     },
     server: {
       transport: "http",
@@ -212,12 +216,14 @@ export function overrideConfigFromParams(
 export const API_BASE_URLS = {
   /** 열린국회정보 */
   openAssembly: "https://open.assembly.go.kr/portal/openapi",
-  /** 공공데이터포털 - 국회 */
+  /** 공공데이터포털 -国会 */
   dataGoKr: "http://apis.data.go.kr/9710000",
   /** 국회도서관 */
   nanet: "https://www.nanet.go.kr",
   /** 국회예산정책처 */
   nabo: "https://www.nabo.go.kr",
+  /** 국민참여입법센터 */
+  lawmaking: "https://www.lawmaking.go.kr/rest",
 } as const;
 
 // ---------------------------------------------------------------------------

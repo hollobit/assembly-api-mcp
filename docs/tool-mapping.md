@@ -384,6 +384,73 @@ Full 프로필은 Lite 6개를 모두 포함하며, 심층 분석용 4개 도구
 | 개정대상 법률 | `CLAWSTATE` | `committee_detail` | 2 |
 | 위원회 자료실 | `nbiwfpqbaipwgkhfr` | `committee_detail` | 2 |
 
+---
+
+## 국민참여입법센터 API (lawmaking.go.kr)
+
+> Phase 23-24: v0.6.0에서 추가
+> Base URL: `https://www.lawmaking.go.kr/rest`
+> 인증: OC (정보공개 서비스 신청 ID, `.env`에 `LAWMKING_OC`로 설정)
+
+### 목록 API (6개)
+
+| # | API 코드 | API명 | 매핑 도구 | 비고 |
+|---|----------|-------|----------|------|
+| 1 | `govLmSts` | 입법현황 목록 | `assembly_org(type=lawmaking, category=legislation)` | OC 필요 |
+| 2 | `lmPln` | 입법계획 목록 | `assembly_org(type=lawmaking, category=legislation, keyword=...)` | OC 필요 |
+| 3 | `ogLmPp` | 입법예고 목록 | `assembly_org(type=lawmaking, category=legislation, diff=0)` | OC 필요 |
+| 4 | `ptcpAdmPp` | 행정예고 목록 | `assembly_org(type=lawmaking, category=admin)` | OC 필요 |
+| 5 | `lsItptEmp` | 법령해석례 검색 | `assembly_org(type=lawmaking, category=interpretation)` | OC 필요 |
+| 6 | `loLsExample` | 의견제시사례 목록 | `assembly_org(type=lawmaking, category=opinion)` | OC 필요 |
+
+### 상세 API (6개) — `detail_seq` 파라미터로 조회
+
+| # | API 코드 | API명 | 매핑 도구 |
+|---|----------|-------|----------|
+| 7 | `govLmSts/{seq}` | 입법현황 상세 | `assembly_org(type=lawmaking, category=legislation, detail_seq=...)` |
+| 8 | `lmPln/{seq}` | 입법계획 상세 | `assembly_org(type=lawmaking, category=legislation, keyword=..., detail_seq=...)` |
+| 9 | `ogLmPp/{seq}/...` | 입법예고 상세 | `assembly_org(type=lawmaking, category=legislation, diff=..., detail_seq=...)` |
+| 10 | `ptcpAdmPp/{seq}` | 행정예고 상세 | `assembly_org(type=lawmaking, category=admin, detail_seq=...)` |
+| 11 | `lsItptEmp/{seq}` | 법령해석례 상세 | `assembly_org(type=lawmaking, category=interpretation, detail_seq=...)` |
+| 12 | `loLsExample/{seq}` | 의견제시사례 상세 | `assembly_org(type=lawmaking, category=opinion, detail_seq=...)` |
+
+### assembly_org lawmaking 파라미터
+
+```
+assembly_org(
+  type="lawmaking",           // 필수
+  category="legislation",     // legislation | admin | interpretation | opinion
+  keyword="검색어",          // 공통 검색어
+  page=1, page_size=20,      // 페이지네이션
+  detail_seq="일련번호",      // 상세 조회 시 (선택)
+
+  // legislation 전용
+  diff="0",                  // 0=진행중, 1=종료 (notice 모드)
+  ls_cls_cd="AA0101",       // 법령분류코드 (AA0101=법률)
+  cpt_ofi_org_cd="1741000", // 소관부처 코드
+
+  // admin 전용
+  closing="N",               // N=진행, Y=종료
+
+  // interpretation 전용
+  prd_fr_day="2024.01.01",  // 검색기간
+  ls_cpt_org="1320000",     // 소관기관 코드
+
+  // opinion 전용
+  sc_text_type="caseNm",     // caseNm | caseNo | reqOrgNm
+  sc_text="검색어"
+)
+```
+
+###国会 API와 중복/보완 관계
+
+| 국민참여입법센터 |国会 API | 관계 |
+|----------------|---------|------|
+| 입법예고(ogLmPp) | `nknalejkafmvgzmpt` (진행중) | **보완**: lawmaking은 진행/종료 모두 제공 |
+| 행정예고(ptcpAdmPp) | 없음 | **신규**: 자치법규(훈령/예규/고시/공고) 예고 |
+| 법령해석례(lsItptEmp) | 법제처 해석례 API | **별도**: lawmaking vs 법제처 해석 |
+| 의견제시사례(loLsExample) | 없음 | **신규**: 자치법제 의견제시 |
+
 > 발굴 스크립트: `ASSEMBLY_API_KEY=your-key npx tsx scripts/discover-all-codes.ts`
 > 전체 결과: `docs/discovered-all-codes.json`
 
@@ -391,12 +458,12 @@ Full 프로필은 Lite 6개를 모두 포함하며, 심층 분석용 4개 도구
 
 ## 수치 요약
 
-| 항목 | v0.3 | v0.4 | v0.5 |
+| 항목 | v0.4 | v0.5 | v0.6 |
 |------|------|----------|--------------|
-| Lite 도구 수 | 9 | 6 | **6** |
-| Full 도구 수 | 19 | 10 | **10** |
-| 토큰 소비 (Lite) | ~3,800 | ~2,800 | **~2,800** |
-| API 코드 등록 | 39 | 44 | **271** (98.2%) |
-| 전용 도구에서 사용 | 39 | 44 | **107** |
-| 전용 도구 커버율 | 14% | 16% | **39%** |
-| 276개 API 접근 | 100% | 100% | **100%** |
+| Lite 도구 수 | 6 | 6 | **6** |
+| Full 도구 수 | 10 | 10 | **10** |
+| 토큰 소비 (Lite) | ~2,800 | ~2,800 | **~2,880** (+80 lawmaking) |
+| API 코드 등록 | 44 | 271 (98.2%) | **277** (+6 lawmaking) |
+| 전용 도구에서 사용 | 44 | 107 | **107** |
+| 전용 도구 커버율 | 16% | 39% | **43%** |
+| API 접근 |国会 276개 |国会 276개 | **282개** (+lawmaking 6개) |

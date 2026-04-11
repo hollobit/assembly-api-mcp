@@ -619,6 +619,23 @@ export const API_CODES = {
   DISCOVERED_국회미래연구원_제공_자료_통합_API: "ALLNAFIPBLM",
   /** 국회예산정책처 제공 자료 통합 API */
   DISCOVERED_국회예산정책처_제공_자료_통합_API: "ALLNABOPBLM",
+  // ── 국민참여입법센터 (lawmaking.go.kr) ─────────────────────────────────
+  // Base URL: https://www.lawmaking.go.kr/rest
+  // 인증: OC (정보공개 서비스 신청 ID)
+  // 참고: endpoint 경로 직접 사용 (국회 API와 다른 형식)
+  /** 입법현황 목록/상세 ( govLmSts) */
+  LAWMKG_VOLMSTS: "govLmSts",
+  /** 입법계획 목록/상세 ( lmPln) */
+  LAWMKG_LMPLN: "lmPln",
+  /** 입법예고 목록/상세 ( ogLmPp) */
+  LAWMKG_OGLMPP: "ogLmPp",
+  /** 행정예고 목록/상세 ( ptcpAdmPp) */
+  LAWMKG_PTCPADMPP: "ptcpAdmPp",
+  /** 법령해석례 검색/상세 ( lsItptEmp) */
+  LAWMKG_LSITPTEMP: "lsItptEmp",
+  /** 의견제시사례 목록/상세 ( loLsExample) */
+  LAWMKG_LOLSEXAMPLE: "loLsExample",
+
 } as const;
 
 export type ApiCode = (typeof API_CODES)[keyof typeof API_CODES];
