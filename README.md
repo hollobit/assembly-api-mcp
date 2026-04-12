@@ -8,6 +8,8 @@ Claude, Gemini, ChatGPT 등 AI 도구에서 국회의원, 의안, 일정, 회의
 
 ## 업데이트 내역
 
+> **전체 변경사항:** [CHANGELOG](docs/CHANGELOG.md) | **v0.3→v0.4 마이그레이션:** [MIGRATION.md](MIGRATION.md)
+
 ### v0.7.0 — 국회예산정책처(NABO) Open API 통합 (2026-04-12)
 
 - [docs/legislative-lifecycle.md](docs/legislative-lifecycle.md) 입법 라이프사이클 완전 가이드 — 입법 전/중/후 데이터 추적 

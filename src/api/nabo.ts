@@ -133,7 +133,7 @@ export function createNaboClient(config: AppConfig) {
     }
 
     // エラーコード応答チェック
-    const errCode = (parsed as Record<string, unknown>).RESULT as string | undefined;
+    const errCode = (parsed as unknown as Record<string, unknown>).RESULT as string | undefined;
     if (errCode && errCode !== "INFO-000") {
       const ERROR_MESSAGES: Record<string, string> = {
         INVALID_KEY: "유효하지 않은 NABO API Key입니다.",
