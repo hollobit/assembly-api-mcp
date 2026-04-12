@@ -333,6 +333,102 @@ async function cmdNabo(flags: Record<string, string>): Promise<void> {
   printTable(result.items as unknown as Record<string, unknown>[], ["subj", "cdNm", "pubDt", "count"]);
 }
 
+async function cmdCross(flags: Record<string, string>): Promise<void> {
+  const keyword = flags.keyword ?? flags._positional;
+  if (!keyword) {
+    console.error("사용법: cli cross --keyword <검색어> [--sources assembly,lawmaking,nabo] [--size 5]");
+    process.exit(1);
+  }
+
+  const size = Number(flags.size ?? 5);
+  const sourceFlag = flags.sources ?? "all";
+  const sources = sourceFlag === "all"
+    ? ["assembly", "lawmaking", "nabo"] as const
+    : sourceFlag.split(",").map((s) => s.trim()) as ("assembly" | "lawmaking" | "nabo")[];
+
+  console.log(`\n=== "${keyword}" 교차 검색 (${sources.join(", ")}) ===\n`);
+
+  const promises: Promise<{ source: string; result: unknown; error?: string }>[] = [];
+
+  if (sources.includes("assembly")) {
+    promises.push(
+      getApi()
+        .fetchOpenAssembly(API_CODES.MEMBER_BILLS, {
+          AGE: 22,
+          BILL_NAME: keyword,
+          pSize: size,
+        })
+        .then((r) => ({ source: "국회(assembly)", result: r }))
+        .catch((e: unknown) => ({ source: "국회(assembly)", result: null, error: e instanceof Error ? e.message : String(e) })),
+    );
+  }
+
+  if (sources.includes("lawmaking")) {
+    promises.push(
+      getLawmaking()
+        .getLegislationNotices({ lsNm: keyword })
+        .then((r) => ({ source: "국민참여입법센터(lawmaking)", result: r }))
+        .catch((e: unknown) => ({ source: "국민참여입법센터(lawmaking)", result: null, error: e instanceof Error ? e.message : String(e) })),
+    );
+  }
+
+  if (sources.includes("nabo")) {
+    promises.push(
+      getNabo()
+        .searchReports({ page: 1, size, scSw: keyword })
+        .then((r) => ({ source: "NABO(nabo.go.kr)", result: r }))
+        .catch((e: unknown) => ({ source: "NABO(nabo.go.kr)", result: null, error: e instanceof Error ? e.message : String(e) })),
+    );
+  }
+
+  const settled = await Promise.allSettled(promises);
+  let hasResults = false;
+
+  for (const outcome of settled) {
+    if (outcome.status === "rejected") {
+      console.log(`[오류] ${outcome.reason}`);
+      continue;
+    }
+    const { source, result, error } = outcome.value;
+
+    if (error) {
+      console.log(`[${source}] 오류: ${error}\n`);
+      continue;
+    }
+
+    if (source === "국회(assembly)" && result && typeof result === "object" && "totalCount" in result) {
+      const r = result as { totalCount: number; rows: readonly Record<string, unknown>[] };
+      console.log(`[${source}] 의안 검색 (총 ${r.totalCount}건)`);
+      if (r.rows.length > 0) {
+        printTable(r.rows.slice(0, size), ["BILL_NO", "BILL_NAME", "COMMITTEE", "PROC_RESULT"]);
+      }
+      console.log();
+      hasResults = true;
+    } else if (source === "국민참여입법센터(lawmaking)" && result && typeof result === "object") {
+      const rows = extractLawmakingRows(result as Record<string, unknown>);
+      console.log(`[${source}] 입법예고 (총 ${rows.length}건)`);
+      if (rows.length > 0) {
+        const cols = Object.keys(rows[0]!).filter((k) => !k.startsWith("@_"));
+        printTable(rows.slice(0, size), cols.slice(0, 5));
+      }
+      console.log();
+      hasResults = true;
+    } else if (source === "NABO(nabo.go.kr)" && result && typeof result === "object" && "total" in result) {
+      const r = result as { total: number; items: readonly { subj: string; cdNm: string; pubDt: string }[] };
+      console.log(`[${source}] NABO 보고서 (총 ${r.total}건)`);
+      if (r.items.length > 0) {
+        printTable(r.items.slice(0, size) as unknown as Record<string, unknown>[], ["subj", "cdNm", "pubDt"]);
+      }
+      console.log();
+      hasResults = true;
+    }
+  }
+
+  if (!hasResults) {
+    console.log("검색 결과가 없습니다.");
+  }
+}
+
 async function cmdTest(): Promise<void> {
   console.log("\n=== 전체 API 작동 테스트 ===\n");
 
@@ -409,11 +505,17 @@ function printHelp(): void {
     --diff <차수>       예고 차수
     --searchType <유형>  검색구분 (opinion: caseNm|caseNo|reqOrgNm)
 
-  nabo                국회예산정책처 NABO API
+  nabo               国会예산정책처 NABO API
     --type <type>      report(기본)|periodical|recruitments
     --key <검색어>      검색어
     --page <숫자>       페이지 번호 (기본: 1)
     --size <숫자>       결과 수 (기본: 20)
+
+  cross                교차 검색 (2~3개 API 소스 통합)
+    --keyword <검색어>  필수: 검색어
+    --sources <sources> 소스 선택 (기본: all, 예: assembly,lawmaking)
+    --size <숫자>       소스당 결과 수 (기본: 5)
+    예: npx tsx src/cli.ts cross --keyword 교육 --sources assembly,nabo
 
 공통 옵션:
   --size <N>           결과 수 (기본: 20)
@@ -454,6 +556,8 @@ async function main(): Promise<void> {
         return cmdLawmaking(flags);
       case "nabo":
         return cmdNabo(flags);
+      case "cross":
+        return cmdCross(flags);
       case "test":
         return cmdTest();
       case "help":
