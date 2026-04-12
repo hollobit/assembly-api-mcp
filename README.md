@@ -8,8 +8,9 @@ Claude, Gemini, ChatGPT 등 AI 도구에서 국회의원, 의안, 일정, 회의
 
 ## 주요 기능
 
-- **9개 Lite / 18개 Full 프로필 도구** — 기본 Lite 프로필로 핵심 기능 제공 ([활용 사례 100선](USECASE.md))
-- **276개 국회 API 100% 접근** — `discover_apis` + `query_assembly` 범용 도구
+- **9개 Lite / 19개 Full 프로필 도구** — 기본 Lite 프로필로 핵심 기능 제공 ([활용 사례 100선](USECASE.md))
+- **287개 공식 API 통합** — 국회 276개 + 국민참여입법센터 8개 + **국회예산정책처(NABO) 3개** (v0.7.0~)
+- **입법 라이프사이클 전구간 관측** — 정부 입법계획 → 입법예고 → 발의·심사 → 행정예고·하위법령 ([자세히](docs/legislative-lifecycle.md))
 - **36개 검증된 API 코드** — 실제 데이터 반환 확인
 - **CLI 지원** — 터미널에서 직접 국회 데이터 조회
 - **이중 Transport** — stdio (Claude Desktop) + HTTP (원격 서버)
@@ -46,7 +47,7 @@ Claude Desktop 설정 예시:
 | 파라미터 | 필수 | 기본값 | 설명 |
 |---------|------|--------|------|
 | `key` | O | `sample` | 열린국회정보 API 키 |
-| `profile` | X | `lite` | `lite` (9개 도구) 또는 `full` (18개 도구) |
+| `profile` | X | `lite` | `lite` (9개 도구) 또는 `full` (19개 도구, `get_nabo` 포함) |
 
 > `sample` 키로 최대 10건까지 테스트할 수 있습니다.
 
@@ -58,7 +59,7 @@ URL의 `profile` 파라미터를 변경하면 사용 가능한 도구 수가 달
 # Lite 프로필 (9개 도구, 기본) — 일반 사용에 권장
 https://assembly-api-mcp.fly.dev/mcp?key=YOUR_API_KEY&profile=lite
 
-# Full 프로필 (18개 도구) — 심사정보, 청원, 입법예고 등 세부 도구 필요 시
+# Full 프로필 (19개 도구) — 심사정보, 청원, 입법예고, NABO 등 세부 도구 필요 시
 https://assembly-api-mcp.fly.dev/mcp?key=YOUR_API_KEY&profile=full
 ```
 
@@ -283,13 +284,13 @@ AI가 효율적으로 사용할 수 있도록 핵심 기능을 통합한 프로�
 
 > 활용 예시는 [활용 사례 100선](USECASE.md)을 참조하세요.
 
-### Full 프로필 (18개)
+### Full 프로필 (19개)
 
-`MCP_PROFILE=full`로 전환하면 Lite 9개 + Full 전용 9개를 사용할 수 있습니다.
+`MCP_PROFILE=full`로 전환하면 Lite 9개 + Full 전용 10개를 사용할 수 있습니다.
 
 #### Lite 도구 (9개) — 위와 동일
 
-#### Full 전용 (9개)
+#### Full 전용 (10개)
 
 | 도구 | 설명 |
 |------|------|
@@ -300,8 +301,13 @@ AI가 효율적으로 사용할 수 있도록 핵심 기능을 통합한 프로�
 | `search_petitions` | 국민동의청원 검색 |
 | `get_legislation_notices` | 입법예고 조회 |
 | `search_library` | 국회도서관 자료 검색 |
-| `get_budget_analysis` | 예산정책처 분석 자료 |
+| `get_budget_analysis` | 예산정책처 분석 자료 (열린국회정보 경유) |
 | `search_research_reports` | 입법조사처 보고서 |
+| `get_nabo` ⭐ v0.7.0 | **NABO 직접 호출** — 보고서 자료(`report`) · 정기간행물(`periodical`) · 채용정보(`recruitments`) 통합. `NABO_API_KEY` 별도 필요. [라이프사이클 가이드](docs/legislative-lifecycle.md) |
+
+> `get_budget_analysis`는 열린국회정보(open.assembly.go.kr)를 경유하는 간접 호출이고,
+> `get_nabo`는 NABO 본 서버(nabo.go.kr)의 공식 Open API를 직접 호출합니다. 두 도구는
+> 커버 범위와 최신성이 다르므로 상황에 맞게 병행 사용하세요.
 
 ## CLI 사용법
 
@@ -466,7 +472,7 @@ MCP_PORT=3001 npm start
 | `ASSEMBLY_API_KEY` | O | - | 열린국회정보 API 키 |
 | `DATA_GO_KR_SERVICE_KEY` | X | - | 공공데이터포털 ServiceKey |
 | `NANET_API_KEY` | X | - | 국회도서관 API 키 |
-| `NABO_API_KEY` | X | - | 국회예산정책처 API 키 |
+| `NABO_API_KEY` | X | - | 국회예산정책처 NABO Open API 키 (v0.7.0~, `get_nabo` / `/api/nabo` 사용 시 필수, [발급](https://www.nabo.go.kr/ko/api/apply.do?key=2509230004)) |
 | `MCP_PROFILE` | X | `lite` | `lite` 또는 `full` |
 | `MCP_TRANSPORT` | X | `stdio` | `stdio` 또는 `http` |
 | `MCP_PORT` | X | `3000` | HTTP 모드 포트 |

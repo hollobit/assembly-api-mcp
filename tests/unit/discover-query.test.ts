@@ -460,6 +460,7 @@ describe("tools/index.ts exports", () => {
     "registerBillExtraTools",
     "registerDiscoverTools",
     "registerQueryTools",
+    "registerNaboTool",
   ];
 
   it.each(expectedExports)("%s가 export되어 있다", (name) => {
@@ -467,10 +468,10 @@ describe("tools/index.ts exports", () => {
     expect(typeof (toolsIndex as Record<string, unknown>)[name]).toBe("function");
   });
 
-  it("총 15개의 register 함수가 export된다", () => {
+  it("총 16개의 register 함수가 export된다", () => {
     const registerFns = Object.keys(toolsIndex).filter((k) =>
       k.startsWith("register"),
     );
-    expect(registerFns).toHaveLength(15);
+    expect(registerFns).toHaveLength(16);
   });
 });

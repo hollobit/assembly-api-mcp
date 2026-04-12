@@ -8,6 +8,7 @@ import { registerLegislationTools } from "../../src/tools/legislation.js";
 import { registerLibraryTools } from "../../src/tools/library.js";
 import { registerPetitionTools } from "../../src/tools/petitions.js";
 import { registerResearchTools } from "../../src/tools/research.js";
+import { registerNaboTool } from "../../src/tools/nabo.js";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -415,4 +416,137 @@ describe("Full-mode MCP Tools", () => {
   // speeches.ts와 votes.ts (Full 전용)은 Level 2에서 제거됨
   // search_member_activity → analyze_legislator(Lite)로 대체
   // get_vote_results → get_votes(Lite)로 대체
+
+  // =========================================================================
+  // nabo.ts — 국회예산정책처 통합 (v0.7.0)
+  // =========================================================================
+
+  describe("get_nabo", () => {
+    function configWithNabo(): AppConfig {
+      return { ...config, apiKeys: { ...config.apiKeys, naboApiKey: "test-nabo-key" } };
+    }
+
+    it("registerNaboTool는 get_nabo 도구를 등록한다", () => {
+      registerNaboTool(server, configWithNabo());
+      const tools = getRegisteredTools(server);
+      expect(tools).toHaveProperty("get_nabo");
+    });
+
+    it("type=report 응답을 한글 키로 정규화한다", async () => {
+      mockFetchSuccess(
+        JSON.stringify({
+          page: 1,
+          size: 20,
+          total: 1,
+          items: [
+            {
+              subj: "2025년 재정 전망 보고서",
+              cdNm: "거시경제분석과",
+              pubDt: "2025-09-15",
+              count: 123,
+              detailUrl: "https://www.nabo.go.kr/report/1",
+              name: "report.pdf",
+              url: "https://www.nabo.go.kr/download/1",
+            },
+          ],
+        }),
+      );
+
+      registerNaboTool(server, configWithNabo());
+      const tools = getRegisteredTools(server);
+      const result = (await tools.get_nabo.handler(
+        { type: "report", keyword: "재정" },
+        {} as never,
+      )) as ToolResult;
+
+      const parsed = JSON.parse(result.content[0].text);
+      expect(parsed.type).toBe("report");
+      expect(parsed.total).toBe(1);
+      expect(parsed.items[0]).toMatchObject({
+        제목: "2025년 재정 전망 보고서",
+        작성자: "거시경제분석과",
+        게시일: "2025-09-15",
+        조회수: 123,
+      });
+      expect(parsed.items[0].첨부파일).toMatchObject({
+        파일명: "report.pdf",
+        다운로드: "https://www.nabo.go.kr/download/1",
+      });
+    });
+
+    it("type=recruitments는 접수기간·모집분야를 포함한다", async () => {
+      mockFetchSuccess(
+        JSON.stringify({
+          page: 1,
+          size: 20,
+          total: 1,
+          items: [
+            {
+              subj: "2025년 경력직 채용",
+              pubDt: "2025-08-01",
+              applyPeriod: "2025-08-01 ~ 2025-08-15",
+              field: "예산분석관",
+            },
+          ],
+        }),
+      );
+
+      registerNaboTool(server, configWithNabo());
+      const tools = getRegisteredTools(server);
+      const result = (await tools.get_nabo.handler(
+        { type: "recruitments" },
+        {} as never,
+      )) as ToolResult;
+
+      const parsed = JSON.parse(result.content[0].text);
+      expect(parsed.items[0]).toMatchObject({
+        제목: "2025년 경력직 채용",
+        접수기간: "2025-08-01 ~ 2025-08-15",
+        모집분야: "예산분석관",
+      });
+    });
+
+    it("NABO_API_KEY 미설정 시 명시적 에러를 반환한다", async () => {
+      registerNaboTool(server, config); // naboApiKey: undefined
+      const tools = getRegisteredTools(server);
+      const result = (await tools.get_nabo.handler(
+        { type: "report" },
+        {} as never,
+      )) as ToolResult;
+
+      expect(result.isError).toBe(true);
+      const parsed = JSON.parse(result.content[0].text);
+      expect(parsed.code).toBe("AUTH_ERROR");
+      expect(parsed.error).toContain("NABO_API_KEY");
+    });
+
+    it("INVALID_KEY 응답을 에러로 변환한다", async () => {
+      mockFetchSuccess(JSON.stringify({ code: "INVALID_KEY", message: "invalid" }));
+
+      registerNaboTool(server, configWithNabo());
+      const tools = getRegisteredTools(server);
+      const result = (await tools.get_nabo.handler(
+        { type: "report" },
+        {} as never,
+      )) as ToolResult;
+
+      expect(result.isError).toBe(true);
+      const parsed = JSON.parse(result.content[0].text);
+      expect(parsed.code).toBe("AUTH_ERROR");
+    });
+
+    it("네트워크 오류를 처리한다", async () => {
+      mockFetchNetworkError();
+
+      registerNaboTool(server, configWithNabo());
+      const tools = getRegisteredTools(server);
+      const result = (await tools.get_nabo.handler(
+        { type: "periodical" },
+        {} as never,
+      )) as ToolResult;
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain("오류");
+    });
+  });
 });

@@ -1,5 +1,80 @@
 # CHANGES.md
 
+## 2026-04-12 — v0.7.0 (국회예산정책처 NABO Open API 통합)
+
+### 하이라이트
+
+**입법 라이프사이클 완전 가이드** — 정부 입법계획(태동) → 입법예고(형성) → 국회 발의·심사
+→ 행정예고·하위 법령(실행)으로 이어지는 엔드투엔드 입법 생애주기 전체를 단일 MCP 서버에서
+관측할 수 있게 되었습니다. 자세한 설명은 [`docs/legislative-lifecycle.md`](docs/legislative-lifecycle.md)
+를 참조하세요.
+
+### nabo.go.kr 3개 API 통합
+
+- **보고서 자료 검색** — `/api/v1/report.do`
+- **정기간행물** — `/api/v1/periodical.do`
+- **채용정보** — `/api/v1/recruitments.do`
+
+세 엔드포인트를 `type` 파라미터로 스위칭하는 단일 진입점으로 통합했습니다. 응답 필드는
+`subj`(제목) / `cdNm`(작성자) / `pubDt`(게시일) / `count`(조회수) / `detailUrl`(상세 링크)
+/ `name`·`url`(첨부파일) 기준으로 한글 키로 정규화합니다.
+
+### 추가된 MCP 도구
+
+- `get_nabo` (Full 프로필 전용) — `type`: `report | periodical | recruitments`
+  - 파라미터: `keyword`, `sort`(pubDt/subj), `order`(asc/desc), `page`, `page_size`
+  - 에러 코드: `INVALID_KEY`, `NOT_APPROVED`, `EXPIRED`는 명시적 메시지로 변환
+
+### 추가된 REST 엔드포인트
+
+- `GET /api/nabo?type=report&keyword=...` (Full 프로필 전용)
+- OpenAPI 3.1 스펙(`/openapi.json?profile=full`)에 `getNabo` operationId 포함 →
+  ChatGPT GPTs Actions에서 바로 import 가능
+
+### 도구 수 변경
+
+| 프로필 | v0.2.1 | v0.7.0 | 변화 |
+|--------|--------|--------|------|
+| Lite   | 9      | 9      | 유지 |
+| Full   | 18     | **19** | +1 (`get_nabo`) |
+
+### API 소스 확장
+
+| 축 | 이전 | v0.7.0 |
+|----|------|-------|
+| 국회 (open.assembly.go.kr) | 276 | 276 |
+| 국민참여입법센터 (data.go.kr 경유) | 8 | 8 |
+| 국회예산정책처 NABO (nabo.go.kr) | 0 | **3** |
+| **합계** | 284 | **287** |
+
+### 인증 체계
+
+NABO는 열린국회정보·data.go.kr와 별개의 인증키를 사용하므로 `NABO_API_KEY` 환경 변수를
+추가로 설정해야 합니다. 미설정 시 `get_nabo` / `/api/nabo`는 명확한 발급 안내 메시지와 함께
+실패합니다.
+
+- 발급 URL: https://www.nabo.go.kr/ko/api/apply.do?key=2509230004
+- 인증 방식: SNS(Naver/Kakao) 로그인 → 관리자 승인 대기 → 인증키 발급
+- 문의: iamnabo@nabo.go.kr / 02-2070-3114
+
+### 코드 변경
+
+- `src/api/client.ts` — `fetchNabo(resource, params)` + `parseNaboResponse()` + `NaboResult`/`NaboResource` 타입 추가
+- `src/tools/nabo.ts` — 신규 `registerNaboTool`, 한글 필드 정규화(`normalizeNaboRow`)
+- `src/openapi/handlers.ts` — `getNabo` REST 핸들러 추가
+- `src/openapi/router.ts` — `/api/nabo` 라우트(Full 프로필 전용) 등록
+- `src/openapi/spec.ts` — OpenAPI 3.1 스펙 `/api/nabo` 경로 추가, 버전 0.7.0 반영
+- `src/server.ts` — `McpServer` 이름·버전 `0.7.0`, Full 프로필 블록에 `registerNaboTool` 추가
+- `.env.example`, `README.md` — NABO 발급 가이드·환경 변수 문서화
+
+### 문서
+
+- `docs/legislative-lifecycle.md` — **신규**. 입법 태동→형성→심사→실행 4단계 각 구간에 어떤
+  API가 매핑되는지, 왜 통합 관측이 전략적 가치가 있는지 설명
+- `README.md` — Lite 9 / Full 19 도구 수, 287개 API 통합 배지, NABO 환경 변수 설명 갱신
+
+---
+
 ## 2026-04-06 — v0.2.1 (품질 개선)
 
 ### 의원 사진 URL 추가

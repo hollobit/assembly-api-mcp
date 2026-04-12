@@ -17,3 +17,4 @@ export { registerSpeechTools } from "./speeches.js";
 export { registerBillExtraTools } from "./bill-extras.js";
 export { registerDiscoverTools } from "./discover.js";
 export { registerQueryTools } from "./query.js";
+export { registerNaboTool } from "./nabo.js";

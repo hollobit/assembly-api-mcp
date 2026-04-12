@@ -25,6 +25,7 @@ import { registerLibraryTools } from "./tools/library.js";
 import { registerBudgetTools } from "./tools/budget.js";
 import { registerResearchTools } from "./tools/research.js";
 import { registerBillExtraTools } from "./tools/bill-extras.js";
+import { registerNaboTool } from "./tools/nabo.js";
 import { registerResources } from "./resources/static-data.js";
 import { registerPrompts } from "./prompts/templates.js";
 
@@ -35,7 +36,7 @@ import { registerPrompts } from "./prompts/templates.js";
 function buildMcpServer(config: AppConfig): McpServer {
   const server = new McpServer({
     name: "assembly-api-mcp",
-    version: "0.2.0",
+    version: "0.7.0",
   });
 
   // 도구 등록 — 프로필에 따라 분기
@@ -52,6 +53,7 @@ function buildMcpServer(config: AppConfig): McpServer {
     registerLibraryTools(server, config);     // search_library
     registerBudgetTools(server, config);      // get_budget_analysis
     registerResearchTools(server, config);    // search_research_reports
+    registerNaboTool(server, config);         // get_nabo (NABO direct Open API)
   } else {
     // Lite 프로필 (기본): 9개 도구
     registerLiteTools(server, config);

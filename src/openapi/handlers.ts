@@ -7,7 +7,11 @@
  */
 
 import { type AppConfig } from "../config.js";
-import { createApiClient, type ApiClient } from "../api/client.js";
+import {
+  createApiClient,
+  type ApiClient,
+  type NaboResource,
+} from "../api/client.js";
 import { API_CODES, CURRENT_AGE } from "../api/codes.js";
 
 // ---------------------------------------------------------------------------
@@ -555,6 +559,37 @@ export const getBudgetAnalysis: RouteHandler = async (ctx, params) => {
 
     const result = await ctx.api.fetchOpenAssembly(API_CODES.BUDGET_ANALYSIS, qp);
     return ok(result.rows, { total: result.totalCount });
+  } catch (e) {
+    return error(500, e instanceof Error ? e.message : String(e));
+  }
+};
+
+export const getNabo: RouteHandler = async (ctx, params) => {
+  try {
+    const type = params.type;
+    if (type !== "report" && type !== "periodical" && type !== "recruitments") {
+      return error(
+        400,
+        "type 파라미터는 report | periodical | recruitments 중 하나여야 합니다.",
+      );
+    }
+
+    const qp: Record<string, string | number> = {};
+    if (params.keyword) qp.scSw = params.keyword;
+    if (params.sort === "pubDt" || params.sort === "subj") qp.scSort = params.sort;
+    if (params.order === "asc" || params.order === "desc") qp.scOrder = params.order;
+    const page = intParam(params.page, 0);
+    if (page > 0) qp.page = page;
+    const size = clampPageSize(params.page_size, ctx.config.apiResponse.maxPageSize);
+    if (size > 0) qp.size = size;
+
+    const result = await ctx.api.fetchNabo(type as NaboResource, qp);
+    return ok(result.items, {
+      type,
+      page: result.page,
+      size: result.size,
+      total: result.total,
+    });
   } catch (e) {
     return error(500, e instanceof Error ? e.message : String(e));
   }

@@ -205,7 +205,7 @@ describe("createServer (HTTP 통합)", () => {
     expect(Object.keys(prompts)).toHaveLength(3);
   });
 
-  it("Full 프로필로 28개 도구를 등록한다", async () => {
+  it("Full 프로필로 19개 도구를 등록한다", async () => {
     const { createServer } = await import("../../src/server.js");
     const config = createTestConfig({
       server: { transport: "http", port: 0, logLevel: "info" },
@@ -215,13 +215,13 @@ describe("createServer (HTTP 통합)", () => {
     const mcpServer = await createServer(config);
     const tools = getRegisteredTools(mcpServer);
 
-    // Full 프로필: Lite 9개 + Full 전용 8개 = 17개 도구
+    // Full 프로필: Lite 9개 + Full 전용 10개 = 19개 도구
     // Lite: search_members, search_bills, get_schedule, search_meetings, get_votes,
     //        analyze_legislator, track_legislation, discover_apis, query_assembly
     // Full: get_bill_detail, get_bill_review, get_bill_history, get_committees,
     //       search_petitions, get_legislation_notices, search_library,
-    //       get_budget_analysis, search_research_reports
-    expect(Object.keys(tools)).toHaveLength(18);
+    //       get_budget_analysis, search_research_reports, get_nabo (v0.7.0+)
+    expect(Object.keys(tools)).toHaveLength(19);
     // Lite 도구 확인
     expect(tools["search_members"]).toBeDefined();
     expect(tools["search_bills"]).toBeDefined();
@@ -230,6 +230,8 @@ describe("createServer (HTTP 통합)", () => {
     expect(tools["get_bill_detail"]).toBeDefined();
     expect(tools["get_committees"]).toBeDefined();
     expect(tools["search_petitions"]).toBeDefined();
+    // NABO 통합 (v0.7.0)
+    expect(tools["get_nabo"]).toBeDefined();
   });
 });
 

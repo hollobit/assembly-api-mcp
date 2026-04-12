@@ -315,6 +315,42 @@ const ROUTES: Record<string, Record<string, PathDef>> = {
       ],
     },
   },
+  "/api/nabo": {
+    get: {
+      summary: "국회예산정책처(NABO) Open API 통합 조회",
+      description:
+        "국회예산정책처(NABO)의 보고서 자료(report), 정기간행물(periodical), 채용정보(recruitments)를 type 파라미터로 전환하여 조회합니다. NABO_API_KEY(별도 발급)가 서버에 설정되어 있어야 합니다.",
+      operationId: "getNabo",
+      profile: "full",
+      parameters: [
+        {
+          name: "type",
+          in: "query",
+          description: "조회 대상 — report | periodical | recruitments",
+          required: true,
+          schema: {
+            type: "string",
+            enum: ["report", "periodical", "recruitments"],
+          },
+        },
+        { name: "keyword", in: "query", description: "검색어", schema: { type: "string" } },
+        {
+          name: "sort",
+          in: "query",
+          description: "정렬 기준 (pubDt=게시일, subj=제목)",
+          schema: { type: "string", enum: ["pubDt", "subj"] },
+        },
+        {
+          name: "order",
+          in: "query",
+          description: "정렬 순서 (asc/desc)",
+          schema: { type: "string", enum: ["asc", "desc"] },
+        },
+        PAGE_PARAM,
+        PAGE_SIZE_PARAM,
+      ],
+    },
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -413,7 +449,7 @@ export function generateOpenApiSpec(
     info: {
       title: "대한민국 국회 API",
       description: "대한민국 국회 열린국회정보 API — 국회의원, 의안, 일정, 회의록, 표결, 청원 등 국회 데이터를 REST API로 제공합니다.",
-      version: "0.2.1",
+      version: "0.7.0",
       contact: {
         name: "assembly-api-mcp",
         url: "https://github.com/hollobit/assembly-api-mcp",

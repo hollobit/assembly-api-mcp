@@ -37,6 +37,23 @@ export interface ApiResult {
   readonly rows: readonly Record<string, unknown>[];
 }
 
+/** NABO API type discriminator — matches the three published endpoints. */
+export type NaboResource = "report" | "periodical" | "recruitments";
+
+/** NABO API error codes returned by https://www.nabo.go.kr/api/v1/*. */
+export const NABO_ERROR_CODES: Record<string, string> = {
+  INVALID_KEY: "NABO 인증키가 유효하지 않습니다. NABO_API_KEY를 확인하세요.",
+  NOT_APPROVED: "NABO 인증키가 아직 승인되지 않았습니다. 관리자 승인 대기 중입니다.",
+  EXPIRED: "NABO 인증키 사용 기간이 만료되었습니다. 재발급이 필요합니다.",
+};
+
+/** NABO endpoint path mapping — used by fetchNabo(). */
+const NABO_ENDPOINTS: Record<NaboResource, string> = {
+  report: "/api/v1/report.do",
+  periodical: "/api/v1/periodical.do",
+  recruitments: "/api/v1/recruitments.do",
+};
+
 // ---------------------------------------------------------------------------
 // Client
 // ---------------------------------------------------------------------------
@@ -163,7 +180,82 @@ export function createApiClient(config: AppConfig) {
     return fetchWithErrorHandling(url);
   }
 
-  return { fetchOpenAssembly, fetchDataGoKr, cache, monitor, rateLimiter };
+  /**
+   * NABO(국회예산정책처) Open API 호출
+   *
+   * Base URL: https://www.nabo.go.kr/api/v1/{report|periodical|recruitments}.do
+   * 인증: key 파라미터 (NABO_API_KEY)
+   * 응답: JSON `{ page, size, total, items: [...] }` (엔드포인트별 필드 상이)
+   *
+   * - NABO는 열린국회정보와 완전히 다른 응답 구조를 사용하므로 전용 파서를 사용합니다.
+   * - INVALID_KEY / NOT_APPROVED / EXPIRED 에러는 명시적 메시지로 변환됩니다.
+   */
+  async function fetchNabo(
+    resource: NaboResource,
+    params: Record<string, string | number> = {},
+  ): Promise<NaboResult> {
+    const { naboApiKey } = config.apiKeys;
+    if (!naboApiKey) {
+      throw new Error(
+        "NABO_API_KEY가 설정되지 않았습니다.\n" +
+          "발급: https://www.nabo.go.kr/ko/api/apply.do?key=2509230004 → SNS 인증 → 관리자 승인",
+      );
+    }
+
+    const path = NABO_ENDPOINTS[resource];
+    if (!path) {
+      throw new Error(`알 수 없는 NABO 리소스: ${resource}`);
+    }
+
+    const queryParams: Record<string, string | number> = {
+      page: 1,
+      size: config.apiResponse.defaultPageSize,
+      ...params,
+    };
+
+    // 캐시 조회 — NABO 요청도 리스트 조회이므로 동적 TTL로 캐시
+    const cacheKey = `nabo:${resource}:${buildCacheKey("", queryParams)}`;
+    const cached = cache.get<NaboResult>(cacheKey);
+    if (cached) return cached;
+
+    const entries = Object.entries(queryParams)
+      .map(
+        ([k, v]) =>
+          `${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`,
+      )
+      .join("&");
+    const url = `${API_BASE_URLS.nabo}${path}?${entries}&key=${encodeURIComponent(naboApiKey)}`;
+
+    const startTime = Date.now();
+    let success = true;
+    try {
+      rateLimiter.increment();
+      const raw = await fetchWithErrorHandling(url);
+      const result = parseNaboResponse(raw);
+      cache.set(cacheKey, result, config.cache.ttlDynamic);
+      return result;
+    } catch (err) {
+      success = false;
+      throw err;
+    } finally {
+      monitor.record({
+        apiCode: `nabo:${resource}`,
+        durationMs: Date.now() - startTime,
+        timestamp: Date.now(),
+        success,
+      });
+    }
+  }
+
+  return { fetchOpenAssembly, fetchDataGoKr, fetchNabo, cache, monitor, rateLimiter };
+}
+
+/** NABO API 응답 공통 형태 */
+export interface NaboResult {
+  readonly page: number;
+  readonly size: number;
+  readonly total: number;
+  readonly items: readonly Record<string, unknown>[];
 }
 
 /** createApiClient 반환 타입 */
@@ -237,6 +329,46 @@ function parseOpenAssemblyResponse(
   }
 
   return extractFromArrayResponse(data);
+}
+
+function parseNaboResponse(raw: unknown): NaboResult {
+  if (typeof raw !== "object" || raw === null) {
+    throw new Error("NABO 응답 형식 오류: 객체가 아닙니다.");
+  }
+
+  const obj = raw as Record<string, unknown>;
+
+  // NABO 에러 응답: { code: "INVALID_KEY" | "NOT_APPROVED" | "EXPIRED", message: "..." }
+  const errorCode = typeof obj.code === "string" ? obj.code : undefined;
+  if (errorCode && errorCode in NABO_ERROR_CODES) {
+    const description = NABO_ERROR_CODES[errorCode] ?? String(obj.message ?? "알 수 없는 오류");
+    throw new Error(`NABO API 오류 [${errorCode}]: ${description}`);
+  }
+
+  // 정상 응답: { page, size, total, items|list|rows: [...] }
+  const items = Array.isArray(obj.items)
+    ? (obj.items as Record<string, unknown>[])
+    : Array.isArray(obj.list)
+      ? (obj.list as Record<string, unknown>[])
+      : Array.isArray(obj.rows)
+        ? (obj.rows as Record<string, unknown>[])
+        : [];
+
+  const toInt = (v: unknown, fallback: number): number => {
+    if (typeof v === "number") return v;
+    if (typeof v === "string") {
+      const n = parseInt(v, 10);
+      return Number.isNaN(n) ? fallback : n;
+    }
+    return fallback;
+  };
+
+  return {
+    page: toInt(obj.page, 1),
+    size: toInt(obj.size, items.length),
+    total: toInt(obj.total, items.length),
+    items,
+  };
 }
 
 function extractFromArrayResponse(

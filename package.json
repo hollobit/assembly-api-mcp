@@ -1,7 +1,7 @@
 {
   "name": "assembly-api-mcp",
-  "version": "0.3.0",
-  "description": "대한민국 국회 Open API MCP 서버 — 국회의원, 의안, 일정, 회의록 등 국회 데이터 접근",
+  "version": "0.7.0",
+  "description": "대한민국 국회 Open API MCP 서버 — 국회의원·의안·일정·회의록·국민참여입법센터·국회예산정책처(NABO) 통합 (287개 API, 입법 라이프사이클 전구간)",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
