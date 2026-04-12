@@ -17,6 +17,16 @@ Purpose:国会(open.assembly.go.kr) + 국민참여입법센터(lawmaking.go.kr) 
 
 ---
 
+## Phase 2: README 교차 검색 예제 추가
+
+Purpose: README에 2~3개 API 소스를 함께 사용하는 CLI 복합 예제 추가
+
+| Task | 내용 | DoD | Depends | Status |
+|------|------|-----|---------|--------|
+| 2.1 | 교차 검색 README 섹션 추가 — cross 명령어 3가지 조합 예제 |assembly+nabo, lawmaking+nabo, assembly+lawmaking+nabo 3가지 예제 포함 | - | cc:완료 |
+
+---
+
 ## 구현 방향
 
 ### cross 명령 설계

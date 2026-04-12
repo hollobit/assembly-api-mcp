@@ -469,6 +469,55 @@ npx tsx src/cli.ts nabo --type recruitments
 npx tsx src/cli.ts nabo --type report --page 2 --size 20
 ```
 
+### 교차 검색 (2~3개 API 소스 통합)
+
+`cross` 명령어로国会(open.assembly.go.kr) + 국민참여입법센터(lawmaking.go.kr) + NABO(nabo.go.kr)를 동시에 검색합니다.
+
+```bash
+# 2개 소스:国会 + NABO (예: "교육" 관련 의안과 예산 분석보고서 동시 검색)
+npx tsx src/cli.ts cross --keyword 교육 --sources assembly,nabo
+
+# 2개 소스: 국민참여입법센터 + NABO (예: "교통" 관련 입법예고와 NABO 보고서 동시 검색)
+npx tsx src/cli.ts cross --keyword 교통 --sources lawmaking,nabo
+
+# 3개 소스:国会 + 국민참여입법센터 + NABO (예: "의료" 관련 입법 전/중/후 데이터 통합 검색)
+npx tsx src/cli.ts cross --keyword 의료 --sources assembly,lawmaking,nabo
+
+# 전체 소스 (기본값, --sources all)
+npx tsx src/cli.ts cross --keyword 예산 --sources all --size 10
+```
+
+**출력 예시 (`--sources assembly,lawmaking,nabo`):**
+```
+=== "교육" 교차 검색 (국회, 국민참여입법센터, NABO) ===
+
+[국회(assembly)] 의안 검색 (총 N건)
+BILL_NO  | BILL_NAME               | COMMITTEE  | PROC_RESULT
+---------|-------------------------|------------|------------
+2201234  | 교육기본법 일부개정법률안 | 교육위원회  | 계류
+
+[국민참여입법센터(lawmaking)] 입법예고 (총 N건)
+법령명         | 소관부처 | 공고일자
+--------------|----------|----------
+교육기본법     |教育部    | 2026.03.01
+
+[NABO(nabo.go.kr)] NABO 보고서 (총 N건)
+제목                      | 작성부서 | 게시일
+--------------------------|----------|--------
+2026 교육예산 분석보고서   | NABO     | 2026.03.15
+```
+
+**소스 조합 가이드:**
+
+| 조합 | 용도 | 설명 |
+|------|------|------|
+| `assembly,nabo` | 입법 중 + 입법 후 | 의안 심사경과 + NABO 예산 분석 |
+| `lawmaking,nabo` | 입법 전 + 입법 후 | 입법예고 + NABO 정책보고서 |
+| `assembly,lawmaking` | 입법 전 + 입법 중 | 입법예고 + 실제 의안 검색 |
+| `all` (기본) | 입법 전/중/후 전체 | 입법 라이프사이클 완전 추적 |
+
+> `cross` 명령어는 각 소스를 병렬로 호출하므로 1개 소스 장애 시에도 다른 소스 결과는 정상 반환됩니다.
+
 ## 문서
 
 | 문서 | 설명 |
