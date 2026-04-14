@@ -6,6 +6,8 @@ Claude, Gemini, ChatGPT 등 AI 도구에서 국회의원, 의안, 일정, 회의
 
 ***국가 AI 전환(AX)은 AI 챗봇쓴다고 되지 않죠. 국민들의 일상이 AI로 편리해져야 그것이 진정한 네이티브 AI 시대겠죠***
 
+> 디자인 자료는 별도 워크스페이스에서 관리합니다: [design/README.md](design/README.md)
+
 ## 업데이트 내역
 
 > **전체 변경사항:** [CHANGELOG](docs/CHANGELOG.md) | **v0.3→v0.4 마이그레이션:** [MIGRATION.md](MIGRATION.md)
@@ -523,10 +525,12 @@ BILL_NO  | BILL_NAME               | COMMITTEE  | PROC_RESULT
 | 문서 | 설명 |
 |------|------|
 | [QUICK_START.md](QUICK_START.md) | 5분 안에 시작하는 빠른 설정 가이드 |
+| [design/README.md](design/README.md) | 디자인 자료 저장 규칙 및 외부 디자인 도구 사용 가이드 |
+| [design/DESIGN.md](design/DESIGN.md) | 이 저장소의 canonical 디자인 기준 문서 |
 | [docs/api-catalog.md](docs/api-catalog.md) | 국회 Open API 276개 전체 목록 (카테고리별 분류) |
 | [docs/mcp-api.md](docs/mcp-api.md) | MCP 도구 ↔ 국회 API 코드 매핑 (271개 발굴, 107개 통합) |
 | [docs/discovered-codes.md](docs/discovered-codes.md) | API 코드 발굴 과정 및 검증된 엔드포인트 파라미터 |
-| [docs/mcp-design-analysis.md](docs/mcp-design-analysis.md) | MCP 도구 설계 분석 — Lite/Full 프로필 결정 근거 |
+| [docs/mcp-design-analysis.md](docs/mcp-design-analysis.md) | MCP 도구 설계 분석 문서 — Lite/Full 프로필 결정 근거 |
 | [docs/legislative-lifecycle.md](docs/legislative-lifecycle.md) | 입법 라이프사이클 완전 가이드 — 입법 전/중/후 데이터 추적 |
 
 ## 문제 해결
@@ -636,6 +640,9 @@ assembly-api/
 ├── tests/                    # 단위 테스트 (235개)
 ├── examples/
 │   └── api-tester.html       # 브라우저 API 테스터
+├── design/
+│   ├── DESIGN.md             # canonical 디자인 기준 문서
+│   └── README.md             # 디자인 자료 저장 규칙
 ├── docs/
 │   ├── api-catalog.md        # 국회 API 276개 전체 목록
 │   ├── mcp-api.md            # MCP 도구 ↔ API 매핑

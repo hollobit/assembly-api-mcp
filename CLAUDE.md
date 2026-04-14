@@ -21,6 +21,12 @@ Key routing rules:
 - API 커버율 분석 → invoke analyze-mcp
 - 도구 코드 구현/수정 → invoke implement-mcp
 
+## Design files
+
+- Visual/site/brand work must use `./design/DESIGN.md` as the source of truth.
+- External design references and generated design docs belong under `./design/`, not `./docs/` or `_workspace/`.
+- `docs/mcp-design-analysis.md` is tool architecture analysis, not the canonical visual design file.
+
 ---
 
 ## 하네스: 국회 MCP 서버 개선
