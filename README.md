@@ -680,6 +680,7 @@ docker compose up -d
 ## Star history
 
 [![Star History Chart](https://starchart.cc/hollobit/assembly-api-mcp.svg)](https://starchart.cc/hollobit/assembly-api-mcp)
+[![MCP status](https://mcpvitals.com/badge/552f486be5.svg)](https://mcpvitals.com/status/552f486be5)
 
 ## 라이선스
 
